@@ -61,11 +61,11 @@ public class EmailService {
     }
 
     //인증 코드 검증
-    public boolean verifyAuthCode(String email, String code){
+    public boolean verifyAuthCode(String email, String authCode){
         String key = "authCode:" + email;
         String storedCode = redisTemplate.opsForValue().get(key);
 
         // 저장된 코드가 null이거나 만료된 경우 false 반환
-        return storedCode != null && storedCode.equals(code);
+        return storedCode != null && storedCode.equals(authCode);
     }
 }

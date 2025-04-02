@@ -1,4 +1,4 @@
-package dankook.capstone.auth;
+package dankook.capstone.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

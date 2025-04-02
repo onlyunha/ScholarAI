@@ -17,5 +17,5 @@ public class EmailVerificationDto {
     private String email;
 
     @NotBlank
-    private String code;
+    private String authCode;
 }
