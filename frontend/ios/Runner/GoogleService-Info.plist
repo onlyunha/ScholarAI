@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>538909784173-3emrpjm84felvmauf0s5bqj64m954021.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.538909784173-3emrpjm84felvmauf0s5bqj64m954021</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAqXsrDVL1a6ljdIOaDW_MGvIDdmP06Zb8</string>
+	<key>GCM_SENDER_ID</key>
+	<string>538909784173</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>edu.dku.scholarai.scholarai</string>
+	<key>PROJECT_ID</key>
+	<string>scholarai-1f4ae</string>
+	<key>STORAGE_BUCKET</key>
+	<string>scholarai-1f4ae.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:538909784173:ios:4c48cb5247595384d3e764</string>
+</dict>
+</plist>

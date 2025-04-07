@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "538909784173",
+    "project_id": "scholarai-1f4ae",
+    "storage_bucket": "scholarai-1f4ae.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:538909784173:android:1d4e76c4fa354932d3e764",
+        "android_client_info": {
+          "package_name": "edu.dku.scholarai.scholarai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "538909784173-ivb8pgs0dmr4lfsr7795gu3tvth261kg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD4hC1cYC4-vnexIKZR5vvIPJ15gf-dstI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "538909784173-ivb8pgs0dmr4lfsr7795gu3tvth261kg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
