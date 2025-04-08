@@ -13,6 +13,7 @@ public class Member {
     @Column(name = "member_id")
     private Long id;
 
+    @Column(nullable = false)
     private String name; //이름
 
     @Column(nullable = false, unique = true)
@@ -20,21 +21,32 @@ public class Member {
 
     private String password; //비밀번호
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "profile_id")
-    private Profile profile; //회원 프로필
-
     private String role; //USER, ADMIN
 
     private String provider; //local, kakao, google
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "profile_id")
+    private Profile profile; //회원 프로필
 
     @Builder //DTO -> 엔티티
     public Member(String name, String email, String password, Profile profile, String role, String provider) {
         this.name = name;
         this.email = email;
         this.password = password;
-        this.profile = profile;
         this.role = role;
         this.provider = provider;
+
+        if (profile != null) {
+            this.setProfile(profile); // null이면 아무 동작 안함
+        }
+    }
+
+    //연관관계 편의 메서드
+    public void setProfile(Profile profile){
+        this.profile = profile;
+        if (profile.getMember() != this) {
+            profile.setMember(this);
+        }
     }
 }
