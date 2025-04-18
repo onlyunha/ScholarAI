@@ -1,5 +1,6 @@
 package dankook.capstone.dto;
 
+import dankook.capstone.domain.FinancialAidType;
 import dankook.capstone.domain.Scholarship;
 import lombok.Builder;
 import lombok.Getter;

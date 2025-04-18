@@ -8,6 +8,7 @@ class CapstoneApplicationTests {
 
 	@Test
 	void contextLoads() {
+		System.out.println("테스트 통과");
 	}
 
 }
