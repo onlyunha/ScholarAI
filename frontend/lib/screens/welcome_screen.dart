@@ -13,7 +13,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../constants.dart';
 import 'login_screen.dart';
-import 'main_screen.dart';
+import 'home/main_screen.dart';
 import 'signup_screen.dart';
 
 // 시작 화면 (Welcome)

@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../constants.dart';
-import 'main_screen.dart';
+import 'home/main_screen.dart';
 
 // 회원가입 - 이름 설정 화면
 class WelcomeNameScreen extends StatefulWidget {
