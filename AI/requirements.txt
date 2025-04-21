@@ -1,7 +1,9 @@
-fastapi
-uvicorn
-pydantic
-pandas
-scikit-learn
-python-dotenv
-torch
+langchain==0.1.13
+langchain-community==0.0.33
+langchain-openai==0.0.8
+openai==1.14.3
+tiktoken==0.5.2
+faiss-cpu==1.7.4
+jq
+python-dotenv==1.0.1
+tqdm
