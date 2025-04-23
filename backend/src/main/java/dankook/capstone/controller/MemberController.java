@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/auth")
+@RequestMapping("/api")
 public class MemberController {
 
     private final MemberService memberService;
@@ -21,7 +21,7 @@ public class MemberController {
      * 회원가입 API
      * - 클라이언트가 JSON 형식으로 데이터를 보내면 해당 데이터를 MemberJoinDto 객체로 변환.
      */
-    @PostMapping("/signup")
+    @PostMapping("/auth/signup")
     public ResponseEntity<ResponseDto<Long>> signUp(@RequestBody @Valid MemberJoinDto memberJoinDto){
         Long memberId = memberService.join(memberJoinDto); // 회원가입 로직 실행
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -29,14 +29,14 @@ public class MemberController {
     }
 
     //이메일 인증 코드 발송 API
-    @PostMapping("/sendEmail")
+    @PostMapping("/auth/sendEmail")
     public ResponseEntity<ResponseDto<Void>> sendVerificationEmail(@RequestBody @Valid EmailRequestDto emailRequestDto){
         emailService.sendAuthCode(emailRequestDto.getEmail());
         return ResponseEntity.ok(new ResponseDto<>("인증 코드가 이메일로 전송되었습니다.", null));
     }
 
     //이메일 인증 코드 확인 API
-    @PostMapping("/verifyEmail")
+    @PostMapping("/auth/verifyEmail")
     public ResponseEntity<ResponseDto<Void>> verifyAuthCode(@RequestBody @Valid EmailVerificationDto emailVerificationDto) {
         boolean isValid = emailService.verifyAuthCode(emailVerificationDto.getEmail(), emailVerificationDto.getAuthCode());
         if (isValid) {
@@ -47,6 +47,17 @@ public class MemberController {
         }
     }
 
+    //회원 이름 수정
+    @PatchMapping("/auth/name")
+    public ResponseEntity<ResponseDto<Void>> updateName(@RequestBody @Valid UpdateNameRequestDto updateNameRequestDto){
+        try {
+            memberService.updateName(updateNameRequestDto.getEmail(), updateNameRequestDto.getName());
+            return ResponseEntity.ok(new ResponseDto<>("이름이 성공적으로 변경되었습니다.", null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseDto<>("이름 변경에 실패했습니다: " + e.getMessage(), null));
+        }
+    }
 
 
 }

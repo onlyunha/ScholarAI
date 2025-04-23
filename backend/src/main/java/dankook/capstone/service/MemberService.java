@@ -53,5 +53,15 @@ public class MemberService {
         }
     }
 
+    //회원 이름 수정
+    @Transactional
+    public void updateName(String email, String newName){
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일입니다."));
+
+        member.updateName(newName); // 이름 변경
+    }
+
+
 
 }
