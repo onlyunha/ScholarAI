@@ -12,9 +12,9 @@ import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../constants.dart';
-import 'login_screen.dart';
+import 'auth/login_screen.dart';
 import 'home/main_screen.dart';
-import 'signup_screen.dart';
+import 'auth/signup_screen.dart';
 
 // 시작 화면 (Welcome)
 class WelcomeScreen extends StatelessWidget {

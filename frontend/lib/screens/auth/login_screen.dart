@@ -9,8 +9,8 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../constants.dart';
-import 'home/main_screen.dart';
+import '../../constants.dart';
+import '../home/main_screen.dart';
 import 'signup_screen.dart';
 
 // 로그인 화면

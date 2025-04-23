@@ -9,7 +9,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../constants.dart';
+import '../../constants.dart';
 import 'welcome_name_screen.dart';
 
 // 회원가입 - 비밀번호 설정 화면

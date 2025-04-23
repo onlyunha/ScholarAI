@@ -1,16 +1,8 @@
-/// =============================================================
-/// File : welcome_screen.dart
-/// Desc : <<개발중>>
-/// Auth : yunha Hwang (DKU)
-/// Crtd : 2025-04-02
-/// Updt : 2025-04-07
-/// =============================================================
-
 import 'package:flutter/material.dart';
-import '../../../constants.dart';
 import 'tabs/home_tab.dart';
-import 'tabs/calendar_tab.dart';
-import 'tabs/forum_tab.dart';
+import 'tabs/scholarship_tab.dart';
+import 'tabs/bookmark_tab.dart';
+import 'tabs/community_tab.dart';
 import 'tabs/settings_tab.dart';
 
 class MainScreen extends StatefulWidget {
@@ -23,30 +15,45 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
-final List<Widget> _tabs = [
-  const HomeTab(),
-  const CalendarTab(),
-  const ForumTab(),
-  const SettingsTab(),
-];
+  final List<Widget> _tabs = const [
+    HomeTab(),
+    ScholarshipTab(),
+    BookmarkTab(),
+    CommunityTab(),
+    SettingsTab(),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: _tabs[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        selectedItemColor: kPrimaryColor,
-        unselectedItemColor: Colors.grey,
+        onTap: (index) => setState(() => _currentIndex = index),
         type: BottomNavigationBarType.fixed,
-        onTap: (index) {
-          setState(() => _currentIndex = index);
-        },
+        selectedItemColor: Theme.of(context).colorScheme.primary,
+        unselectedItemColor: Colors.grey,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: '홈'),
-          BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: '일정'),
-          BottomNavigationBarItem(icon: Icon(Icons.forum), label: '게시판'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: '설정'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: '홈',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.school),
+            label: '장학금',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bookmark_border),
+            label: '찜',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.forum_outlined),
+            label: '커뮤니티',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: '설정',
+          ),
         ],
       ),
     );

@@ -9,8 +9,8 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../constants.dart';
-import 'home/main_screen.dart';
+import '../../constants.dart';
+import '../home/main_screen.dart';
 
 // 회원가입 - 이름 설정 화면
 class WelcomeNameScreen extends StatefulWidget {
@@ -178,10 +178,10 @@ class _WelcomeNameScreenState extends State<WelcomeNameScreen> {
                 const SizedBox(height: 12),
 
                 // ✅ 임시 버튼
-                TextButton(
-                  onPressed: handleSkip,
-                  child: const Text('스킵 →', style: TextStyle(fontSize: 12)),
-                ),
+                // TextButton(
+                //   onPressed: handleSkip,
+                //   child: const Text('스킵 →', style: TextStyle(fontSize: 12)),
+                // ),
               ],
             ),
           ),

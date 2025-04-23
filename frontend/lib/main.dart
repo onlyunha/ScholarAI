@@ -7,6 +7,7 @@
 /// =============================================================
 
 import 'package:flutter/material.dart';
+import 'package:scholarai/screens/home/tabs/scholarship_tab.dart';
 import 'constants.dart';
 import 'screens/welcome_screen.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
