@@ -39,8 +39,19 @@ public class EmailService {
         redisTemplate.opsForValue().set(key, authCode, Duration.ofMinutes(5));
 
         // 이메일 전송
-        String subject = "이메일 인증 코드";
-        String content = "인증 코드: " + authCode + "\n5분 안에 입력해주세요.";
+        String subject = "[ScholarAI] 이메일 인증 코드 안내";
+        String content =
+                "🎓 ScholarAI - 내 손 안의 기회\n\n" +
+                "안녕하세요, ScholarAI입니다.\n" +
+                "당신만을 위한 맞춤형 장학금 추천 서비스를 시작하기 위해\n" +
+                "아래의 인증 코드를 입력해주세요.\n\n" +
+                "✅ 이메일 인증 코드: " + authCode + "\n\n" +
+                "본 인증 코드는 발송 시점부터 5분간만 유효하며,\n" +
+                "타인에게 노출되지 않도록 주의해주세요.\n\n" +
+                "지금 바로 ScholarAI에서 당신에게 꼭 맞는 장학금을 찾아보세요!\n\n" +
+                "감사합니다.\n" +
+                "ScholarAI 드림";
+
         sendEmail(email, subject, content);
     }
 

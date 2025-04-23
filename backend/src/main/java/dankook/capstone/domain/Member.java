@@ -49,4 +49,9 @@ public class Member {
             profile.setMember(this);
         }
     }
+
+    //회원 이름 수정
+    public void updateName(String name){
+        this.name = name;
+    }
 }

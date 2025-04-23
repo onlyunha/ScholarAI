@@ -17,18 +17,14 @@ public class ScholarshipService {
 
     private final ScholarshipRepository scholarshipRepository;
 
-//    //운영기관명 또는 상품명을 키워드로
-//    public List<Scholarship> searchScholarshipsByKeyword(String keyword){
-//        return scholarshipRepository.searchScholarshipsByKeyword(keyword);
-//    }
-//
-//    //학자금유형구분 & 모집중 필터
-//    public List<Scholarship> searchScholarshipsByFilters(List<FinancialAidType> types, boolean onlyRecruiting){
-//        return scholarshipRepository.searchScholarshipsByFilters(types, onlyRecruiting);
-//    }
-
-    //통합
+    //장학금 검색&필터링
     public Page<Scholarship> searchScholarships(ScholarshipSearchCondition condition, Pageable pageable){
         return scholarshipRepository.searchScholarships(condition, pageable);
+    }
+
+    //장학금 조회
+    public Scholarship findById(Long id){
+        return scholarshipRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 장학금입니다. ID: " + id));
     }
 }
