@@ -8,6 +8,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:scholarai/constants/app_colors.dart';
+import 'package:scholarai/constants/app_images.dart';
 import 'package:scholarai/screens/settings/profile_view_screen.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -23,7 +24,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 1,
       leading: Padding(
         padding: const EdgeInsets.all(12),
-        child: Image.asset('assets/main_logo.png', color: kPrimaryColor),
+        child: Image.asset(AppImages.mainLogo, color: kPrimaryColor),
       ),
       actions: [
         Padding(
@@ -32,7 +33,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             children: [
               IconButton(
                 icon: Image.asset(
-                  'assets/AI_logo.png',
+                  AppImages.aiLogo,
                   height: 30,
                   width: 30,
                   color: kPrimaryColor,

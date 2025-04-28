@@ -11,4 +11,5 @@ class AppRoutes {
   static const main = '/main';
   static const welcomeName = '/welcome-name';
   static const password = '/password';
+  static const login = '/login';
 }

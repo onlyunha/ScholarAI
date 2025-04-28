@@ -7,10 +7,13 @@
 /// =============================================================
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:http/http.dart' as http;
 import 'package:scholarai/constants/app_colors.dart';
+import 'package:scholarai/constants/app_images.dart';
+import 'package:scholarai/constants/app_routes.dart';
 import 'package:scholarai/constants/config.dart';
 import 'dart:convert';
 import 'auth/login_screen.dart';
@@ -23,10 +26,7 @@ class WelcomeScreen extends StatelessWidget {
 
   // 이메일 로그인 화면으로 이동
   void goToLogin(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const LoginScreen()),
-    );
+    context.go(AppRoutes.login); // 수정
   }
 
   // 구글 로그인 처리
@@ -116,7 +116,7 @@ class WelcomeScreen extends StatelessWidget {
                 Column(
                   children: [
                     Image.asset(
-                      'assets/main_logo.png',
+                      AppImages.mainLogo,
                       height: 120,
                       color: kPrimaryColor,
                     ),
@@ -168,7 +168,7 @@ class WelcomeScreen extends StatelessWidget {
 
                 // Google 로그인 버튼
                 customSocialButton(
-                  assetPath: 'assets/google_logo.png',
+                  assetPath: AppImages.googleLogo,
                   text: 'Google로 계속하기',
                   backgroundColor: const Color(0xFFf2f2f2),
                   textColor: Colors.black,
@@ -179,7 +179,7 @@ class WelcomeScreen extends StatelessWidget {
 
                 // KaKao 로그인 버튼
                 customSocialButton(
-                  assetPath: 'assets/kakao_logo.png',
+                  assetPath: AppImages.kakaoLogo,
                   text: 'Kakao로 계속하기',
                   backgroundColor: const Color(0xFFFEE500),
                   textColor: Colors.black,
@@ -196,10 +196,7 @@ class WelcomeScreen extends StatelessWidget {
                 // 이메일 회원가입 버튼
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const SignupScreen()),
-                    );
+                    context.go(AppRoutes.signup); 
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: kPrimaryColor,
@@ -227,10 +224,7 @@ class WelcomeScreen extends StatelessWidget {
                 // ✅ 임시 버튼
                 TextButton(
                   onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (_) => const MainScreen()),
-                    );
+                    context.go(AppRoutes.main);
                   },
                   child: const Text(
                     '메인화면으로 이동 →',
