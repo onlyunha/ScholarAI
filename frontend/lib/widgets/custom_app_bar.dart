@@ -1,4 +1,13 @@
+/// =============================================================
+/// File : custom_app_bar.dart
+/// Desc : 앱 상단바
+/// Auth : yunha Hwang (DKU)
+/// Crtd : 2025-04-19
+/// Updt : 2025-04-23
+/// =============================================================
+
 import 'package:flutter/material.dart';
+import 'package:scholarai/screens/settings/profile_view_screen.dart';
 import '../../constants.dart';
 import '../../screens/settings/profile_edit_screen.dart';
 
@@ -44,7 +53,7 @@ actions: [
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => const ProfileEditScreen(),
+                builder: (_) => const ProfileViewScreen(),
               ),
             );
           },

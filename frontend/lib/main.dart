@@ -3,7 +3,7 @@
 /// Desc : 메인
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-03-23
-/// Updt : 2025-04-07
+/// Updt : 2025-04-23
 /// =============================================================
 
 import 'package:flutter/material.dart';
@@ -11,6 +11,9 @@ import 'package:scholarai/screens/home/tabs/scholarship_tab.dart';
 import 'constants.dart';
 import 'screens/welcome_screen.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
+import 'package:provider/provider.dart';
+import 'package:scholarai/providers/user_profile_provider.dart';
+
 
 
 // 앱의 진입점
@@ -23,8 +26,15 @@ void main() {
     FlutterError.presentError(details);
   };
 
-  // 앱 실행
-  runApp(const MyApp());
+  // Provider 포함하여 앱 실행
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserProfileProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

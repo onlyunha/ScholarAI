@@ -3,10 +3,11 @@
 /// Desc : 회원가입 - 이름 설정
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-04
-/// Updt : 2025-04-07
+/// Updt : 2025-04-28
 /// =============================================================
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../constants.dart';
@@ -58,11 +59,7 @@ class _WelcomeNameScreenState extends State<WelcomeNameScreen> {
 
       // 성공: 메인화면으로 이동
       if (response.statusCode == 200) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (_) => const MainScreen()),
-          (route) => false,
-        );
+        context.go('/main');
 
       // 실패: 오류 메시지
       } else {
@@ -83,14 +80,6 @@ class _WelcomeNameScreenState extends State<WelcomeNameScreen> {
     }
   }
 
-  // ✅ 임시 코드 - 디버깅용 (메인화면 이동)
-  void handleSkip() {
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (_) => const MainScreen()),
-      (route) => false,
-    );
-  }
 
   @override
   Widget build(BuildContext context) {

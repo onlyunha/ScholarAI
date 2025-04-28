@@ -3,10 +3,11 @@
 /// Desc : 회원가입 - 비밀번호 설정
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-04
-/// Updt : 2025-04-07
+/// Updt : 2025-04-28
 /// =============================================================
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../constants.dart';
@@ -97,12 +98,9 @@ class _PasswordScreenState extends State<PasswordScreen>
 
       // 회원가입 성공: 이름 설정 화면으로 이동
       if (response.statusCode == 201) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => WelcomeNameScreen(email: widget.email),
-          ),
-        );
+        context.go('/welcome-name', extra: {
+  'email': widget.email,
+});
       
       // 회원가입 실패: 에러 메시지
       } else {
@@ -116,16 +114,6 @@ class _PasswordScreenState extends State<PasswordScreen>
         errorMessage = '네트워크 오류가 발생했습니다.';
       });
     }
-  }
-
-  // ✅ 임시버튼
-  void handleSkip() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => WelcomeNameScreen(email: widget.email),
-      ),
-    );
   }
 
   @override
@@ -260,13 +248,6 @@ class _PasswordScreenState extends State<PasswordScreen>
                 ),
 
                 const SizedBox(height: 12),
-
-                // ✅ 임시 버튼
-                TextButton(
-                  onPressed: handleSkip,
-                  child: const Text('스킵 →',
-                      style: TextStyle(fontSize: 12, color: Colors.black54)),
-                ),
               ],
             ),
           ),

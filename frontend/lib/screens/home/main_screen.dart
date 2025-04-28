@@ -1,3 +1,11 @@
+/// =============================================================
+/// File : main_screen.dart
+/// Desc : 메인 탭
+/// Auth : yunha Hwang (DKU)
+/// Crtd : 2025-04-19
+/// Updt : 2025-04-28
+/// =============================================================
+
 import 'package:flutter/material.dart';
 import 'tabs/home_tab.dart';
 import 'tabs/scholarship_tab.dart';

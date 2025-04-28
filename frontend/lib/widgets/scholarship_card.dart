@@ -1,3 +1,11 @@
+/// =============================================================
+/// File : scholarship_card.dart
+/// Desc : 장학금 카드 (아직 미사용 개발중)
+/// Auth : yunha Hwang (DKU)
+/// Crtd : 2025-04-21
+/// Updt : 2025-04-23
+/// =============================================================
+
 import 'package:flutter/material.dart';
 import '../constants.dart';
 

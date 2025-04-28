@@ -3,10 +3,11 @@
 /// Desc : 이메일과 비밀번호를 이용한 로그인 화면 UI 및 기능 구현
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-02
-/// Updt : 2025-04-07
+/// Updt : 2025-04-28
 /// =============================================================
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../constants.dart';
@@ -71,10 +72,8 @@ class _LoginScreenState extends State<LoginScreen>
 
     // 성공: 메인 화면으로 이동 
     if (response.statusCode == 200) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const MainScreen()),
-      );
+      context.go('/signup');
+
 
     // 실패: 에러 메시지 + shake 애니메이션 
     } else {
@@ -90,10 +89,7 @@ class _LoginScreenState extends State<LoginScreen>
 
   // 회원 가입 화면 이동 함수
   void goToSignup() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const SignupScreen()),
-    );
+context.go('/main');
   }
 
   @override

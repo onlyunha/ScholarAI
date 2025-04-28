@@ -1,3 +1,11 @@
+/// =============================================================
+/// File : schoarlship_tab.dart
+/// Desc : 장학금 검색 + 추천
+/// Auth : yunha Hwang (DKU)
+/// Crtd : 2025-04-21
+/// Updt : 2025-04-23
+/// =============================================================
+
 import 'package:flutter/material.dart';
 import '../../../constants.dart';
 import '../../../widgets/custom_app_bar.dart';
