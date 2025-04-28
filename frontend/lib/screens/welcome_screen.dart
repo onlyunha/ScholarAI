@@ -3,15 +3,16 @@
 /// Desc : 앱의 시작화면 - 로그인/회원가입 진입 제공
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-02
-/// Updt : 2025-04-07
+/// Updt : 2025-04-28
 /// =============================================================
 
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:http/http.dart' as http;
+import 'package:scholarai/constants/app_colors.dart';
+import 'package:scholarai/constants/config.dart';
 import 'dart:convert';
-import '../constants.dart';
 import 'auth/login_screen.dart';
 import 'home/main_screen.dart';
 import 'auth/signup_screen.dart';
@@ -117,7 +118,7 @@ class WelcomeScreen extends StatelessWidget {
                     Image.asset(
                       'assets/main_logo.png',
                       height: 120,
-                      color: kPrimaryColor, 
+                      color: kPrimaryColor,
                     ),
                     const SizedBox(height: 0),
                     const Text.rich(
@@ -149,7 +150,7 @@ class WelcomeScreen extends StatelessWidget {
                     ),
 
                     const SizedBox(height: 2),
-                    
+
                     const Text(
                       '내 손 안의 기회, 당신만을 위한 맞춤형 장학금',
                       style: TextStyle(

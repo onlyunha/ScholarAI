@@ -3,14 +3,13 @@
 /// Desc : 프로필 보기 화면
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-21
-/// Updt : 2025-04-23
+/// Updt : 2025-04-28
 /// =============================================================
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../../../constants.dart';
-import 'profile_edit_screen.dart';
+import 'package:scholarai/constants/app_colors.dart';
 import '../../../providers/user_profile_provider.dart';
 
 class ProfileViewScreen extends StatelessWidget {
@@ -19,7 +18,10 @@ class ProfileViewScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<UserProfileProvider>();
-    final age = user.birthYear == null ? '' : '만 ${DateTime.now().year - user.birthYear!}세';
+    final age =
+        user.birthYear == null
+            ? ''
+            : '만 ${DateTime.now().year - user.birthYear!}세';
 
     return Scaffold(
       appBar: AppBar(
@@ -73,10 +75,14 @@ class ProfileViewScreen extends StatelessWidget {
             if (user.gender != null || user.region != null)
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text('${user.gender ?? ''}${user.gender != null && user.region != null ? ', ' : ''}${user.region ?? ''} 거주'),
+                child: Text(
+                  '${user.gender ?? ''}${user.gender != null && user.region != null ? ', ' : ''}${user.region ?? ''} 거주',
+                ),
               ),
             const SizedBox(height: 24),
-            if (user.university != null || user.universityType != null || user.academicStatus != null)
+            if (user.university != null ||
+                user.universityType != null ||
+                user.academicStatus != null)
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -85,7 +91,8 @@ class ProfileViewScreen extends StatelessWidget {
               ),
             const Spacer(),
             ElevatedButton(
-              onPressed: () {context.go('/profile-edit');
+              onPressed: () {
+                context.go('/profile-edit');
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: kPrimaryColor,

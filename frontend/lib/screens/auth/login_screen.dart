@@ -10,9 +10,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../../constants.dart';
-import '../home/main_screen.dart';
-import 'signup_screen.dart';
+import 'package:scholarai/constants/app_images.dart';
+import '../../constants/app_routes.dart';
+import '../../constants/app_strings.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/constants.dart';
+import '../../constants/config.dart';
 
 // 로그인 화면
 class LoginScreen extends StatefulWidget {
@@ -72,16 +75,16 @@ class _LoginScreenState extends State<LoginScreen>
 
     // 성공: 메인 화면으로 이동 
     if (response.statusCode == 200) {
-      context.go('/signup');
+      context.go(AppRoutes.main);
 
 
     // 실패: 에러 메시지 + shake 애니메이션 
     } else {
       final resBody = jsonDecode(response.body);
       if (resBody['message'].toString().contains('이메일')) {
-        setState(() => errorMessage = '이메일을 다시 확인해주세요.');
+        setState(() => errorMessage = AppStrings.emailError);
       } else {
-        setState(() => errorMessage = '비밀번호를 다시 확인해주세요.');
+        setState(() => errorMessage = AppStrings.passwordError);
       }
       _shakeController.forward(from: 0);
     }
@@ -89,7 +92,7 @@ class _LoginScreenState extends State<LoginScreen>
 
   // 회원 가입 화면 이동 함수
   void goToSignup() {
-context.go('/main');
+    context.go(AppRoutes.signup);
   }
 
   @override
@@ -108,15 +111,15 @@ context.go('/main');
 
                 // 어플 로고
                 Image.asset(
-                  'assets/main_logo.png',
-                  height: 100,
+                  AppImages.mainLogo,
+                  height: kLogoHeight,
                   color: kPrimaryColor,
                 ),
                 const SizedBox(height: 16),
 
                 // 로그인 타이틀
                 const Text(
-                  '로그인',
+                  AppStrings.loginTitle,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontFamily: 'Pretendard',
@@ -131,9 +134,9 @@ context.go('/main');
                 TextField(
                   controller: emailController,
                   decoration: InputDecoration(
-                    labelText: '이메일',
+                    labelText: AppStrings.email,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(kDefaultBorderRadius),
                     ),
                   ),
                 ),
@@ -144,9 +147,9 @@ context.go('/main');
                   controller: passwordController,
                   obscureText: true,
                   decoration: InputDecoration(
-                    labelText: '비밀번호',
+                    labelText: AppStrings.password,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(kDefaultBorderRadius),
                     ),
                   ),
                 ),
@@ -167,7 +170,7 @@ context.go('/main');
                             errorMessage,
                             textAlign: TextAlign.center,
                             style: const TextStyle(
-                              color: Colors.red,
+                              color: kErrorColor,
                               fontSize: 13,
                             ),
                           )
@@ -179,7 +182,7 @@ context.go('/main');
                 // 로그인 버튼
                 ElevatedButton(
                   onPressed: handleLogin,
-                  child: const Text('로그인'),
+                  child: const Text(AppStrings.loginButton),
                 ),
 
                 const SizedBox(height: 20),
@@ -188,7 +191,7 @@ context.go('/main');
                 TextButton(
                   onPressed: goToSignup,
                   child: const Text(
-                    '아직 계정이 없다면?',
+                    AppStrings.noAccount,
                     style: TextStyle(
                       color: Colors.grey, // 회색 텍스트
                       decoration: TextDecoration.underline, // 밑줄

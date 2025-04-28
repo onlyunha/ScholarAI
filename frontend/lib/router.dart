@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 // 화면 import
@@ -14,22 +13,13 @@ import 'screens/settings/profile_edit_screen.dart';
 final GoRouter router = GoRouter(
   routes: [
     /// Welcome
-    GoRoute(
-      path: '/',
-      builder: (context, state) => const WelcomeScreen(),
-    ),
+    GoRoute(path: '/', builder: (context, state) => const WelcomeScreen()),
 
     /// Login
-    GoRoute(
-      path: '/login',
-      builder: (context, state) => const LoginScreen(),
-    ),
+    GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
 
     /// Signup
-    GoRoute(
-      path: '/signup',
-      builder: (context, state) => const SignupScreen(),
-    ),
+    GoRoute(path: '/signup', builder: (context, state) => const SignupScreen()),
 
     /// PasswordScreen (extra로 email, authCode 받아야 함)
     GoRoute(
@@ -53,10 +43,7 @@ final GoRouter router = GoRouter(
     ),
 
     /// Main Screen
-    GoRoute(
-      path: '/main',
-      builder: (context, state) => const MainScreen(),
-    ),
+    GoRoute(path: '/main', builder: (context, state) => const MainScreen()),
 
     /// Profile Edit
     GoRoute(

@@ -3,11 +3,11 @@
 /// Desc : 장학금 카드 (아직 미사용 개발중)
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-21
-/// Updt : 2025-04-23
+/// Updt : 2025-04-28
 /// =============================================================
 
 import 'package:flutter/material.dart';
-import '../constants.dart';
+import 'package:scholarai/constants/app_colors.dart';
 
 class ScholarshipCard extends StatelessWidget {
   final String organization;
@@ -37,19 +37,24 @@ class ScholarshipCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(name,
-              style: const TextStyle(
-                  fontSize: 16, fontWeight: FontWeight.w600)),
+          Text(
+            name,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          ),
           const SizedBox(height: 4),
-          Text(organization,
-              style: const TextStyle(fontSize: 13, color: Colors.black54)),
+          Text(
+            organization,
+            style: const TextStyle(fontSize: 13, color: Colors.black54),
+          ),
           const SizedBox(height: 4),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(type, style: const TextStyle(fontSize: 13)),
-              Text('$start ~ $end',
-                  style: const TextStyle(fontSize: 13, color: Colors.black54)),
+              Text(
+                '$start ~ $end',
+                style: const TextStyle(fontSize: 13, color: Colors.black54),
+              ),
             ],
           ),
         ],

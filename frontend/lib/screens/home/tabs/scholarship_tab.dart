@@ -3,11 +3,12 @@
 /// Desc : 장학금 검색 + 추천
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-21
-/// Updt : 2025-04-23
+/// Updt : 2025-04-28
 /// =============================================================
 
 import 'package:flutter/material.dart';
-import '../../../constants.dart';
+import 'package:scholarai/constants/app_colors.dart';
+import 'package:scholarai/constants/app_strings.dart';
 import '../../../widgets/custom_app_bar.dart';
 
 class ScholarshipTab extends StatefulWidget {
@@ -366,7 +367,10 @@ class _ScholarshipTabState extends State<ScholarshipTab> {
                       _buildDetailRow('장학금유형', '장학금'),
                       _buildDetailRow('대학 유형', '4년제(5~6년제포함)'),
                       _buildDetailRow('대상 학기', '대학2~8학기 이상'),
-                      _buildDetailRow('지원 계열', '공학, 교육, 사회, 예체능, 의약, 인문, 자연, 제한없음',),
+                      _buildDetailRow(
+                        '지원 계열',
+                        '공학, 교육, 사회, 예체능, 의약, 인문, 자연, 제한없음',
+                      ),
                       _buildDetailRow('학업 요건', '직전학기 12학점 이상 + 평균 2.75 이상'),
                       _buildDetailRow('소득 요건', '중위소득 150% 이하'),
                       _buildDetailRow('지원 금액', '1인당 100만원 (생활비 지원 포함)'),
@@ -374,7 +378,9 @@ class _ScholarshipTabState extends State<ScholarshipTab> {
                       _buildDetailRow('선발 인원', '11명'),
                       _buildDetailRow('심사 방법', '서류심사 + 심사위원회 의결'),
                       _buildDetailRow('필요 서류', '신청서, 주민등록등본 등 10종'),
-                      _buildDetailRow('지원 사이트', 'https://itle.or.kr/user/main.do',
+                      _buildDetailRow(
+                        '지원 사이트',
+                        'https://itle.or.kr/user/main.do',
                       ),
                     ],
                   ),
@@ -426,7 +432,7 @@ class _ScholarshipTabState extends State<ScholarshipTab> {
                     setState(() => isSearchMode = true);
                   },
                   child: Text(
-                    '장학금 검색',
+                    AppStrings.scholarshipSearchTab,
                     style: TextStyle(
                       color: isSearchMode ? kPrimaryColor : Colors.grey,
                       fontWeight: FontWeight.w600,
@@ -439,7 +445,7 @@ class _ScholarshipTabState extends State<ScholarshipTab> {
                     setState(() => isSearchMode = false);
                   },
                   child: Text(
-                    '장학금 추천',
+                    AppStrings.scholarshipRecommendTab,
                     style: TextStyle(
                       color: !isSearchMode ? kPrimaryColor : Colors.grey,
                       fontWeight: FontWeight.w600,
@@ -475,116 +481,137 @@ class _ScholarshipTabState extends State<ScholarshipTab> {
             ),
 
             const SizedBox(height: 24),
-          if(isSearchMode)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Flexible(
-                  child: TextField(
-                    controller: keywordController,
-                    decoration: InputDecoration(
-                      hintText: '키워드를 입력하세요',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: kPrimaryColor),
-                      ),
-                      suffixIcon: IconButton(
-                        icon: Icon(Icons.search, color: kPrimaryColor),
-                        onPressed: handleSearch,
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
+            if (isSearchMode)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(
+                    child: TextField(
+                      controller: keywordController,
+                      decoration: InputDecoration(
+                        hintText: AppStrings.keywordHint,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: kPrimaryColor),
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.search, color: kPrimaryColor),
+                          onPressed: handleSearch,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
             const SizedBox(height: 8),
             if (isSearchMode)
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton.icon(
-                onPressed: showFilterPopup,
-                icon: Icon(Icons.tune, color: kPrimaryColor, size: 18),
-                label: Text(
-                  '검색 필터',
-                  style: TextStyle(color: kPrimaryColor, fontSize: 13),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton.icon(
+                  onPressed: showFilterPopup,
+                  icon: Icon(Icons.tune, color: kPrimaryColor, size: 18),
+                  label: Text(
+                    '검색 필터',
+                    style: TextStyle(color: kPrimaryColor, fontSize: 13),
+                  ),
                 ),
               ),
-            ),
             const SizedBox(height: 24),
 
             Expanded(
-  child: isSearchMode
-      ? ListView.builder(
-          itemCount: filteredScholarships.length,
-          itemBuilder: (context, index) {
-            final item = filteredScholarships[index];
-            return GestureDetector(
-              onTap: () => showScholarshipDetail(context, item),
-              child: Container(
-                margin: const EdgeInsets.only(bottom: 16),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade300),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 4),
-                    Text(
-                      item['productName'] ?? '',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
+              child:
+                  isSearchMode
+                      ? ListView.builder(
+                        itemCount: filteredScholarships.length,
+                        itemBuilder: (context, index) {
+                          final item = filteredScholarships[index];
+                          return GestureDetector(
+                            onTap: () => showScholarshipDetail(context, item),
+                            child: Container(
+                              margin: const EdgeInsets.only(bottom: 16),
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.grey.shade300),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    item['productName'] ?? '',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    item['organization'] ?? '',
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.black54,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        (item['type'] as List<String>)
+                                            .map((t) => '#$t')
+                                            .join(' '),
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          color: kPrimaryColor,
+                                        ),
+                                      ),
+                                      Text(
+                                        '${item['start']} ~ ${item['end']}',
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.black54,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      )
+                      : Center(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            // TODO: 추천 로직 구현
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: kPrimaryColor,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 32,
+                              vertical: 16,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text(
+                            '장학금 추천받기',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      item['organization'] ?? '',
-                      style: const TextStyle(fontSize: 13, color: Colors.black54),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          (item['type'] as List<String>).map((t) => '#$t').join(' '),
-                          style: const TextStyle(fontSize: 13, color: kPrimaryColor),
-                        ),
-                        Text(
-                          '${item['start']} ~ ${item['end']}',
-                          style: const TextStyle(fontSize: 13, color: Colors.black54),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        )
-      : Center(
-          child: ElevatedButton(
-            onPressed: () {
-              // TODO: 추천 로직 구현
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: kPrimaryColor,
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            child: const Text(
-              '장학금 추천받기',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-),
           ],
         ),
       ),

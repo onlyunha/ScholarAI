@@ -3,12 +3,12 @@
 /// Desc : 장학금 상세사항 안내
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-21
-/// Updt : 2025-04-23
+/// Updt : 2025-04-28
 /// =============================================================
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../constants.dart';
+import 'package:scholarai/constants/config.dart';
 
 // 장학금 요약 모델
 class ScholarshipSummary {

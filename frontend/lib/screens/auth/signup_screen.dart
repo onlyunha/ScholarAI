@@ -10,8 +10,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../../constants.dart';
-import 'password_screen.dart';
+import 'package:scholarai/constants/app_images.dart';
+
+import '../../constants/app_routes.dart';
+import '../../constants/app_strings.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/constants.dart';
+import '../../constants/config.dart';
 
 // 이메일 인증 회원가입 화면
 class SignupScreen extends StatefulWidget {
@@ -29,13 +34,13 @@ class _SignupScreenState extends State<SignupScreen> {
   String errorMessage = ''; // 에러 메시지
   String authCode = ''; // 인증코드 저장
 
-  final emailRegex = RegExp(r'^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$'); // 이메일 정규식
+  final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
 
   // 인증코드 요청
   Future<void> handleSendCode() async {
     final email = emailController.text.trim().toLowerCase();
     if (!emailRegex.hasMatch(email)) {
-      setState(() => errorMessage = '올바른 이메일 형식을 입력해주세요.');
+      setState(() => errorMessage = AppStrings.emailFormatError);
       return;
     }
 
@@ -51,7 +56,7 @@ class _SignupScreenState extends State<SignupScreen> {
         codeStep = true;
       });
     } else {
-      setState(() => errorMessage = '인증코드 전송에 실패했습니다.');
+      setState(() => errorMessage = AppStrings.sendCodeFailed);
     }
   }
 
@@ -72,18 +77,18 @@ class _SignupScreenState extends State<SignupScreen> {
         context: context,
         builder:
             (_) => AlertDialog(
-              title: const Text('인증 성공'),
-              content: const Text('인증되었습니다!'),
+              title: const Text(AppStrings.signupSuccessTitle),
+              content: const Text(AppStrings.signupSuccessContent),
               actions: [
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context);
                     context.go(
-                      '/password',
+                      AppRoutes.password,
                       extra: {'email': email, 'authCode': code},
                     );
                   },
-                  child: const Text('확인'),
+                  child: const Text(AppStrings.confirm),
                 ),
               ],
             ),
@@ -95,8 +100,8 @@ class _SignupScreenState extends State<SignupScreen> {
         context: context,
         builder:
             (_) => const AlertDialog(
-              title: Text('인증 실패'),
-              content: Text('인증코드를 다시 확인해주세요.'),
+              title: Text(AppStrings.signupFailedTitle),
+              content: Text(AppStrings.signupFailedContent),
             ),
       );
     }
@@ -108,19 +113,19 @@ class _SignupScreenState extends State<SignupScreen> {
       context: context,
       builder:
           (_) => AlertDialog(
-            title: const Text('코드 재전송'),
-            content: const Text('코드를 재전송하시겠습니까?'),
+            title: const Text(AppStrings.sendCodeResendTitle),
+            content: const Text(AppStrings.sendCodeResendContent),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('취소'),
+                child: const Text(AppStrings.cancelButton),
               ),
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
                   handleSendCode(); // 재전송
                 },
-                child: const Text('확인'),
+                child: const Text(AppStrings.confirm),
               ),
             ],
           ),
@@ -138,22 +143,22 @@ class _SignupScreenState extends State<SignupScreen> {
           child: SingleChildScrollView(
             padding: EdgeInsets.symmetric(
               horizontal: width * 0.1,
-              vertical: 32,
+              vertical: kDefaultPaddingVertical,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // 어플 로고
                 Image.asset(
-                  'assets/main_logo.png',
-                  height: 100,
+                  AppImages.mainLogo,
+                  height: kLogoHeight,
                   color: kPrimaryColor,
                 ),
                 const SizedBox(height: 16),
 
                 // 타이틀
                 const Text(
-                  '이메일로 회원가입',
+                  AppStrings.signupTitle,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20,
@@ -168,7 +173,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   Text(
                     errorMessage,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(color: Colors.red, fontSize: 13),
+                    style: const TextStyle(color: kErrorColor, fontSize: 13),
                   ),
 
                 // 이메일 입력 필드
@@ -176,8 +181,8 @@ class _SignupScreenState extends State<SignupScreen> {
                   controller: emailController,
                   enabled: !codeStep, // 인증 단계 이후에는 비활성화
                   decoration: InputDecoration(
-                    labelText: '이메일',
-                    hintText: 'example@email.com',
+                    labelText: AppStrings.email,
+                    hintText: AppStrings.emailHint,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -189,7 +194,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   const SizedBox(height: 12),
                   ElevatedButton(
                     onPressed: handleSendCode,
-                    child: const Text('인증코드 전송'),
+                    child: const Text(AppStrings.sendAuthCodeButton),
                   ),
 
                   // 인증코드 입력 및 검증
@@ -198,8 +203,8 @@ class _SignupScreenState extends State<SignupScreen> {
                     TextField(
                       controller: codeController,
                       decoration: InputDecoration(
-                        labelText: '인증코드',
-                        hintText: '6자리 인증코드 입력',
+                        labelText: AppStrings.authCode,
+                        hintText: AppStrings.authCodeHint,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -221,14 +226,14 @@ class _SignupScreenState extends State<SignupScreen> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                            child: const Text('코드 재전송'),
+                            child: const Text(AppStrings.sendCodeResendTitle),
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: ElevatedButton(
                             onPressed: handleVerifyCode,
-                            child: const Text('인증하기'),
+                            child: const Text(AppStrings.verifyCodeButton),
                           ),
                         ),
                       ],
@@ -246,7 +251,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           });
                         },
                         child: const Text(
-                          '이메일 재입력',
+                          AppStrings.reenterEmailButton,
                           style: TextStyle(
                             decoration: TextDecoration.underline,
                             color: Colors.black54,

@@ -10,8 +10,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../../constants.dart';
-import 'welcome_name_screen.dart';
+import 'package:scholarai/constants/app_images.dart';
+import '../../constants/app_routes.dart';
+import '../../constants/app_strings.dart';
+import '../../constants/app_colors.dart';
+import '../../constants/constants.dart';
+import '../../constants/config.dart';
 
 // 회원가입 - 비밀번호 설정 화면
 class PasswordScreen extends StatefulWidget {
@@ -37,7 +41,7 @@ class _PasswordScreenState extends State<PasswordScreen>
   bool showConfirm = false; // 비밀번호 확인 보기 여부
   String errorMessage = ''; // 에러 메시지 변수
 
-  // shake 애니메이션 
+  // shake 애니메이션
   late final AnimationController _shakeController;
 
   @override
@@ -77,7 +81,7 @@ class _PasswordScreenState extends State<PasswordScreen>
     if (!isPasswordValid(pw) || !isConfirmMatched()) {
       _shakeController.forward(from: 0);
       setState(() {
-        errorMessage = '비밀번호 생성 조건을 확인해주세요.';
+        errorMessage = AppStrings.passwordErrorCondition;
       });
       return;
     }
@@ -98,20 +102,18 @@ class _PasswordScreenState extends State<PasswordScreen>
 
       // 회원가입 성공: 이름 설정 화면으로 이동
       if (response.statusCode == 201) {
-        context.go('/welcome-name', extra: {
-  'email': widget.email,
-});
-      
-      // 회원가입 실패: 에러 메시지
+        context.go(AppRoutes.welcomeName, extra: {'email': widget.email});
+
+        // 회원가입 실패: 에러 메시지
       } else {
         setState(() {
-          errorMessage = '회원가입에 실패했습니다.';
+          errorMessage = AppStrings.signupFailed;
         });
       }
-    // 네트워크 예외 처리
+      // 네트워크 예외 처리
     } catch (e) {
       setState(() {
-        errorMessage = '네트워크 오류가 발생했습니다.';
+        errorMessage = AppStrings.networkError;
       });
     }
   }
@@ -130,13 +132,23 @@ class _PasswordScreenState extends State<PasswordScreen>
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // 어플 로고
-                Image.asset('assets/main_logo.png', height: 100, color: kPrimaryColor),
+                Image.asset(
+                  AppImages.mainLogo,
+                  height: kLogoHeight,
+                  color: kPrimaryColor,
+                ),
                 const SizedBox(height: 20),
 
                 // 타이틀
-                const Text('비밀번호 설정',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: kPrimaryColor)),
+                const Text(
+                  AppStrings.passwordSettingTitle,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: kPrimaryColor,
+                  ),
+                ),
                 const SizedBox(height: 32),
 
                 // 비밀번호 입력 필드
@@ -145,7 +157,7 @@ class _PasswordScreenState extends State<PasswordScreen>
                   obscureText: !showPassword,
                   onChanged: (_) => setState(() {}),
                   decoration: InputDecoration(
-                    labelText: '비밀번호',
+                    labelText: AppStrings.password,
                     suffixIcon: IconButton(
                       icon: Icon(
                         showPassword ? Icons.visibility_off : Icons.visibility,
@@ -155,7 +167,9 @@ class _PasswordScreenState extends State<PasswordScreen>
                         setState(() => showPassword = !showPassword);
                       },
                     ),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(kDefaultBorderRadius),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -166,7 +180,7 @@ class _PasswordScreenState extends State<PasswordScreen>
                   obscureText: !showConfirm,
                   onChanged: (_) => setState(() {}),
                   decoration: InputDecoration(
-                    labelText: '비밀번호 확인',
+                    labelText: AppStrings.passwordConfirmLabel,
                     suffixIcon: IconButton(
                       icon: Icon(
                         showConfirm ? Icons.visibility_off : Icons.visibility,
@@ -176,7 +190,9 @@ class _PasswordScreenState extends State<PasswordScreen>
                         setState(() => showConfirm = !showConfirm);
                       },
                     ),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(kDefaultBorderRadius),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -186,7 +202,9 @@ class _PasswordScreenState extends State<PasswordScreen>
                   animation: _shakeController,
                   builder: (context, child) {
                     final offset =
-                        6 * (1 - _shakeController.value) * (_shakeController.value % 0.2 == 0 ? -1 : 1);
+                        6 *
+                        (1 - _shakeController.value) *
+                        (_shakeController.value % 0.2 == 0 ? -1 : 1);
                     return Transform.translate(
                       offset: Offset(offset, 0),
                       child: Column(
@@ -195,14 +213,22 @@ class _PasswordScreenState extends State<PasswordScreen>
                           Row(
                             children: [
                               Icon(
-                                isPasswordValid(pw) ? Icons.check_circle : Icons.error_outline,
-                                color: isPasswordValid(pw) ? Colors.green : Colors.red,
+                                isPasswordValid(pw)
+                                    ? Icons.check_circle
+                                    : Icons.error_outline,
+                                color:
+                                    isPasswordValid(pw)
+                                        ? Colors.green
+                                        : Colors.red,
                                 size: 18,
                               ),
                               const SizedBox(width: 6),
                               const Text(
-                                '영어, 숫자 조합 최소 10자리 이상',
-                                style: TextStyle(color: Colors.grey, fontSize: 13),
+                                AppStrings.passwordCondition,
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 13,
+                                ),
                               ),
                             ],
                           ),
@@ -216,13 +242,19 @@ class _PasswordScreenState extends State<PasswordScreen>
                                 isConfirmMatched()
                                     ? Icons.check_circle
                                     : Icons.error_outline,
-                                color: isConfirmMatched() ? Colors.green : Colors.red,
+                                color:
+                                    isConfirmMatched()
+                                        ? Colors.green
+                                        : Colors.red,
                                 size: 18,
                               ),
                               const SizedBox(width: 6),
                               const Text(
-                                '비밀번호 확인 일치',
-                                style: TextStyle(color: Colors.grey, fontSize: 13),
+                                AppStrings.passwordConfirmMatch,
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 13,
+                                ),
                               ),
                             ],
                           ),
@@ -236,15 +268,18 @@ class _PasswordScreenState extends State<PasswordScreen>
 
                 // 에러 메시지
                 if (errorMessage.isNotEmpty)
-                  Text(errorMessage,
-                      style: const TextStyle(color: Colors.red), textAlign: TextAlign.center),
+                  Text(
+                    errorMessage,
+                    style: const TextStyle(color: kErrorColor),
+                    textAlign: TextAlign.center,
+                  ),
 
                 const SizedBox(height: 24),
 
                 // 다음 버튼
                 ElevatedButton(
                   onPressed: handleSubmit,
-                  child: const Text('다음'),
+                  child: const Text(AppStrings.nextButton),
                 ),
 
                 const SizedBox(height: 12),

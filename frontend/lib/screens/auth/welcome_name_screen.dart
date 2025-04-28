@@ -10,8 +10,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../../constants.dart';
-import '../home/main_screen.dart';
+import 'package:scholarai/constants/app_colors.dart';
+import 'package:scholarai/constants/app_images.dart';
+import 'package:scholarai/constants/app_routes.dart';
+import 'package:scholarai/constants/app_strings.dart';
+import 'package:scholarai/constants/config.dart';
+import '../../constants/constants.dart';
 
 // 회원가입 - 이름 설정 화면
 class WelcomeNameScreen extends StatefulWidget {
@@ -38,7 +42,7 @@ class _WelcomeNameScreenState extends State<WelcomeNameScreen> {
     // 이름 유효성 검사
     if (!nameRegex.hasMatch(name)) {
       setState(() {
-        errorMessage = '한글 또는 영어만 입력 (최대 20자)';
+        errorMessage = AppStrings.nameFormatError;
       });
       return;
     }
@@ -59,19 +63,19 @@ class _WelcomeNameScreenState extends State<WelcomeNameScreen> {
 
       // 성공: 메인화면으로 이동
       if (response.statusCode == 200) {
-        context.go('/main');
+        context.go(AppRoutes.main);
 
-      // 실패: 오류 메시지
+        // 실패: 오류 메시지
       } else {
         setState(() {
-          errorMessage = '이름 설정에 실패했습니다.';
+          errorMessage = AppStrings.nameFailed;
         });
       }
 
       // 네트워크 오류처리
     } catch (e) {
       setState(() {
-        errorMessage = '네트워크 오류가 발생했습니다.';
+        errorMessage = AppStrings.networkError;
       });
     } finally {
       setState(() {
@@ -79,7 +83,6 @@ class _WelcomeNameScreenState extends State<WelcomeNameScreen> {
       });
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -90,17 +93,24 @@ class _WelcomeNameScreenState extends State<WelcomeNameScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: width * 0.1, vertical: 32),
+            padding: EdgeInsets.symmetric(
+              horizontal: width * 0.1,
+              vertical: 32,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // 어플 로고
-                Image.asset('assets/main_logo.png', height: 100, color: kPrimaryColor),
+                Image.asset(
+                  AppImages.mainLogo,
+                  height: kLogoHeight,
+                  color: kPrimaryColor,
+                ),
                 const SizedBox(height: 20),
 
                 // 타이틀
                 const Text(
-                  '가입을 환영해요!',
+                  AppStrings.welcomeTitle,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
@@ -113,7 +123,7 @@ class _WelcomeNameScreenState extends State<WelcomeNameScreen> {
 
                 // 안내 문구
                 const Text(
-                  '사용하실 이름을 입력해주세요.',
+                  AppStrings.welcomeSubtitle,
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey,
@@ -128,9 +138,11 @@ class _WelcomeNameScreenState extends State<WelcomeNameScreen> {
                   controller: nameController,
                   textCapitalization: TextCapitalization.words,
                   decoration: InputDecoration(
-                    labelText: '이름',
+                    labelText: AppStrings.name,
                     hintText: '',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
 
@@ -153,15 +165,21 @@ class _WelcomeNameScreenState extends State<WelcomeNameScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: kPrimaryColor,
                     minimumSize: const Size.fromHeight(48),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
-                  child: isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                        )
-                      : const Text('완료'),
+                  child:
+                      isLoading
+                          ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                          : const Text(AppStrings.completeButton),
                 ),
 
                 const SizedBox(height: 12),
