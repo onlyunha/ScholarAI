@@ -7,6 +7,7 @@
 /// =============================================================
 
 import 'package:flutter/material.dart';
+import 'package:scholarai/router.dart';
 import 'package:scholarai/screens/home/tabs/scholarship_tab.dart';
 import 'constants.dart';
 import 'screens/welcome_screen.dart';
@@ -42,7 +43,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'ScholarAI',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -72,7 +73,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       // 첫 화면 설정
-      home: const WelcomeScreen(),
+      routerConfig: router,
     );
   }
 }
