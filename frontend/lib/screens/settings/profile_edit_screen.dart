@@ -5,10 +5,11 @@
 /// Crtd : 2025-04-21
 /// Updt : 2025-04-28
 /// =============================================================
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:scholarai/constants/app_colors.dart';
+import 'package:scholarai/constants/app_routes.dart';
+import 'package:scholarai/constants/constants.dart';
 
 class ProfileEditScreen extends StatefulWidget {
   const ProfileEditScreen({super.key});
@@ -19,6 +20,7 @@ class ProfileEditScreen extends StatefulWidget {
 
 class _ProfileEditScreenState extends State<ProfileEditScreen> {
   final nameController = TextEditingController();
+
   int? selectedYear;
   String? selectedGender;
   String? selectedRegion;
@@ -38,9 +40,12 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
     60,
     (i) => DateTime.now().year - i,
   );
-  final List<String> genderOptions = ['선택 안 함', '남자', '여자'];
+  final List<Map<String, String>> genderOptions = [
+    {'value': 'MALE', 'label': '남자'},
+    {'value': 'FEMALE', 'label': '여자'},
+  ];
+
   final List<String> regionOptions = [
-    '선택 안 함',
     '서울특별시',
     '부산광역시',
     '대구광역시',
@@ -60,11 +65,11 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
     '제주특별자치도',
   ];
   final List<String> universityTypes = ['4년제', '전문대', '기타'];
-  final List<String> academicStatuses = [
-    'ENROLLED',
-    'LEAVE_OF_ABSENCE',
-    'EXPECTED_GRADUATION',
-    'GRADUATED',
+  final List<Map<String, String>> academicStatuses = [
+    {'code': 'ENROLLED', 'label': '재학'},
+    {'code': 'LEAVE_OF_ABSENCE', 'label': '휴학'},
+    {'code': 'EXPECTED_GRADUATION', 'label': '졸업예정'},
+    {'code': 'GRADUATED', 'label': '졸업'},
   ];
   final List<String> majorFields = [
     '공학계열',
@@ -94,284 +99,286 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          onPressed: () => context.pop(),
+        
+          onPressed: () {
+                  GoRouter.of(context).pop(); 
+          },
         ),
       ),
-      body: Column(
-        children: [
-          const SizedBox(height: 24),
-          const CircleAvatar(
-            radius: 48,
-            backgroundColor: Colors.grey,
-            child: Icon(Icons.person, size: 48, color: Colors.white),
-          ),
-          const SizedBox(height: 12),
-          const Text(
-            'NAME',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: kPrimaryColor,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    '기본정보',
-                    style: TextStyle(
+                  const CircleAvatar(
+                    radius: 48,
+                    backgroundColor: Colors.grey,
+                    child: Icon(Icons.person, size: 48, color: Colors.white),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller:
+                        nameController
+                          ..text =
+                              nameController.text.isNotEmpty
+                                  ? nameController.text
+                                  : 'NAME',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: kPrimaryColor,
                     ),
-                  ),
-                  const SizedBox(height: 12),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: DropdownButtonFormField<int>(
-                          decoration: const InputDecoration.collapsed(
-                            hintText: '나이',
-                          ),
-                          value: selectedYear,
-                          onChanged:
-                              (value) => setState(() => selectedYear = value),
-                          items: [
-                            const DropdownMenuItem(
-                              value: null,
-                              child: Text('선택 안 함'),
-                            ),
-                            ...yearOptions.map(
-                              (year) => DropdownMenuItem(
-                                value: year,
-                                child: Text('$year년생'),
-                              ),
-                            ),
-                          ],
-                        ),
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      hintText: 'NAME',
+                      hintStyle: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: kPrimaryColor,
                       ),
-                      const SizedBox(width: 12),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+              ),
+            ),
+            _buildDropdownRow(
+              '출생년도',
+              selectedYear,
+              yearOptions,
+              (val) => setState(() => selectedYear = val),
+              isInt: true,
+            ),
+            _buildDropdownRow(
+              '성별',
+              selectedGender,
+              genderOptions,
+              (val) => setState(() => selectedGender = val),
+              isMap: true,
+            ),
+            _buildDropdownRow(
+              '거주지',
+              selectedRegion,
+              regionOptions,
+              (val) => setState(() => selectedRegion = val),
+            ),
+            _buildDropdownRow(
+              '대학구분',
+              selectedUniversityType,
+              universityTypes,
+              (val) => setState(() => selectedUniversityType = val),
+            ),
+            _buildDropdownRow(
+              '학적 상태',
+              selectedAcademicStatus,
+              academicStatuses,
+              (val) => setState(() => selectedAcademicStatus = val),
+              isMap: true,
+            ),
+            _buildDropdownRow(
+              '학기',
+              selectedSemester,
+              semesterOptions,
+              (val) => setState(() => selectedSemester = val),
+              isInt: true,
+            ),
+            _buildDropdownRow(
+              '학과 구분',
+              selectedMajorField,
+              majorFields,
+              (val) => setState(() => selectedMajorField = val),
+            ),
+
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.3,
+                  child: const Text(
+                    '전공명',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: kPrimaryColor,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: TextField(
+                    onChanged: (value) => selectedMajor = value,
+                    decoration: const InputDecoration(
+                      hintText: '입력 안 함',
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.3,
+                  child: const Text(
+                    '성적',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: kPrimaryColor,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    children: [
                       Text(
-                        selectedYear == null
-                            ? ''
-                            : '만 ${DateTime.now().year - selectedYear!}세',
+                        '${selectedGpa.toStringAsFixed(2)} / 4.50',
                         style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w300,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                           color: kPrimaryColor,
                         ),
                       ),
-                      const SizedBox(width: 24),
-                      Expanded(
-                        child: DropdownButtonFormField<String>(
-                          decoration: const InputDecoration.collapsed(
-                            hintText: '성별',
-                          ),
-                          value: selectedGender,
-                          onChanged:
-                              (value) => setState(() => selectedGender = value),
-                          items:
-                              genderOptions
-                                  .map(
-                                    (gender) => DropdownMenuItem(
-                                      value: gender,
-                                      child: Text(gender),
-                                    ),
-                                  )
-                                  .toList(),
-                        ),
+                      Slider(
+                        value: selectedGpa,
+                        min: 0.0,
+                        max: 4.5,
+                        divisions: 90,
+                        label: selectedGpa.toStringAsFixed(2),
+                        onChanged:
+                            (value) => setState(() => selectedGpa = value),
                       ),
                     ],
                   ),
+                ),
+              ],
+            ),
 
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<String>(
-                    decoration: const InputDecoration.collapsed(
-                      hintText: '거주지',
-                    ),
-                    value: selectedRegion,
-                    onChanged:
-                        (value) => setState(() => selectedRegion = value),
-                    items:
-                        regionOptions
-                            .map(
-                              (region) => DropdownMenuItem(
-                                value: region,
-                                child: Text(region),
-                              ),
-                            )
-                            .toList(),
-                  ),
-
-                  const SizedBox(height: 24),
-                  DropdownButtonFormField<String>(
-                    decoration: const InputDecoration.collapsed(
-                      hintText: '대학 구분',
-                    ),
-                    value: selectedUniversityType,
-                    onChanged:
-                        (value) =>
-                            setState(() => selectedUniversityType = value),
-                    items:
-                        universityTypes
-                            .map(
-                              (type) => DropdownMenuItem(
-                                value: type,
-                                child: Text(type),
-                              ),
-                            )
-                            .toList(),
-                  ),
-                  const SizedBox(height: 20),
-
-                  DropdownButtonFormField<String>(
-                    decoration: const InputDecoration.collapsed(
-                      hintText: '학적 상태',
-                    ),
-                    value: selectedAcademicStatus,
-                    onChanged:
-                        (value) =>
-                            setState(() => selectedAcademicStatus = value),
-                    items:
-                        academicStatuses
-                            .map(
-                              (status) => DropdownMenuItem(
-                                value: status,
-                                child: Text(status),
-                              ),
-                            )
-                            .toList(),
-                  ),
-                  const SizedBox(height: 20),
-
-                  DropdownButtonFormField<int>(
-                    decoration: const InputDecoration.collapsed(hintText: '학기'),
-                    value: selectedSemester,
-                    onChanged:
-                        (value) => setState(() => selectedSemester = value),
-                    items:
-                        semesterOptions
-                            .map(
-                              (s) => DropdownMenuItem(
-                                value: s,
-                                child: Text('$s학기'),
-                              ),
-                            )
-                            .toList(),
-                  ),
-                  const SizedBox(height: 20),
-
-                  DropdownButtonFormField<String>(
-                    decoration: const InputDecoration.collapsed(
-                      hintText: '학과 구분',
-                    ),
-                    value: selectedMajorField,
-                    onChanged:
-                        (value) => setState(() => selectedMajorField = value),
-                    items:
-                        majorFields
-                            .map(
-                              (f) => DropdownMenuItem(value: f, child: Text(f)),
-                            )
-                            .toList(),
-                  ),
-                  const SizedBox(height: 20),
-
-                  TextField(
-                    decoration: const InputDecoration(
-                      labelText: '전공명',
-                      border: OutlineInputBorder(),
-                    ),
-                    onChanged: (value) => selectedMajor = value,
-                  ),
-                  const SizedBox(height: 20),
-
-                  const Text(
-                    '성적 (0.0 ~ 4.5)',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Slider(
-                    value: selectedGpa,
-                    min: 0.0,
-                    max: 4.5,
-                    divisions: 45,
-                    label: selectedGpa.toStringAsFixed(1),
-                    onChanged: (value) => setState(() => selectedGpa = value),
-                  ),
-
-                  const SizedBox(height: 20),
-                  DropdownButtonFormField<int>(
-                    decoration: const InputDecoration.collapsed(
-                      hintText: '소득 분위 (1~9구간)',
-                    ),
-                    value: selectedIncomeLevel,
-                    onChanged:
-                        (value) => setState(() => selectedIncomeLevel = value),
-                    items:
-                        incomeLevels
-                            .map(
-                              (l) => DropdownMenuItem(
-                                value: l,
-                                child: Text('$l분위'),
-                              ),
-                            )
-                            .toList(),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  CheckboxListTile(
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: CheckboxListTile(
+                    title: const Text('장애 여부'),
                     value: isDisabled,
                     onChanged:
                         (value) => setState(() => isDisabled = value ?? false),
-                    title: const Text('장애 여부'),
+                    controlAffinity: ListTileControlAffinity.leading,
                   ),
-                  CheckboxListTile(
+                ),
+                Expanded(
+                  child: CheckboxListTile(
+                    title: const Text('다자녀 가구 여부'),
                     value: isMultiChild,
                     onChanged:
                         (value) =>
                             setState(() => isMultiChild = value ?? false),
-                    title: const Text('다자녀 가구 여부'),
+                    controlAffinity: ListTileControlAffinity.leading,
                   ),
-                  CheckboxListTile(
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: CheckboxListTile(
+                    title: const Text('기초생활수급자 여부'),
                     value: isBasicLiving,
                     onChanged:
                         (value) =>
                             setState(() => isBasicLiving = value ?? false),
-                    title: const Text('기초생활 수급자 여부'),
+                    controlAffinity: ListTileControlAffinity.leading,
                   ),
-                  CheckboxListTile(
+                ),
+                Expanded(
+                  child: CheckboxListTile(
+                    title: const Text('차상위계층 여부'),
                     value: isSecondLowest,
                     onChanged:
                         (value) =>
                             setState(() => isSecondLowest = value ?? false),
-                    title: const Text('차상위 계층 여부'),
+                    controlAffinity: ListTileControlAffinity.leading,
                   ),
-                ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDropdownRow(
+    String title,
+    dynamic selectedValue,
+    List options,
+    Function(dynamic) onChanged, {
+    bool isInt = false,
+    bool isMap = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        children: [
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.3,
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: kPrimaryColor,
+                fontSize: 15,
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(24),
-            child: ElevatedButton(
-              onPressed: () {
-                // 저장 로직
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: kPrimaryColor,
-                minimumSize: const Size.fromHeight(48),
+          Expanded(
+            child: DropdownButtonFormField(
+              value: selectedValue,
+              onChanged: onChanged,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
               ),
-              child: const Text('저장', style: TextStyle(fontSize: 16)),
+              isExpanded: true,
+              items: [
+                const DropdownMenuItem(value: null, child: Text('선택 안 함')),
+                ...options.map((option) {
+                  if (isMap) {
+                    return DropdownMenuItem(
+                      value: option['value'] ?? option['code'],
+                      child: Text(option['label']!),
+                    );
+                  } else {
+                    return DropdownMenuItem(
+                      value: option,
+                      child: Text(isInt ? '$option학기' : option.toString()),
+                    );
+                  }
+                }).toList(),
+              ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildCheckbox(String title, bool value, Function(bool) onChanged) {
+    return CheckboxListTile(
+      title: Text(title),
+      value: value,
+      onChanged: (val) => onChanged(val ?? false),
+      controlAffinity: ListTileControlAffinity.leading,
     );
   }
 }

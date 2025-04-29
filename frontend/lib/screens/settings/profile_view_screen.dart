@@ -36,7 +36,14 @@ class ProfileViewScreen extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          onPressed: () => context.pop(),
+    onPressed: () {
+      if (GoRouter.of(context).canPop()) {
+      GoRouter.of(context).pop();  // 이전 화면으로 pop
+    } else {
+      context.go('/main'); 
+    }
+
+    }
         ),
       ),
       body: Padding(
@@ -92,7 +99,7 @@ class ProfileViewScreen extends StatelessWidget {
             const Spacer(),
             ElevatedButton(
               onPressed: () {
-                context.go('/profile-edit');
+                context.go('/profile-view/profile-edit');
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: kPrimaryColor,

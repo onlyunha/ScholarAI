@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:scholarai/screens/settings/profile_view_screen.dart';
 
 // 화면 import
 import 'screens/welcome_screen.dart';
@@ -45,10 +46,17 @@ final GoRouter router = GoRouter(
     /// Main Screen
     GoRoute(path: '/main', builder: (context, state) => const MainScreen()),
 
-    /// Profile Edit
+    /// Profile View
     GoRoute(
-      path: '/profile-edit',
-      builder: (context, state) => const ProfileEditScreen(),
+      path: '/profile-view',
+      builder: (context, state) => const ProfileViewScreen(),
+      routes: [
+        // 프로필 수정 화면이 /profile-view 하위 라우트로 설정
+        GoRoute(
+          path: '/profile-edit', // 상대 경로를 이용해 하위 경로로 설정
+          builder: (context, state) => const ProfileEditScreen(),
+        ),
+      ],
     ),
   ],
 );
