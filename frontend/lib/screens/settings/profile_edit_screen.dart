@@ -5,11 +5,16 @@
 /// Crtd : 2025-04-21
 /// Updt : 2025-04-28
 /// =============================================================
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:scholarai/constants/app_colors.dart';
-import 'package:scholarai/constants/app_routes.dart';
-import 'package:scholarai/constants/constants.dart';
+import 'package:scholarai/constants/config.dart';
+import 'package:scholarai/providers/user_profile_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileEditScreen extends StatefulWidget {
   const ProfileEditScreen({super.key});
@@ -20,6 +25,146 @@ class ProfileEditScreen extends StatefulWidget {
 
 class _ProfileEditScreenState extends State<ProfileEditScreen> {
   final nameController = TextEditingController();
+
+@override
+  void initState() {
+    super.initState();
+    _loadProfileData();  // 프로필 데이터 로드
+  }
+
+  // 로컬에서 데이터 불러오는 함수
+  Future<void> _loadProfileData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? profileDataString = prefs.getString('profileData');
+    
+    if (profileDataString != null) {
+      final Map<String, dynamic> profileData = jsonDecode(profileDataString);
+
+      setState(() {
+        nameController.text = profileData['name'] ?? '';
+        selectedYear = profileData['birthYear'];
+        selectedGender = profileData['gender'];
+        selectedRegion = profileData['region'];
+        selectedUniversityType = profileData['universityType'];
+        selectedAcademicStatus = profileData['academicStatus'];
+        selectedMajorField = profileData['majorField'];
+        selectedMajor = profileData['major'];
+        selectedSemester = profileData['semester'];
+        selectedIncomeLevel = profileData['incomeLevel'];
+        selectedGpa = profileData['gpa'];
+        isDisabled = profileData['isDisabled'];
+        isMultiChild = profileData['isMultiChild'];
+        isBasicLiving = profileData['isBasicLiving'];
+        isSecondLowest = profileData['isSecondLowest'];
+      });
+    }
+  }
+
+
+// 2. 저장 처리 함수
+Future<void> handleSave() async {
+  try {
+  final memberId = Provider.of<UserProfileProvider>(context, listen: false).memberId;
+    
+    if (memberId == null) {
+      print('Error: Member ID is null');
+      return;
+    }
+
+    // 실제 백엔드 호출
+    final response = await sendDataToBackend(memberId);
+    
+    if (response == 'success') {
+      print('Data saved to backend');
+    } else {
+      print('Backend failed, saving data locally');
+      await saveLocally(); // 백엔드 실패 시 로컬에 저장
+    }
+  } catch (e) {
+    print('Error: $e');
+    await saveLocally(); // 예외가 발생하면 로컬에 저장
+  }
+}
+
+ // 3. 로컬 저장 함수
+  Future<void> saveLocally() async {
+    final prefs = await SharedPreferences.getInstance();
+    final profileData = {
+      'name': nameController.text,
+      'birthYear': selectedYear,
+      'gender': selectedGender,
+      'region': selectedRegion,
+      'universityType': selectedUniversityType,
+      'academicStatus': selectedAcademicStatus,
+      'majorField': selectedMajorField,
+      'major': selectedMajor,
+      'semester': selectedSemester,
+      'incomeLevel': selectedIncomeLevel,
+      'gpa': selectedGpa,
+      'isDisabled': isDisabled,
+      'isMultiChild': isMultiChild,
+      'isBasicLiving': isBasicLiving,
+      'isSecondLowest': isSecondLowest,
+    };
+    prefs.setString('profileData', jsonEncode(profileData));  // 로컬에 저장
+    print("Data saved locally");
+  }
+
+// 3. 백엔드 호출 함수 (백엔드 API를 호출하는 부분)
+Future<String> sendDataToBackend(String memberId) async {
+  final url = Uri.parse('$baseUrl/api/profile?memberId=$memberId');
+
+  // 요청 데이터 (백엔드에 보낼 데이터)
+  final profileData = {
+    'name': nameController.text,
+    'birthYear': selectedYear,
+    'gender': selectedGender,
+    'region': selectedRegion,
+    'universityType': selectedUniversityType,
+    'academicStatus': selectedAcademicStatus,
+    'majorField': selectedMajorField,
+    'major': selectedMajor,
+    'semester': selectedSemester,
+    'incomeLevel': selectedIncomeLevel,
+    'gpa': selectedGpa,
+    'isDisabled': isDisabled,
+    'isMultiChild': isMultiChild,
+    'isBasicLiving': isBasicLiving,
+    'isSecondLowest': isSecondLowest,
+  };
+
+  try {
+    // POST 요청 (memberId 포함된 URL로)
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(profileData), // 데이터를 JSON으로 인코딩하여 보내기
+    );
+
+    if (response.statusCode == 200) {
+      // 백엔드에서 성공적인 응답을 받은 경우
+      return 'success';
+    } else {
+      // 실패한 경우
+      print('Error: ${response.body}');
+      return 'failure';
+    }
+  } catch (e) {
+    // 예외 처리
+    print('Error during request: $e');
+    return 'failure';
+  }
+}
+
+void _showSaveMessage() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('저장되었습니다!'),
+        duration: const Duration(seconds: 2),  // 2초 후 자동으로 사라짐
+      ),
+    );
+  }
+
 
   int? selectedYear;
   String? selectedGender;
@@ -309,6 +454,17 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                 ),
               ],
             ),
+            Padding(
+  padding: const EdgeInsets.all(24),
+  child: ElevatedButton(
+    onPressed: handleSave, 
+    style: ElevatedButton.styleFrom(
+      backgroundColor: kPrimaryColor,
+      minimumSize: const Size.fromHeight(48),
+    ),
+    child: const Text('저장', style: TextStyle(fontSize: 16)),
+  ),
+),
           ],
         ),
       ),
@@ -361,7 +517,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                   } else {
                     return DropdownMenuItem(
                       value: option,
-                      child: Text(isInt ? '$option학기' : option.toString()),
+                      child: Text(isInt ? '$option' : option.toString()),
                     );
                   }
                 }).toList(),
@@ -381,4 +537,5 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
       controlAffinity: ListTileControlAffinity.leading,
     );
   }
+  
 }

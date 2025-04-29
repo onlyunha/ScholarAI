@@ -23,6 +23,8 @@ class ProfileViewScreen extends StatelessWidget {
             ? ''
             : '만 ${DateTime.now().year - user.birthYear!}세';
 
+            
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
