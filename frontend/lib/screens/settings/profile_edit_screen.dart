@@ -3,7 +3,7 @@
 /// Desc : 프로필 수정
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-21
-/// Updt : 2025-04-28
+/// Updt : 2025-05-07
 /// =============================================================
 import 'dart:convert';
 
@@ -14,7 +14,6 @@ import 'package:provider/provider.dart';
 import 'package:scholarai/constants/app_colors.dart';
 import 'package:scholarai/constants/config.dart';
 import 'package:scholarai/providers/user_profile_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileEditScreen extends StatefulWidget {
   const ProfileEditScreen({super.key});
@@ -24,153 +23,14 @@ class ProfileEditScreen extends StatefulWidget {
 }
 
 class _ProfileEditScreenState extends State<ProfileEditScreen> {
-  final nameController = TextEditingController();
-
-@override
-  void initState() {
-    super.initState();
-    _loadProfileData();  // 프로필 데이터 로드
-  }
-
-  // 로컬에서 데이터 불러오는 함수
-  Future<void> _loadProfileData() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? profileDataString = prefs.getString('profileData');
-    
-    if (profileDataString != null) {
-      final Map<String, dynamic> profileData = jsonDecode(profileDataString);
-
-      setState(() {
-        nameController.text = profileData['name'] ?? '';
-        selectedYear = profileData['birthYear'];
-        selectedGender = profileData['gender'];
-        selectedRegion = profileData['region'];
-        selectedUniversityType = profileData['universityType'];
-        selectedAcademicStatus = profileData['academicStatus'];
-        selectedMajorField = profileData['majorField'];
-        selectedMajor = profileData['major'];
-        selectedSemester = profileData['semester'];
-        selectedIncomeLevel = profileData['incomeLevel'];
-        selectedGpa = profileData['gpa'];
-        isDisabled = profileData['isDisabled'];
-        isMultiChild = profileData['isMultiChild'];
-        isBasicLiving = profileData['isBasicLiving'];
-        isSecondLowest = profileData['isSecondLowest'];
-      });
-    }
-  }
-
-
-// 2. 저장 처리 함수
-Future<void> handleSave() async {
-  try {
-  final memberId = Provider.of<UserProfileProvider>(context, listen: false).memberId;
-    
-    if (memberId == null) {
-      print('Error: Member ID is null');
-      return;
-    }
-
-    // 실제 백엔드 호출
-    final response = await sendDataToBackend(memberId);
-    
-    if (response == 'success') {
-      print('Data saved to backend');
-    } else {
-      print('Backend failed, saving data locally');
-      await saveLocally(); // 백엔드 실패 시 로컬에 저장
-    }
-  } catch (e) {
-    print('Error: $e');
-    await saveLocally(); // 예외가 발생하면 로컬에 저장
-  }
-}
-
- // 3. 로컬 저장 함수
-  Future<void> saveLocally() async {
-    final prefs = await SharedPreferences.getInstance();
-    final profileData = {
-      'name': nameController.text,
-      'birthYear': selectedYear,
-      'gender': selectedGender,
-      'region': selectedRegion,
-      'universityType': selectedUniversityType,
-      'academicStatus': selectedAcademicStatus,
-      'majorField': selectedMajorField,
-      'major': selectedMajor,
-      'semester': selectedSemester,
-      'incomeLevel': selectedIncomeLevel,
-      'gpa': selectedGpa,
-      'isDisabled': isDisabled,
-      'isMultiChild': isMultiChild,
-      'isBasicLiving': isBasicLiving,
-      'isSecondLowest': isSecondLowest,
-    };
-    prefs.setString('profileData', jsonEncode(profileData));  // 로컬에 저장
-    print("Data saved locally");
-  }
-
-// 3. 백엔드 호출 함수 (백엔드 API를 호출하는 부분)
-Future<String> sendDataToBackend(String memberId) async {
-  final url = Uri.parse('$baseUrl/api/profile?memberId=$memberId');
-
-  // 요청 데이터 (백엔드에 보낼 데이터)
-  final profileData = {
-    'name': nameController.text,
-    'birthYear': selectedYear,
-    'gender': selectedGender,
-    'region': selectedRegion,
-    'universityType': selectedUniversityType,
-    'academicStatus': selectedAcademicStatus,
-    'majorField': selectedMajorField,
-    'major': selectedMajor,
-    'semester': selectedSemester,
-    'incomeLevel': selectedIncomeLevel,
-    'gpa': selectedGpa,
-    'isDisabled': isDisabled,
-    'isMultiChild': isMultiChild,
-    'isBasicLiving': isBasicLiving,
-    'isSecondLowest': isSecondLowest,
-  };
-
-  try {
-    // POST 요청 (memberId 포함된 URL로)
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(profileData), // 데이터를 JSON으로 인코딩하여 보내기
-    );
-
-    if (response.statusCode == 200) {
-      // 백엔드에서 성공적인 응답을 받은 경우
-      return 'success';
-    } else {
-      // 실패한 경우
-      print('Error: ${response.body}');
-      return 'failure';
-    }
-  } catch (e) {
-    // 예외 처리
-    print('Error during request: $e');
-    return 'failure';
-  }
-}
-
-void _showSaveMessage() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('저장되었습니다!'),
-        duration: const Duration(seconds: 2),  // 2초 후 자동으로 사라짐
-      ),
-    );
-  }
-
+  final TextEditingController nameController = TextEditingController();
 
   int? selectedYear;
   String? selectedGender;
   String? selectedRegion;
   String? selectedUniversityType;
   String? selectedAcademicStatus;
+  String? selectedUniversity;
   String? selectedMajorField;
   String? selectedMajor;
   int? selectedSemester;
@@ -180,6 +40,100 @@ void _showSaveMessage() {
   bool isMultiChild = false;
   bool isBasicLiving = false;
   bool isSecondLowest = false;
+  String errorMessage = '';
+
+    @override
+  void initState() {
+    super.initState();
+    _loadProfileData(); // 프로필 데이터를 로드합니다.
+  }
+  // 프로필 데이터를 불러오는 함수
+  Future<void> _loadProfileData() async {
+    try {
+      String? userId = Provider.of<UserProfileProvider>(context, listen: false).getUserId();
+
+    if (userId == null) {
+      // userId가 없으면, 로그인 안된 경우 처리
+      setState(() {
+        errorMessage = '로그인된 사용자 정보가 없습니다';
+      });
+      return;
+    }
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/profile/$userId'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final profileData = jsonDecode(response.body);
+        nameController.text = profileData['name'] ?? ''; // 이름 데이터를 불러와서 nameController에 설정
+        selectedYear = profileData['year'];
+        selectedGender = profileData['gender'];
+        selectedRegion = profileData['region'];
+        selectedUniversityType = profileData['universityType'];
+        selectedAcademicStatus = profileData['academicStatus'];
+        selectedMajorField = profileData['majorField'];
+        selectedMajor = profileData['major'];
+        selectedGpa = profileData['gpa']?.toDouble() ?? 0.0;
+        setState(() {});
+      } else {
+        setState(() {
+          errorMessage = '프로필 데이터를 불러오는 데 실패했습니다';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        errorMessage = '네트워크 오류: 연결을 확인해주세요';
+      });
+    }
+  }
+
+  // 수정된 프로필 데이터를 서버로 저장하는 함수
+  Future<void> _saveProfileData() async {
+    try {
+      String? userId = Provider.of<UserProfileProvider>(context, listen: false).getUserId();
+
+      if (userId == null) {
+        setState(() {
+          errorMessage = '로그인된 사용자 정보가 없습니다';
+        });
+        return;
+      }
+      final response = await http.patch(
+        Uri.parse('$baseUrl/api/profile/$userId'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'name': nameController.text,
+          "age": selectedYear != null ? DateTime.now().year - selectedYear! : null,
+          'gender': selectedGender,
+          'residence': selectedRegion,
+          'universityType': selectedUniversityType,
+          'university': selectedUniversity,
+          'academicStatus': selectedAcademicStatus,
+          'majorField': selectedMajorField,
+          'major': selectedMajor,
+          'gpa': selectedGpa,
+          'isDisabled': isDisabled,
+          'isMultiChild': isMultiChild,
+          'isBasicLiving': isBasicLiving,
+          'isSecondLowest': isSecondLowest,
+        }),
+      );
+
+      if (response.statusCode == 201) {
+        // 성공적으로 업데이트되면 이전 화면으로 돌아가기
+        Navigator.pop(context);
+      } else {
+        setState(() {
+          errorMessage = '프로필 업데이트 실패';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        errorMessage = '네트워크 오류: 연결을 확인해주세요';
+      });
+    }
+  }
 
   final List<int> yearOptions = List.generate(
     60,
@@ -236,19 +190,9 @@ void _showSaveMessage() {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Text(
-            '<',
-            style: TextStyle(
-              fontSize: 24,
-              color: kPrimaryColor,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        
-          onPressed: () {
-                  GoRouter.of(context).pop(); 
-          },
-        ),
+          icon: const Icon(Icons.arrow_back, color: kPrimaryColor),
+          onPressed: () => context.pop(),
+        )
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -339,6 +283,34 @@ void _showSaveMessage() {
             ),
 
             const SizedBox(height: 24),
+            Row(
+  children: [
+    SizedBox(
+      width: MediaQuery.of(context).size.width * 0.3,
+      child: const Text(
+        '대학명',
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: kPrimaryColor,
+        ),
+      ),
+    ),
+    Expanded(
+      child: TextField(
+        onChanged: (value) => selectedUniversity = value,
+        decoration: const InputDecoration(
+          hintText: '입력 안 함',
+          border: OutlineInputBorder(),
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 10,
+          ),
+        ),
+      ),
+    ),
+  ],
+),
+const SizedBox(height: 24),
             Row(
               children: [
                 SizedBox(
@@ -457,7 +429,7 @@ void _showSaveMessage() {
             Padding(
   padding: const EdgeInsets.all(24),
   child: ElevatedButton(
-    onPressed: handleSave, 
+    onPressed: _saveProfileData, 
     style: ElevatedButton.styleFrom(
       backgroundColor: kPrimaryColor,
       minimumSize: const Size.fromHeight(48),

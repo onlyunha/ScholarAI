@@ -28,6 +28,11 @@ class UserProfileProvider extends ChangeNotifier {
   String? get getAcademicStatus => academicStatus;
   String? get getMemberId => memberId; 
 
+  String? getUserId() {
+    return memberId;
+  }
+
+
   // 데이터 업데이트
   void updateProfile({
     String? name,
@@ -63,3 +68,4 @@ class UserProfileProvider extends ChangeNotifier {
     notifyListeners();  // 모든 정보를 초기화한 후 listeners에게 알림
   }
 }
+

@@ -9,7 +9,7 @@
 import 'package:flutter/material.dart';
 import 'package:scholarai/constants/app_colors.dart';
 import 'package:scholarai/constants/app_images.dart';
-import 'package:scholarai/screens/settings/profile_view_screen.dart';
+import 'package:scholarai/screens/settings/profile_edit_screen.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({super.key});
@@ -50,7 +50,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const ProfileViewScreen(),
+                      builder: (_) => const ProfileEditScreen(),
                     ),
                   );
                 },

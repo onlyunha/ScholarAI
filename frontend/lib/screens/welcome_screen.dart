@@ -16,9 +16,7 @@ import 'package:scholarai/constants/app_images.dart';
 import 'package:scholarai/constants/app_routes.dart';
 import 'package:scholarai/constants/config.dart';
 import 'dart:convert';
-import 'auth/login_screen.dart';
 import 'home/main_screen.dart';
-import 'auth/signup_screen.dart';
 
 // 시작 화면 (Welcome)
 class WelcomeScreen extends StatelessWidget {
@@ -52,16 +50,40 @@ class WelcomeScreen extends StatelessWidget {
         );
 
         if (response.statusCode == 200) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const MainScreen()),
-          );
+          context.go(AppRoutes.main);
         } else {
-          print('백엔드 로그인 실패: ${response.body}');
+          showDialog(
+            context: context,
+            builder:
+                (_) => AlertDialog(
+                  title: const Text('로그인 실패'),
+                  content: Text('Google 로그인 실패: ${response.body}'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('확인'),
+                    ),
+                  ],
+                ),
+          );
         }
       }
     } catch (e) {
       print('구글 로그인 실패: $e');
+      showDialog(
+        context: context,
+        builder:
+            (_) => AlertDialog(
+              title: const Text('에러'),
+              content: Text('Google 로그인 중 문제가 발생했습니다.\n\n$e'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('확인'),
+                ),
+              ],
+            ),
+      );
     }
   }
 
@@ -86,18 +108,30 @@ class WelcomeScreen extends StatelessWidget {
         body: jsonEncode({'accessToken': token.accessToken}),
       );
 
-      if (response.statusCode == 200) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const MainScreen()),
-        );
-      } else {
-        print('백엔드 로그인 실패: ${response.body}');
-      }
-    } catch (e) {
-      print('카카오 로그인 실패: $e');
+ if (response.statusCode == 200) {
+      context.go(AppRoutes.main);
+    } else {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text('로그인 실패'),
+          content: Text('Kakao 로그인 실패: ${response.body}'),
+          actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('확인'))],
+        ),
+      );
     }
+  } catch (e) {
+    print('카카오 로그인 실패: $e');
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('에러'),
+        content: Text('Kakao 로그인 중 문제가 발생했습니다.\n\n$e'),
+        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('확인'))],
+      ),
+    );
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -196,7 +230,7 @@ class WelcomeScreen extends StatelessWidget {
                 // 이메일 회원가입 버튼
                 ElevatedButton(
                   onPressed: () {
-                    context.go(AppRoutes.signup); 
+                    context.go(AppRoutes.signup);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: kPrimaryColor,
