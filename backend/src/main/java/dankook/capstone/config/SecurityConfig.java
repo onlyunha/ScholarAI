@@ -41,7 +41,7 @@ public class SecurityConfig {
 //                                .userService(customOAuth2UserService))
 //                        .successHandler(customSuccessHandler)) //oauth2
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/api/auth/**", "/", "/api/scholarships/**").permitAll() //인증 없이 허용
+                        .requestMatchers("/api/auth/**", "/", "/api/scholarships/**", "/api/likes/**").permitAll() //인증 없이 허용
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated()) //그 외는 인증 필요
                 .logout(logout -> logout.disable()) // JWT에서는 별도의 로그아웃 로직 필요

@@ -68,6 +68,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
         String email = customUserDetails.getUsername(); //이메일(아이디)
+        Long memberId = customUserDetails.getMemberId(); //memberId 추출
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
@@ -78,11 +79,11 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         //jwt 생성
         String token = jwtUtil.generateJwt(email, role, 60*60*10L);
 
-        // 응답 메시지 작성
-        ResponseDto<Void> responseDto = new ResponseDto<>("로그인에 성공하였습니다.", null);
-
         //생성한 jwt를 response에 담아서 응답
         response.addHeader("Authorization", "Bearer " + token);
+
+        // 응답 메시지 작성
+        ResponseDto<Long> responseDto = new ResponseDto<>("로그인에 성공하였습니다.", memberId);
 
         // 응답 본문 작성
         try {

@@ -42,6 +42,10 @@ public class CustomUserDetails implements UserDetails {
         return member.getEmail();
     }
 
+    public Long getMemberId(){
+        return member.getId();
+    }
+
     @Override //계정 만료 여부
     public boolean isAccountNonExpired() {
         return true;

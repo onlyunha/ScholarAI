@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Builder
 @Getter
@@ -21,16 +24,16 @@ public class ScholarshipDetailResponseDto {
     private String universityType; //대학구분
     private String gradeSemester; //학년(학기)구분
     private String majorField; //학과구분
-    private String academicRequirement; //성적기준
-    private String incomeRequirement; //소득기준
-    private String fundingAmount; //지원금액
-    private String specificEligibility; //특정자격
-    private String regionalRequirement; //지역거주여부
-    private String selectionMethod; //선발방법
-    private String selectionCount; //선발인원
-    private String eligibilityRestriction; //자격제한
-    private String recommendationRequired; //추천필요여부
-    private String requiredDocuments; //제출서류
+    private List<String> academicRequirement; //성적기준
+    private List<String> incomeRequirement; //소득기준
+    private List<String> fundingAmount; //지원금액
+    private List<String> specificEligibility; //특정자격
+    private List<String> regionalRequirement; //지역거주여부
+    private List<String> selectionMethod; //선발방법
+    private List<String> selectionCount; //선발인원
+    private List<String> eligibilityRestriction; //자격제한
+    private List<String> recommendationRequired; //추천필요여부
+    private List<String> requiredDocuments; //제출서류
     private String websiteUrl; //홈페이지주소
     private LocalDate applicationStartDate; //모집시작일
     private LocalDate applicationEndDate; //모집종료일
@@ -46,19 +49,27 @@ public class ScholarshipDetailResponseDto {
                 .universityType(s.getUniversityType())
                 .gradeSemester(s.getGradeSemester())
                 .majorField(s.getMajorField())
-                .academicRequirement(s.getAcademicRequirement())
-                .incomeRequirement(s.getIncomeRequirement())
-                .fundingAmount(s.getFundingAmount())
-                .specificEligibility(s.getSpecificEligibility())
-                .regionalRequirement(s.getRegionalRequirement())
-                .selectionMethod(s.getSelectionMethod())
-                .selectionCount(s.getSelectionCount())
-                .eligibilityRestriction(s.getEligibilityRestriction())
-                .recommendationRequired(s.getRecommendationRequired())
-                .requiredDocuments(s.getRequiredDocuments())
+                .academicRequirement(splitByBullet(s.getAcademicRequirement()))
+                .incomeRequirement(splitByBullet(s.getIncomeRequirement()))
+                .fundingAmount(splitByBullet(s.getFundingAmount()))
+                .specificEligibility(splitByBullet(s.getSpecificEligibility()))
+                .regionalRequirement(splitByBullet(s.getRegionalRequirement()))
+                .selectionMethod(splitByBullet(s.getSelectionMethod()))
+                .selectionCount(splitByBullet(s.getSelectionCount()))
+                .eligibilityRestriction(splitByBullet(s.getEligibilityRestriction()))
+                .recommendationRequired(splitByBullet(s.getRecommendationRequired()))
+                .requiredDocuments(splitByBullet(s.getRequiredDocuments()))
                 .websiteUrl(s.getWebsiteUrl())
                 .applicationStartDate(s.getApplicationStartDate())
                 .applicationEndDate(s.getApplicationEndDate())
                 .build();
+    }
+    //○ 로 나뉘어진 여러 항목들을 List<String>으로 파싱
+    private static List<String> splitByBullet(String raw) {
+        if (raw == null || raw.isBlank()) return List.of(); //null이나 빈 문자열이면 빈 리스트 반환
+        return Arrays.stream(raw.split("○")) //○ 기준으로 split
+                .map(String::trim)                 //앞뒤 공백 제거
+                .filter(s -> !s.isEmpty())         //빈 항목 제거
+                .collect(Collectors.toList());
     }
 }
