@@ -21,7 +21,7 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: khy0309
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: capstone_db
       TZ: Asia/Seoul
     volumes:
