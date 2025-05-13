@@ -6,4 +6,4 @@
 /// Updt : 2025-04-28
 /// =============================================================
 
-const String baseUrl = 'http://your.backend.server';
+const String baseUrl = 'http://52.79.104.48:8080';
