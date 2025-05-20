@@ -2,6 +2,7 @@
 
 .env
 chroma_db/
+data/
 data/faiss_index/
 data/scholarships_cleaned.json
 sample_user_input.json
