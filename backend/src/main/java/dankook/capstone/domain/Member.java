@@ -25,6 +25,8 @@ public class Member {
 
     private String provider; //local, kakao, google
 
+    private String fcmToken; //FCM 토큰
+
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "profile_id")
     private Profile profile; //회원 프로필
@@ -53,5 +55,10 @@ public class Member {
     //회원 이름 수정
     public void updateName(String name){
         this.name = name;
+    }
+
+    //FCM 토큰 업데이트
+    public void updateFcmToken(String fcmToken){
+        this.fcmToken = fcmToken;
     }
 }

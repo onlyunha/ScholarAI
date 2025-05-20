@@ -39,3 +39,6 @@ out/
 .vscode/
 
 .env
+
+#Firebase 서비스 키 파일
+src/main/resources/firebase/scholarai_firebase_service_key.json

@@ -36,12 +36,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) //CSRF 보호 비활성화
                 .formLogin(formLogin -> formLogin.disable()) // JWT 사용 시 Form 로그인 비활성화
                 .httpBasic(httpBasic -> httpBasic.disable()) // HTTP Basic 인증 비활성화
-//                .oauth2Login(oauth2 -> oauth2
-//                        .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
-//                                .userService(customOAuth2UserService))
-//                        .successHandler(customSuccessHandler)) //oauth2
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/api/auth/**", "/", "/api/scholarships/**", "/api/likes/**").permitAll() //인증 없이 허용
+                        .requestMatchers("/api/auth/**", "/", "/api/scholarships/**", "/api/likes/**","/api/fcm-token/**").permitAll() //인증 없이 허용
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated()) //그 외는 인증 필요
                 .logout(logout -> logout.disable()) // JWT에서는 별도의 로그아웃 로직 필요
@@ -49,8 +45,7 @@ public class SecurityConfig {
                 .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class) //LoginFilter 추가
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())); // CORS 설정; //세션 비활성화
-
-
+        
         return http.build();
     }
 
@@ -69,6 +64,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
+        corsConfiguration.addAllowedOriginPattern("*"); // 개발 시 모든 Origin 허용
         corsConfiguration.setAllowedOrigins(List.of("http://10.0.2.2:8080")); // 허용할 출처(클라이언트의 주소)
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE")); // 허용할 메서드
         corsConfiguration.setAllowedHeaders(List.of("Content-Type", "Authorization")); // 허용할 헤더
