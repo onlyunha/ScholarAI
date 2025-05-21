@@ -60,6 +60,9 @@ public class ScholarshipLikeService {
                         .scholarshipId(like.getScholarship().getId())
                         .organizationName(like.getScholarship().getOrganizationName())
                         .productName(like.getScholarship().getProductName())
+                        .financialAidType(like.getScholarship().getFinancialAidType())
+                        .applicationStartDate(like.getScholarship().getApplicationStartDate())
+                        .applicationEndDate(like.getScholarship().getApplicationEndDate())
                         .likedAt(like.getCreatedAt())
                         .build()
                 ).toList();
