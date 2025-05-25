@@ -65,7 +65,7 @@ public class JWTUtil { //JWT를 생성하고 검증
         return Jwts.builder()
                 .setClaims(claims) //사용자 정보(클레임 = JWT의 Payload 부분에 들어가는 데이터) 추가
                 .setIssuedAt(new Date(System.currentTimeMillis())) //발급 시간
-                .setExpiration(new Date(System.currentTimeMillis() + expiredMs)) //만료 시간 설정
+                .setExpiration(new Date(System.currentTimeMillis() + expiredMs * 1000L)) //만료 시간 설정
                 .signWith(key, SignatureAlgorithm.HS256) //서명(변조 방지)
                 .compact(); //JWT 문자열 반환
     }

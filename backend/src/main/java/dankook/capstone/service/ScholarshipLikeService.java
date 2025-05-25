@@ -20,6 +20,7 @@ public class ScholarshipLikeService {
     private final ScholarshipLikeRepository scholarshipLikeRepository;
     private final MemberRepository memberRepository;
     private final ScholarshipRepository scholarshipRepository;
+    private final ScholarshipScheduler scholarshipScheduler;
 
     //찜 하기
     @Transactional
@@ -40,6 +41,9 @@ public class ScholarshipLikeService {
                 .build();
 
         scholarshipLikeRepository.save(scholarshipLike);
+
+        //장학금을 찜한 후 알림 예약
+        scholarshipScheduler.scheduleScholarshipReminder(memberId, scholarshipId);
     }
 
     //찜 취소

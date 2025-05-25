@@ -14,6 +14,10 @@ public class CustomUserDetails implements UserDetails {
 
     private final Member member;
 
+    public Member getMember() {
+        return member;
+    }
+
     /*
      * member 객체를 기반으로 이메일(아이디), 비밀번호, 역할(role) 등의 정보 반환
      */
