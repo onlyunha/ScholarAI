@@ -26,7 +26,7 @@ public class ProfileService {
 
         Profile profile = Profile.builder()
                 .member(member)
-                .age(profileRequestDto.getAge())
+                .birthYear(profileRequestDto.getBirthYear())
                 .gender(profileRequestDto.getGender())
                 .residence(profileRequestDto.getResidence())
                 .universityType(profileRequestDto.getUniversityType())
@@ -43,6 +43,7 @@ public class ProfileService {
                 .isSecondLowestIncome(profileRequestDto.isSecondLowestIncome())
                 .build();
 
+        member.setProfile(profile);
         Profile savedProfile = profileRepository.save(profile);
         return savedProfile.getId();
     }

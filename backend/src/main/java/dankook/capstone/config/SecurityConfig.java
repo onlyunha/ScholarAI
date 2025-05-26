@@ -39,7 +39,7 @@ public class SecurityConfig {
                 .formLogin(formLogin -> formLogin.disable()) // JWT 사용 시 Form 로그인 비활성화
                 .httpBasic(httpBasic -> httpBasic.disable()) // HTTP Basic 인증 비활성화
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/api/auth/**", "/", "/api/scholarships/**", "/api/likes/**","/api/fcm-token/**").permitAll() //인증 없이 허용
+                        .requestMatchers("/api/auth/**", "/", "/api/scholarships/**", "/api/likes/**","/api/profile/**","/api/fcm-token/**").permitAll() //인증 없이 허용
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated()) //그 외는 인증 필요
                 .logout(logout -> logout.disable()) // JWT에서는 별도의 로그아웃 로직 필요

@@ -22,7 +22,7 @@ public class Profile {
     private Member member;
 
     @Column(nullable = false)
-    private int age; //나이
+    private int birthYear; //출생년도
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -73,9 +73,9 @@ public class Profile {
     }
 
     @Builder
-    public Profile(Member member, int age, Gender gender, String residence, String universityType, String university, AcademicStatus academicStatus, int semester, String majorField, String major, BigDecimal gpa, int incomeLevel, boolean isDisabled, boolean isMultiChild, boolean isBasicLivingRecipient, boolean isSecondLowestIncome) {
+    public Profile(Member member, int birthYear, Gender gender, String residence, String universityType, String university, AcademicStatus academicStatus, int semester, String majorField, String major, BigDecimal gpa, int incomeLevel, boolean isDisabled, boolean isMultiChild, boolean isBasicLivingRecipient, boolean isSecondLowestIncome) {
         this.member = member;
-        this.age = age;
+        this.birthYear = birthYear;
         this.gender = gender;
         this.residence = residence;
         this.universityType = universityType;
