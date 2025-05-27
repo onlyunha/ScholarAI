@@ -7,8 +7,10 @@
 /// =============================================================
 
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../widgets/custom_app_bar.dart';
-import '../../../constants/app_colors.dart';
+import '../../../constants/app_images.dart';
+import '../../../constants/app_urls.dart';
 
 class HomeTab extends StatelessWidget {
   const HomeTab({super.key});
@@ -21,13 +23,22 @@ class HomeTab extends StatelessWidget {
         children: [
           // 1️⃣ 장학금 꿀팁 배너 - PageView 방식
           SizedBox(
-            height: 220,
+            height: 270,
             child: PageView(
               controller: PageController(viewportFraction: 0.85),
               children: const [
-                TipCard(title: '카드 1'),
-                TipCard(title: '카드 2'),
-                TipCard(title: '카드 3'),
+                TipCard(
+                  imagePath: AppImages.homeCard1,
+                  link: AppUrls.homeCard1,
+                ),
+                TipCard(
+                  imagePath: AppImages.homeCard2,
+                  link: AppUrls.homeCard2,
+                ),
+                TipCard(
+                  imagePath: AppImages.homeCard3,
+                  link: AppUrls.homeCard3,
+                ),
               ],
             ),
           ),
@@ -109,25 +120,38 @@ class HomeTab extends StatelessWidget {
 
 // 💡 장학금 꿀팁 카드
 class TipCard extends StatelessWidget {
-  final String title;
+  final String imagePath;
+  final String? link;
 
-  const TipCard({super.key, required this.title});
+  const TipCard({super.key, required this.imagePath, this.link});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: kPrimaryColor.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: kPrimaryColor.withOpacity(0.2)),
+    final card = ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: Image.asset(
+        imagePath,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
       ),
-      child: Center(
-        child: Text(
-          title,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-        ),
+    );
+
+    return AspectRatio(
+      aspectRatio: 4 / 3,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+        child:
+            link != null
+                ? GestureDetector(
+                  onTap: () async {
+                    if (await canLaunchUrl(Uri.parse(link!))) {
+                      await launchUrl(Uri.parse(link!));
+                    }
+                  },
+                  child: card,
+                )
+                : card,
       ),
     );
   }

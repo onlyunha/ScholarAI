@@ -3,7 +3,7 @@
 /// Desc : 프로필 수정
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-21
-/// Updt : 2025-05-07
+/// Updt : 2025-05-20
 /// =============================================================
 import 'dart:convert';
 
@@ -42,23 +42,25 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   bool isSecondLowest = false;
   String errorMessage = '';
 
-    @override
+  @override
   void initState() {
     super.initState();
     _loadProfileData(); // 프로필 데이터를 로드합니다.
   }
+
   // 프로필 데이터를 불러오는 함수
   Future<void> _loadProfileData() async {
     try {
-      String? userId = Provider.of<UserProfileProvider>(context, listen: false).getUserId();
+      String? userId =
+          Provider.of<UserProfileProvider>(context, listen: false).getUserId();
 
-    if (userId == null) {
-      // userId가 없으면, 로그인 안된 경우 처리
-      setState(() {
-        errorMessage = '로그인된 사용자 정보가 없습니다';
-      });
-      return;
-    }
+      if (userId == null) {
+        // userId가 없으면, 로그인 안된 경우 처리
+        setState(() {
+          errorMessage = '로그인된 사용자 정보가 없습니다';
+        });
+        return;
+      }
       final response = await http.get(
         Uri.parse('$baseUrl/api/profile/$userId'),
         headers: {'Content-Type': 'application/json'},
@@ -66,10 +68,11 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
 
       if (response.statusCode == 200) {
         final profileData = jsonDecode(response.body);
-        nameController.text = profileData['name'] ?? ''; // 이름 데이터를 불러와서 nameController에 설정
+        nameController.text =
+            profileData['name'] ?? ''; // 이름 데이터를 불러와서 nameController에 설정
         selectedYear = profileData['year'];
         selectedGender = profileData['gender'];
-        selectedRegion = profileData['region'];
+        selectedRegion = profileData['residence'];
         selectedUniversityType = profileData['universityType'];
         selectedAcademicStatus = profileData['academicStatus'];
         selectedMajorField = profileData['majorField'];
@@ -91,7 +94,8 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   // 수정된 프로필 데이터를 서버로 저장하는 함수
   Future<void> _saveProfileData() async {
     try {
-      String? userId = Provider.of<UserProfileProvider>(context, listen: false).getUserId();
+      String? userId =
+          Provider.of<UserProfileProvider>(context, listen: false).getUserId();
 
       if (userId == null) {
         setState(() {
@@ -104,7 +108,8 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'name': nameController.text,
-          "age": selectedYear != null ? DateTime.now().year - selectedYear! : null,
+          "age":
+              selectedYear != null ? DateTime.now().year - selectedYear! : null,
           'gender': selectedGender,
           'residence': selectedRegion,
           'universityType': selectedUniversityType,
@@ -117,11 +122,22 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
           'isMultiChild': isMultiChild,
           'isBasicLiving': isBasicLiving,
           'isSecondLowest': isSecondLowest,
+          'semester': selectedSemester,
+          'incomeLevel': selectedIncomeLevel,
         }),
       );
 
       if (response.statusCode == 201) {
-        // 성공적으로 업데이트되면 이전 화면으로 돌아가기
+        Provider.of<UserProfileProvider>(context, listen: false).updateProfile(
+          name: nameController.text,
+          birthYear: selectedYear,
+          gender: selectedGender,
+          region: selectedRegion,
+          university: selectedUniversity,
+          universityType: selectedUniversityType,
+          academicStatus: selectedAcademicStatus,
+          memberId: userId, // ← 필요하면 포함
+        );
         Navigator.pop(context);
       } else {
         setState(() {
@@ -192,7 +208,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: kPrimaryColor),
           onPressed: () => context.pop(),
-        )
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -214,7 +230,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                           ..text =
                               nameController.text.isNotEmpty
                                   ? nameController.text
-                                  : 'NAME',
+                                  : '이름을 입력하세요',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 18,
@@ -223,7 +239,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                     ),
                     decoration: const InputDecoration(
                       border: InputBorder.none,
-                      hintText: 'NAME',
+                      hintText: '이름을 입력하세요',
                       hintStyle: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -284,33 +300,33 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
 
             const SizedBox(height: 24),
             Row(
-  children: [
-    SizedBox(
-      width: MediaQuery.of(context).size.width * 0.3,
-      child: const Text(
-        '대학명',
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          color: kPrimaryColor,
-        ),
-      ),
-    ),
-    Expanded(
-      child: TextField(
-        onChanged: (value) => selectedUniversity = value,
-        decoration: const InputDecoration(
-          hintText: '입력 안 함',
-          border: OutlineInputBorder(),
-          contentPadding: EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 10,
-          ),
-        ),
-      ),
-    ),
-  ],
-),
-const SizedBox(height: 24),
+              children: [
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.3,
+                  child: const Text(
+                    '대학명',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: kPrimaryColor,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: TextField(
+                    onChanged: (value) => selectedUniversity = value,
+                    decoration: const InputDecoration(
+                      hintText: '입력 안 함',
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
             Row(
               children: [
                 SizedBox(
@@ -427,16 +443,16 @@ const SizedBox(height: 24),
               ],
             ),
             Padding(
-  padding: const EdgeInsets.all(24),
-  child: ElevatedButton(
-    onPressed: _saveProfileData, 
-    style: ElevatedButton.styleFrom(
-      backgroundColor: kPrimaryColor,
-      minimumSize: const Size.fromHeight(48),
-    ),
-    child: const Text('저장', style: TextStyle(fontSize: 16)),
-  ),
-),
+              padding: const EdgeInsets.all(24),
+              child: ElevatedButton(
+                onPressed: _saveProfileData,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: kPrimaryColor,
+                  minimumSize: const Size.fromHeight(48),
+                ),
+                child: const Text('저장', style: TextStyle(fontSize: 16)),
+              ),
+            ),
           ],
         ),
       ),
@@ -509,5 +525,4 @@ const SizedBox(height: 24),
       controlAffinity: ListTileControlAffinity.leading,
     );
   }
-  
 }

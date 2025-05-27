@@ -3,7 +3,7 @@
 /// Desc : 유저 정보 관리
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-21
-/// Updt : 2025-04-23
+/// Updt : 2025-05-20
 /// =============================================================
 
 import 'package:flutter/foundation.dart';
