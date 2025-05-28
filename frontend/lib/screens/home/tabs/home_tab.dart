@@ -5,8 +5,11 @@
 /// Crtd : 2025-04-19
 /// Updt : 2025-05-07
 /// =============================================================
+library;
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:scholarai/constants/app_colors.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../widgets/custom_app_bar.dart';
 import '../../../constants/app_images.dart';
@@ -53,27 +56,32 @@ class HomeTab extends StatelessWidget {
                 children: [
                   // 튜토리얼 바로가기 (왼쪽)
                   Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.2),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
+                    child: GestureDetector(
+                      onTap: () {
+                        context.push('/onboarding'); // ✅ GoRouter로 튜토리얼 이동
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.2),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: const Center(
+                          child: Text(
+                            '🎓 튜토리얼 바로가기',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                        ],
-                      ),
-                      child: const Center(
-                        child: Text(
-                          '🎓 튜토리얼 바로가기',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          textAlign: TextAlign.center,
                         ),
                       ),
                     ),

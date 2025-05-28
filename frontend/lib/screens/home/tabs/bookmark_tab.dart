@@ -5,6 +5,7 @@
 /// Crtd : 2025-04-19
 /// Updt : 2025-05-11
 /// =============================================================
+library;
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -27,6 +28,44 @@ class BookmarkTab extends StatefulWidget {
 
 class _BookmarkTabState extends State<BookmarkTab> {
   bool isBookmarkMode = true;
+  String? memberId;
+
+  DateTime focusedDay = DateTime.now();
+  DateTime? selectedDay;
+
+  String convertToKorean(String code) {
+    switch (code) {
+      case 'MERIT':
+        return '성적우수';
+      case 'INCOME':
+        return '소득구분';
+      case 'REGIONAL':
+        return '지역연고';
+      case 'DISABILITY':
+        return '장애인';
+      case 'SPECIAL':
+        return '특기자';
+      case 'OTHER':
+        return '기타';
+      case 'NONE':
+        return '해당없음';
+      default:
+        return code;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    selectedDay = focusedDay;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    memberId ??=
+        Provider.of<UserProfileProvider>(context, listen: false).getUserId();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +168,6 @@ class _BookmarkTabState extends State<BookmarkTab> {
   Widget _buildBookmarkList() {
     final bookmarkedProvider = context.watch<BookmarkedProvider>();
     final bookmarkedData = bookmarkedProvider.bookmarkedData;
-    final memberId = context.read<UserProfileProvider>().getUserId();
 
     if (bookmarkedData.isEmpty) {
       return const Center(
@@ -144,17 +182,25 @@ class _BookmarkTabState extends State<BookmarkTab> {
       itemBuilder: (context, index) {
         final item = bookmarkedData[index];
 
+        final sid = item['scholarshipId'];
+        if (sid == null) return const SizedBox.shrink();
+        final int id = sid is int ? sid : int.tryParse(sid.toString()) ?? -1;
+
         return ScholarshipCard(
           productName: item['productName'],
           organization: item['organizationName'],
-          types: ['#${item['type'] ?? '기타'}'],
-          start: item['start'] ?? '',
-          end: item['end'] ?? '',
+          types: [
+            '#${item['type'] ?? convertToKorean(item['financialAidType'] ?? 'OTHER')}',
+          ],
+          start: item['start'] ?? item['applicationStartDate'] ?? '',
+          end: item['end'] ?? item['applicationEndDate'] ?? '',
+
           isBookmarked: bookmarkedProvider.isBookmarked(item['scholarshipId']),
           onBookmarkToggle: () {
             if (memberId != null) {
+              print('🧪 memberId: $memberId'); // 디버깅
               bookmarkedProvider.toggleBookmark(
-                memberId,
+                memberId!,
                 item['scholarshipId'],
               );
             }
@@ -167,9 +213,6 @@ class _BookmarkTabState extends State<BookmarkTab> {
   }
 
   Widget _buildCalendar() {
-    DateTime _focusedDay = DateTime.now();
-    DateTime? _selectedDay = _focusedDay;
-
     final bookmarkedProvider = context.watch<BookmarkedProvider>();
     final bookmarkedData = bookmarkedProvider.bookmarkedData;
     final memberId = context.read<UserProfileProvider>().getUserId();
@@ -195,19 +238,19 @@ class _BookmarkTabState extends State<BookmarkTab> {
                 locale: 'ko_KR',
                 firstDay: DateTime.utc(2020, 1, 1),
                 lastDay: DateTime.utc(2030, 12, 31),
-                focusedDay: _focusedDay,
-                selectedDayPredicate: (day) => isSameDay(day, _selectedDay),
+                focusedDay: focusedDay,
+                selectedDayPredicate: (day) => isSameDay(day, selectedDay),
                 eventLoader: getEventsForDay,
                 onDaySelected: (selectedDay, focusedDay) {
                   setState(() {
-                    _selectedDay = selectedDay;
-                    _focusedDay = focusedDay;
+                    selectedDay = selectedDay;
+                    focusedDay = focusedDay;
                   });
                 },
                 onHeaderTapped: (_) async {
                   final selectedDate = await showMonthYearPicker(
                     context: context,
-                    initialDate: _focusedDay,
+                    initialDate: focusedDay,
                     firstDate: DateTime(2020),
                     lastDate: DateTime(2030),
                     locale: const Locale('ko'),
@@ -216,7 +259,9 @@ class _BookmarkTabState extends State<BookmarkTab> {
                         data: Theme.of(context).copyWith(
                           highlightColor: kPrimaryColor,
                           colorScheme: ColorScheme.light(
-                            primary: kPrimaryColor.withOpacity(0.8), // 헤더, 선택 포커스 컬러
+                            primary: kPrimaryColor.withOpacity(
+                              0.8,
+                            ), // 헤더, 선택 포커스 컬러
                             onPrimary: Colors.white, // 헤더 텍스트
                             surface: Colors.white, // 배경색
                             onSurface: Colors.black87, // 일반 텍스트
@@ -247,7 +292,6 @@ class _BookmarkTabState extends State<BookmarkTab> {
                               ),
                             ),
                           ),
-                          dialogBackgroundColor: Colors.white,
                           dialogTheme: DialogTheme(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
@@ -258,7 +302,7 @@ class _BookmarkTabState extends State<BookmarkTab> {
                         child: MediaQuery(
                           data: MediaQuery.of(
                             context,
-                          ).copyWith(textScaleFactor: 0.95),
+                          ).copyWith(textScaler: TextScaler.linear(0.95)),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: child!,
@@ -270,12 +314,12 @@ class _BookmarkTabState extends State<BookmarkTab> {
 
                   if (selectedDate != null) {
                     setState(() {
-                      _focusedDay = DateTime(
+                      focusedDay = DateTime(
                         selectedDate.year,
                         selectedDate.month,
                         1,
                       );
-                      _selectedDay = DateTime(
+                      selectedDay = DateTime(
                         selectedDate.year,
                         selectedDate.month,
                         1,
@@ -335,9 +379,8 @@ class _BookmarkTabState extends State<BookmarkTab> {
               ),
             ),
             const SizedBox(height: 16),
-            if (_selectedDay != null &&
-                getEventsForDay(_selectedDay!).isNotEmpty)
-              ...getEventsForDay(_selectedDay!).map(
+            if (selectedDay != null && getEventsForDay(selectedDay!).isNotEmpty)
+              ...getEventsForDay(selectedDay!).map(
                 (item) => GestureDetector(
                   onTap:
                       () => ScholarshipDetailSheet.show(

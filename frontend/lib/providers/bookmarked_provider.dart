@@ -1,16 +1,17 @@
 /// =============================================================
-/// File : user_bookmarked_provider.dart
+/// File :  bookmarked_provider.dart
 /// Desc : 유저 정보 관리
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-05-20
 /// Updt : 2025-05-20
 /// =============================================================
-
+library;
 
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:scholarai/constants/config.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BookmarkedProvider extends ChangeNotifier {
   final Set<int> _bookmarkedIds = {};
@@ -22,7 +23,9 @@ class BookmarkedProvider extends ChangeNotifier {
   /// 서버에서 찜 목록 불러오기
   Future<void> loadBookmarks(String memberId) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/api/likes/$memberId'));
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/likes/$memberId'),
+      );
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
@@ -35,8 +38,8 @@ class BookmarkedProvider extends ChangeNotifier {
           _bookmarkedIds.add(item['scholarshipId']);
           _bookmarkedData.add(item as Map<String, dynamic>);
         }
-
         notifyListeners();
+        
       } else {
         debugPrint('찜 목록 불러오기 실패: ${response.statusCode}');
       }
@@ -49,15 +52,39 @@ class BookmarkedProvider extends ChangeNotifier {
   Future<void> toggleBookmark(String memberId, int scholarshipId) async {
     final isLiked = _bookmarkedIds.contains(scholarshipId);
 
-    final url = Uri.parse('$baseUrl/api/likes?memberId=$memberId&scholarshipId=$scholarshipId');
-    final response = isLiked
-        ? await http.delete(url)
-        : await http.post(url);
+    final url = Uri.parse(
+      '$baseUrl/api/likes?memberId=$memberId&scholarshipId=$scholarshipId',
+    );
+
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('accessToken') ?? '';
+    print('📡 요청 URL: $url');
+    print('🔐 전송할 토큰: $token');
+    print('👤 전송할 memberId: $memberId');
+
+    final response =
+        isLiked
+            ? await http.delete(
+              url,
+              headers: {
+                'Authorization': token,
+                'Content-Type': 'application/json',
+              },
+            )
+            : await http.post(
+              url,
+              headers: {
+                'Authorization': token,
+                'Content-Type': 'application/json',
+              },
+            );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       if (isLiked) {
         _bookmarkedIds.remove(scholarshipId);
-        _bookmarkedData.removeWhere((item) => item['scholarshipId'] == scholarshipId);
+        _bookmarkedData.removeWhere(
+          (item) => item['scholarshipId'] == scholarshipId,
+        );
       } else {
         _bookmarkedIds.add(scholarshipId);
         final detail = await fetchScholarshipDetail(scholarshipId);
@@ -72,7 +99,9 @@ class BookmarkedProvider extends ChangeNotifier {
   /// 개별 장학금 상세 불러오기 (찜 직후 데이터 확보용)
   Future<Map<String, dynamic>> fetchScholarshipDetail(int id) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/api/scholarships/$id'));
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/scholarships/$id'),
+      );
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       }

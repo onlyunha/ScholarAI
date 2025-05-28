@@ -5,6 +5,8 @@
 /// Crtd : 2025-04-21
 /// Updt : 2025-05-20
 /// =============================================================
+library;
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -62,15 +64,13 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         return;
       }
       final response = await http.get(
-        Uri.parse('$baseUrl/api/profile/$userId'),
+        Uri.parse('$baseUrl/api/profile?memberId=$userId'),
         headers: {'Content-Type': 'application/json'},
       );
 
       if (response.statusCode == 200) {
         final profileData = jsonDecode(response.body);
-        nameController.text =
-            profileData['name'] ?? ''; // 이름 데이터를 불러와서 nameController에 설정
-        selectedYear = profileData['year'];
+        selectedYear = profileData['birthYear'];
         selectedGender = profileData['gender'];
         selectedRegion = profileData['residence'];
         selectedUniversityType = profileData['universityType'];
@@ -103,29 +103,56 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         });
         return;
       }
-      final response = await http.patch(
-        Uri.parse('$baseUrl/api/profile/$userId'),
+
+      final url = Uri.parse('$baseUrl/api/profile?memberId=$userId');
+      final body = jsonEncode({
+        'birthYear': selectedYear,
+        'gender': selectedGender,
+        'residence': selectedRegion,
+        'universityType': selectedUniversityType,
+        'university': selectedUniversity,
+        'academicStatus': selectedAcademicStatus,
+        'majorField': selectedMajorField,
+        'major': selectedMajor,
+        'gpa': selectedGpa,
+        'disabled': isDisabled,
+        'multiChild': isMultiChild,
+        'incomeLevel': selectedIncomeLevel,
+        'basicLivingRecipient': isBasicLiving,
+        'semester': selectedSemester,
+        'secondLowestIncome': isSecondLowest,
+      });
+
+      print('📡 요청 URL: $url');
+      print('📤 전송 내용: $body');
+
+      final response = await http.post(
+        url,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'name': nameController.text,
-          "age":
-              selectedYear != null ? DateTime.now().year - selectedYear! : null,
-          'gender': selectedGender,
-          'residence': selectedRegion,
-          'universityType': selectedUniversityType,
-          'university': selectedUniversity,
-          'academicStatus': selectedAcademicStatus,
-          'majorField': selectedMajorField,
-          'major': selectedMajor,
-          'gpa': selectedGpa,
-          'isDisabled': isDisabled,
-          'isMultiChild': isMultiChild,
-          'isBasicLiving': isBasicLiving,
-          'isSecondLowest': isSecondLowest,
-          'semester': selectedSemester,
-          'incomeLevel': selectedIncomeLevel,
-        }),
+        body: body,
       );
+
+      print('📩 응답코드: ${response.statusCode}');
+      print('📩 응답내용: ${response.body}');
+
+      // 모든 항목이 null이면 저장 안 됨
+      if (selectedYear == null ||
+          selectedGender == null ||
+          selectedRegion == null ||
+          selectedUniversityType == null ||
+          selectedAcademicStatus == null ||
+          selectedSemester == null ||
+          selectedMajorField == null ||
+          selectedMajor == null ||
+          selectedUniversity == null ||
+          selectedUniversity!.isEmpty ||
+          selectedGpa == 0.0 ||
+          selectedIncomeLevel == null) {
+        setState(() {
+          errorMessage = '모든 항목을 입력해야 저장할 수 있습니다.';
+        });
+        return;
+      }
 
       if (response.statusCode == 201) {
         Provider.of<UserProfileProvider>(context, listen: false).updateProfile(
@@ -145,6 +172,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         });
       }
     } catch (e) {
+      print('❌ 예외 발생: $e');
       setState(() {
         errorMessage = '네트워크 오류: 연결을 확인해주세요';
       });
@@ -264,6 +292,13 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               genderOptions,
               (val) => setState(() => selectedGender = val),
               isMap: true,
+            ),
+            _buildDropdownRow(
+              '소득 분위',
+              selectedIncomeLevel,
+              incomeLevels,
+              (val) => setState(() => selectedIncomeLevel = val),
+              isInt: true,
             ),
             _buildDropdownRow(
               '거주지',
@@ -508,7 +543,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                       child: Text(isInt ? '$option' : option.toString()),
                     );
                   }
-                }).toList(),
+                }),
               ],
             ),
           ),

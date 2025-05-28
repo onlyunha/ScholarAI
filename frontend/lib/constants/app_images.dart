@@ -5,6 +5,7 @@
 /// Crtd : 2025-04-28
 /// Updt : 2025-04-28
 /// =============================================================
+library;
 
 class AppImages {
   static const mainLogo = 'assets/images/main_logo.png';

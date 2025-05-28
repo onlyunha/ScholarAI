@@ -5,6 +5,7 @@
 /// Crtd : 2025-04-28
 /// Updt : 2025-04-28
 /// =============================================================
+library;
 
 class AppRoutes {
   static const signup = '/signup';
@@ -14,4 +15,5 @@ class AppRoutes {
   static const login = '/login';
   static const profileView = '/profile-view';
   static const profileEdit = '/profile-edit'; 
+
 }

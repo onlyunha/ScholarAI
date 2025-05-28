@@ -5,6 +5,7 @@
 /// Crtd : 2025-04-21
 /// Updt : 2025-05-20
 /// =============================================================
+library;
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -38,6 +39,7 @@ class _ScholarshipTabState extends State<ScholarshipTab> {
   bool isAllSelected = true;
 
   List<Map<String, dynamic>> filteredScholarships = [];
+  List<Map<String, dynamic>> recommendedScholarships = [];
 
   int currentPage = 0;
   int totalPages = 1;
@@ -48,7 +50,14 @@ class _ScholarshipTabState extends State<ScholarshipTab> {
     super.initState();
     selectedTypes = List.from(aidTypes);
     selectedPeriod = '모집중';
-    handleSearch(); // API로부터 데이터 가져오기
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final memberId = context.read<UserProfileProvider>().getUserId();
+      if (memberId != null) {
+        await context.read<BookmarkedProvider>().loadBookmarks(memberId);
+      }
+      handleSearch(); // 북마크 로딩 완료 후 장학금 검색
+    });
   }
 
   Future<void> handleSearch({int page = 0}) async {
@@ -227,7 +236,7 @@ class _ScholarshipTabState extends State<ScholarshipTab> {
                               ),
                             ),
                           );
-                        }).toList(),
+                        }),
                       ],
                     ),
                     const SizedBox(height: 28),
@@ -586,10 +595,9 @@ class _ScholarshipTabState extends State<ScholarshipTab> {
                                       context,
                                       item['id'],
                                     ),
-
-                                isBookmarked: bookmarkedProvider.isBookmarked(
-                                  item['id'],
-                                ),
+                                isBookmarked: context
+                                    .watch<BookmarkedProvider>()
+                                    .isBookmarked(item['id']),
                                 onBookmarkToggle: () {
                                   if (memberId != null) {
                                     bookmarkedProvider.toggleBookmark(
@@ -607,29 +615,55 @@ class _ScholarshipTabState extends State<ScholarshipTab> {
                               );
                             },
                           ))
-                      : Center(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // TODO: 추천 로직 구현
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: kPrimaryColor,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 32,
-                              vertical: 16,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                      : Column(
+                        children: [
+                          const SizedBox(height: 12),
+                          const Icon(
+                            Icons.emoji_objects,
+                            size: 48,
+                            color: kPrimaryColor,
+                          ),
+                          const SizedBox(height: 16),
+                          RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontFamily: 'Pretendard',
+                                color: Colors.black,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: '회원',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: kPrimaryColor,
+                                  ),
+                                ),
+                                const TextSpan(
+                                  text: '님을 위한\n',
+                                  style: TextStyle(fontWeight: FontWeight.w300),
+                                ),
+                                const TextSpan(
+                                  text: '추천 장학금',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                const TextSpan(
+                                  text: '이에요!',
+                                  style: TextStyle(fontWeight: FontWeight.w300),
+                                ),
+                              ],
                             ),
                           ),
-                          child: const Text(
-                            '장학금 추천받기',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                          const SizedBox(height: 24),
+                          Expanded(
+                            child: ListView(
+                              children: [
+                                // TODO: 여기에 추천 장학금 카드 삽입
+                              ],
                             ),
                           ),
-                        ),
+                        ],
                       ),
             ),
 

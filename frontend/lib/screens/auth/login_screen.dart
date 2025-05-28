@@ -5,12 +5,16 @@
 /// Crtd : 2025-04-02
 /// Updt : 2025-04-28
 /// =============================================================
+library;
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:scholarai/constants/app_images.dart';
+import 'package:scholarai/providers/user_profile_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../constants/app_routes.dart';
 import '../../constants/app_strings.dart';
 import '../../constants/app_colors.dart';
@@ -27,7 +31,6 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen>
     with SingleTickerProviderStateMixin {
-
   // 이메일, 비밀번호 입력을 위한 컨트롤러
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -73,12 +76,36 @@ class _LoginScreenState extends State<LoginScreen>
       body: jsonEncode({'email': email, 'password': password}),
     );
 
-    // 성공: 메인 화면으로 이동 
+    // 성공: 메인 화면으로 이동
     if (response.statusCode == 200) {
+      final rawToken =
+          response.headers['authorization'] ??
+          response.headers['Authorization'];
+      final token =
+          rawToken != null && !rawToken.startsWith('Bearer ')
+              ? 'Bearer $rawToken'
+              : rawToken;
+
+      final resBody = jsonDecode(response.body);
+      final memberId = resBody['data'].toString();
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('accessToken', token ?? '');
+      await prefs.setString('memberId', memberId);
+
+      // 디버깅용
+      print('🔐 저장된 토큰: $token');
+      print('👤 저장된 memberId: $memberId');
+
+      Provider.of<UserProfileProvider>(
+        context,
+        listen: false,
+      ).updateProfile(memberId: memberId);
+
+      print('🔐 저장된 토큰: $token'); // 디버깅용
       context.go(AppRoutes.main);
 
-
-    // 실패: 에러 메시지 + shake 애니메이션 
+      // 실패: 에러 메시지 + shake 애니메이션
     } else {
       final resBody = jsonDecode(response.body);
       if (resBody['message'].toString().contains('이메일')) {
@@ -88,6 +115,7 @@ class _LoginScreenState extends State<LoginScreen>
       }
       _shakeController.forward(from: 0);
     }
+    print('🔴 response.headers: ${response.headers}');
   }
 
   // 회원 가입 화면 이동 함수
@@ -108,7 +136,6 @@ class _LoginScreenState extends State<LoginScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-
                 // 어플 로고
                 Image.asset(
                   AppImages.mainLogo,
@@ -154,7 +181,7 @@ class _LoginScreenState extends State<LoginScreen>
                   ),
                 ),
                 const SizedBox(height: 16),
-                
+
                 // 오류 메시지 + shake 애니메이션
                 AnimatedBuilder(
                   animation: _shakeController,

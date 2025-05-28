@@ -3,10 +3,12 @@
 /// Desc : 메인
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-03-23
-/// Updt : 2025-05-20
+/// Updt : 2025-05-28
 /// =============================================================
+library;
 
 import 'package:flutter/material.dart';
+import 'package:scholarai/constants/app_colors.dart';
 import 'package:scholarai/providers/bookmarked_provider.dart';
 import 'package:scholarai/router.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
@@ -15,15 +17,28 @@ import 'package:scholarai/providers/user_profile_provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:month_year_picker/month_year_picker.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 // 앱의 진입점
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('ko_KR', null);
+
   // 카카오 SDK 초기화
   KakaoSdk.init(nativeAppKey: 'dec207abce195979ff115068369eae7c');
 
-  WidgetsFlutterBinding.ensureInitialized();
-  await initializeDateFormatting('ko_KR', null);
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token'); // 또는 로그인 여부
+  final seenTutorial = prefs.getBool('seenTutorial') ?? false;
+
+  String initialRoute;
+  if (token == null) {
+    initialRoute = '/'; // Welcome
+  } else if (!seenTutorial) {
+    initialRoute = '/onboarding';
+  } else {
+    initialRoute = '/main';
+  }
 
   // Flujtter 오류 처리 설정
   FlutterError.onError = (FlutterErrorDetails details) {
@@ -37,34 +52,47 @@ void main() async {
         ChangeNotifierProvider(create: (_) => UserProfileProvider()),
         ChangeNotifierProvider(create: (_) => BookmarkedProvider()),
       ],
-      child: const MyApp(),
+      child: MyApp(initialRoute: initialRoute),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String initialRoute;
+  const MyApp({super.key, required this.initialRoute});
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userProfile = Provider.of<UserProfileProvider>(
+        context,
+        listen: false,
+      );
+      final bookmarkedProvider = Provider.of<BookmarkedProvider>(
+        context,
+        listen: false,
+      );
+
+      final memberId = userProfile.memberId;
+      if (memberId != null) {
+        bookmarkedProvider.loadBookmarks(memberId);
+      }
+    });
+
     return MaterialApp.router(
       title: 'ScholarAI',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        brightness: Brightness.light,
-        scaffoldBackgroundColor: Colors.white,
         fontFamily: 'Pretendard',
-        textTheme: const TextTheme(
-          bodyMedium: TextStyle(color: Color(0xFF222222)),
-        ),
+        scaffoldBackgroundColor: Colors.white,
         colorScheme: ColorScheme.light(
-          primary: Color(0xFF4A6CF7),
-          secondary: Color(0xFFE5EBFF),
-          error: Color(0xFFFF4D4D),
+          primary: kPrimaryColor,
+          secondary: kSubColor,
+          error: kErrorColor,
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF4A6CF7),
+            backgroundColor: kPrimaryColor,
             foregroundColor: Colors.white,
             minimumSize: const Size.fromHeight(48),
             shape: RoundedRectangleBorder(
@@ -73,7 +101,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
         textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(foregroundColor: const Color(0xFF4A6CF7)),
+          style: TextButton.styleFrom(foregroundColor: kPrimaryColor),
         ),
       ),
       localizationsDelegates: [
@@ -88,7 +116,7 @@ class MyApp extends StatelessWidget {
       ],
 
       // 첫 화면 설정
-      routerConfig: router,
+      routerConfig: getRouter(initialRoute),
     );
   }
 }

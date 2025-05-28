@@ -5,6 +5,7 @@
 /// Crtd : 2025-04-02
 /// Updt : 2025-04-28
 /// =============================================================
+library;
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -29,12 +30,12 @@ class WelcomeScreen extends StatelessWidget {
 
   // 구글 로그인 처리
   Future<void> handleGoogleSignIn(BuildContext context) async {
-    final GoogleSignIn _googleSignIn = GoogleSignIn(
+    final GoogleSignIn googleSignIn = GoogleSignIn(
       scopes: ['email', 'profile'],
     );
 
     try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
       if (googleUser == null) return;
 
       final GoogleSignInAuthentication googleAuth =

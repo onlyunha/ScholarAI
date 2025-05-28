@@ -5,6 +5,7 @@
 /// Crtd : 2025-04-19
 /// Updt : 2025-04-28
 /// =============================================================
+library;
 
 import 'package:flutter/material.dart';
 import 'package:scholarai/constants/app_colors.dart';
