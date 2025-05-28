@@ -70,6 +70,7 @@ public class SecurityConfig {
         corsConfiguration.setAllowedOrigins(List.of("http://10.0.2.2:8080")); // 허용할 출처(클라이언트의 주소)
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE")); // 허용할 메서드
         corsConfiguration.setAllowedHeaders(List.of("Content-Type", "Authorization")); // 허용할 헤더
+        corsConfiguration.setExposedHeaders(List.of("Authorization")); //브라우저 환경일 경우
         corsConfiguration.setAllowCredentials(true); // 자격 증명 허용
         corsConfiguration.setMaxAge(3600L); // 캐시 시간 설정
 

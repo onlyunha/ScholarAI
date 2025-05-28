@@ -2,7 +2,9 @@ package dankook.capstone.dto;
 
 import dankook.capstone.domain.AcademicStatus;
 import dankook.capstone.domain.Gender;
+import dankook.capstone.domain.Profile;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +13,7 @@ import java.math.BigDecimal;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ProfileRequestDto {
     private int birthYear; //출생년도
     private Gender gender; //성별
@@ -27,4 +30,24 @@ public class ProfileRequestDto {
     private boolean isMultiChild; //다자녀가구여부
     private boolean isBasicLivingRecipient; //기초생활수급자여부
     private boolean isSecondLowestIncome; //차상위계층여부
+
+    public static ProfileRequestDto from(Profile profile) {
+        return ProfileRequestDto.builder()
+                .birthYear(profile.getBirthYear())
+                .gender(profile.getGender())  // enum이면 .name() 붙여도 됨
+                .residence(profile.getResidence())
+                .universityType(profile.getUniversityType())
+                .university(profile.getUniversity())
+                .academicStatus(profile.getAcademicStatus())
+                .semester(profile.getSemester())
+                .majorField(profile.getMajorField())
+                .major(profile.getMajor())
+                .gpa(profile.getGpa())
+                .incomeLevel(profile.getIncomeLevel())
+                .isDisabled(profile.isDisabled())
+                .isMultiChild(profile.isMultiChild())
+                .isBasicLivingRecipient(profile.isBasicLivingRecipient())
+                .isSecondLowestIncome(profile.isSecondLowestIncome())
+                .build();
+    }
 }

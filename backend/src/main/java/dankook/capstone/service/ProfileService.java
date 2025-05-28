@@ -47,4 +47,14 @@ public class ProfileService {
         Profile savedProfile = profileRepository.save(profile);
         return savedProfile.getId();
     }
+
+    //회원 프로필 조회
+    @Transactional(readOnly = true)
+    public ProfileRequestDto getProfileDtoById(Long profileId){
+        //프로필 ID로 회원 프로필 조회 후 DTO 변환 후 응답
+        Profile profile = profileRepository.findById(profileId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 프로필입니다."));
+
+        return ProfileRequestDto.from(profile);
+    }
 }

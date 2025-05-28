@@ -23,4 +23,7 @@ public class ProfileController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ResponseDto<>("회원 프로필이 저장되었습니다.", profileId));
     }
+
+    //회원 프로필 수정 API
+
 }
