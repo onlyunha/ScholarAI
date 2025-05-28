@@ -1,6 +1,7 @@
 package dankook.capstone.controller;
 
 import dankook.capstone.dto.ProfileRequestDto;
+import dankook.capstone.dto.ProfileResponseDto;
 import dankook.capstone.dto.ResponseDto;
 import dankook.capstone.dto.ScholarshipResponseDto;
 import dankook.capstone.service.AiRecommendationService;
@@ -29,7 +30,10 @@ public class RecommendationController {
             @RequestParam Long profileId
     ){
         //회원 프로필 조회
-        ProfileRequestDto profileRequestDto = profileService.getProfileDtoById(profileId);
+        ProfileResponseDto profileResponseDto = profileService.getProfileResponseById(profileId);
+
+        //응답 DTO → 요청 DTO 변환
+        ProfileRequestDto profileRequestDto = ProfileRequestDto.from(profileResponseDto);
 
         //FastAPI 추천 요청
         List<Long> recommendsIds = aiRecommendationService.getRecommendedScholarships(profileRequestDto);

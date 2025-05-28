@@ -91,4 +91,26 @@ public class Profile {
         this.isBasicLivingRecipient = isBasicLivingRecipient;
         this.isSecondLowestIncome = isSecondLowestIncome;
     }
+
+    //회원 프로필 수정
+    public void update(int birthYear, Gender gender, String residence, String universityType,
+                       String university, AcademicStatus academicStatus, int semester,
+                       String majorField, String major, BigDecimal gpa, int incomeLevel,
+                       boolean isDisabled, boolean isMultiChild, boolean isBasicLivingRecipient, boolean isSecondLowestIncome) {
+        this.birthYear = birthYear;
+        this.gender = gender;
+        this.residence = residence;
+        this.universityType = universityType;
+        this.university = university;
+        this.academicStatus = academicStatus;
+        this.semester = semester;
+        this.majorField = majorField;
+        this.major = major;
+        this.gpa = gpa;
+        this.incomeLevel = incomeLevel;
+        this.isDisabled = isDisabled;
+        this.isMultiChild = isMultiChild;
+        this.isBasicLivingRecipient = isBasicLivingRecipient;
+        this.isSecondLowestIncome = isSecondLowestIncome;
+    }
 }

@@ -31,23 +31,23 @@ public class ProfileRequestDto {
     private boolean isBasicLivingRecipient; //기초생활수급자여부
     private boolean isSecondLowestIncome; //차상위계층여부
 
-    public static ProfileRequestDto from(Profile profile) {
+    public static ProfileRequestDto from(ProfileResponseDto dto) {
         return ProfileRequestDto.builder()
-                .birthYear(profile.getBirthYear())
-                .gender(profile.getGender())  // enum이면 .name() 붙여도 됨
-                .residence(profile.getResidence())
-                .universityType(profile.getUniversityType())
-                .university(profile.getUniversity())
-                .academicStatus(profile.getAcademicStatus())
-                .semester(profile.getSemester())
-                .majorField(profile.getMajorField())
-                .major(profile.getMajor())
-                .gpa(profile.getGpa())
-                .incomeLevel(profile.getIncomeLevel())
-                .isDisabled(profile.isDisabled())
-                .isMultiChild(profile.isMultiChild())
-                .isBasicLivingRecipient(profile.isBasicLivingRecipient())
-                .isSecondLowestIncome(profile.isSecondLowestIncome())
+                .birthYear(dto.getBirthYear())
+                .gender(dto.getGender())  // enum이면 .name() 붙여도 됨
+                .residence(dto.getResidence())
+                .universityType(dto.getUniversityType())
+                .university(dto.getUniversity())
+                .academicStatus(dto.getAcademicStatus())
+                .semester(dto.getSemester())
+                .majorField(dto.getMajorField())
+                .major(dto.getMajor())
+                .gpa(dto.getGpa())
+                .incomeLevel(dto.getIncomeLevel())
+                .isDisabled(dto.isDisabled())
+                .isMultiChild(dto.isMultiChild())
+                .isBasicLivingRecipient(dto.isBasicLivingRecipient())
+                .isSecondLowestIncome(dto.isSecondLowestIncome())
                 .build();
     }
 }

@@ -3,6 +3,7 @@ package dankook.capstone.service;
 import dankook.capstone.domain.Member;
 import dankook.capstone.domain.Profile;
 import dankook.capstone.dto.ProfileRequestDto;
+import dankook.capstone.dto.ProfileResponseDto;
 import dankook.capstone.repository.MemberRepository;
 import dankook.capstone.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
@@ -50,11 +51,36 @@ public class ProfileService {
 
     //회원 프로필 조회
     @Transactional(readOnly = true)
-    public ProfileRequestDto getProfileDtoById(Long profileId){
+    public ProfileResponseDto getProfileResponseById(Long profileId){
         //프로필 ID로 회원 프로필 조회 후 DTO 변환 후 응답
         Profile profile = profileRepository.findById(profileId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 프로필입니다."));
 
-        return ProfileRequestDto.from(profile);
+        return ProfileResponseDto.from(profile);
+    }
+
+    //회원 프로필 수정
+    @Transactional
+    public void updateProfile(Long profileId, ProfileRequestDto profileRequestDto){
+        Profile profile = profileRepository.findById(profileId)
+                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 프로필입니다."));
+
+        profile.update(
+                profileRequestDto.getBirthYear(),
+                profileRequestDto.getGender(),
+                profileRequestDto.getResidence(),
+                profileRequestDto.getUniversityType(),
+                profileRequestDto.getUniversity(),
+                profileRequestDto.getAcademicStatus(),
+                profileRequestDto.getSemester(),
+                profileRequestDto.getMajorField(),
+                profileRequestDto.getMajor(),
+                profileRequestDto.getGpa(),
+                profileRequestDto.getIncomeLevel(),
+                profileRequestDto.isDisabled(),
+                profileRequestDto.isMultiChild(),
+                profileRequestDto.isBasicLivingRecipient(),
+                profileRequestDto.isSecondLowestIncome()
+        );
     }
 }
