@@ -16,13 +16,13 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class CommentService {
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
 
     //댓글 작성
+    @Transactional
     public Comment createComment(Long postId, String content, Member member){
         Post post = postRepository.findById(postId)
                 .orElseThrow(()-> new EntityNotFoundException("해당 게시글이 존재하지 않습니다."));
@@ -37,6 +37,7 @@ public class CommentService {
     }
 
     //댓글 목록 조회
+    @Transactional(readOnly = true)
     public List<Comment> getCommentsByPost(Long postId){
         Post post = postRepository.findById(postId)
                 .orElseThrow(()-> new EntityNotFoundException("해당 게시글이 존재하지 않습니다."));
@@ -45,6 +46,7 @@ public class CommentService {
     }
 
     //댓글 수정
+    @Transactional
     public void updateComment(Long commentId, String newContent, Member currentMember){
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 댓글이 존재하지 않습니다."));
@@ -57,6 +59,7 @@ public class CommentService {
     }
 
     //댓글 삭제
+    @Transactional
     public void deleteComment(Long commentId, Member currentMember){
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 댓글이 존재하지 않습니다."));
