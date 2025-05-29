@@ -27,12 +27,14 @@ public class ScholarshipController {
             @RequestParam(required = false) String keyword,
             @RequestParam(name = "financialAidType", required = false) List<FinancialAidType> types,
             @RequestParam(required = false, defaultValue = "false") boolean onlyRecruiting,
+            @RequestParam(required = false, defaultValue = "false") boolean onlyUpcoming,
             Pageable pageable
     ){
         ScholarshipSearchCondition condition = ScholarshipSearchCondition.builder()
                 .keyword(keyword)
                 .types(types)
                 .onlyRecruiting(onlyRecruiting)
+                .onlyUpcoming(onlyUpcoming)
                 .build();
 
         return scholarshipService.searchScholarships(condition, pageable)

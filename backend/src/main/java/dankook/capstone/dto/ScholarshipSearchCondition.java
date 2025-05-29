@@ -14,7 +14,8 @@ import java.util.List;
 @NoArgsConstructor
 public class ScholarshipSearchCondition {
     //장학금 검색 조건
-    private String keyword;
-    private List<FinancialAidType> types;
-    private boolean onlyRecruiting;
+    private String keyword; //키워드
+    private List<FinancialAidType> types; //학자금유형구분
+    private boolean onlyRecruiting; //모집중
+    private boolean onlyUpcoming; //모집예정
 }

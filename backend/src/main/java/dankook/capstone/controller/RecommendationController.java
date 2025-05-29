@@ -8,6 +8,7 @@ import dankook.capstone.service.AiRecommendationService;
 import dankook.capstone.service.ProfileService;
 import dankook.capstone.service.ScholarshipService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/recommend")
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "feature.ai.enabled", havingValue = "true") //EC2에서 FastAPI 임시 제외
 public class RecommendationController {
     private final AiRecommendationService aiRecommendationService;
     private final ProfileService profileService;
