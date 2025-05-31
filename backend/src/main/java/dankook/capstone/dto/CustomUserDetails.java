@@ -50,6 +50,14 @@ public class CustomUserDetails implements UserDetails {
         return member.getId();
     }
 
+    public Long getProfileId(){
+        if (member.getProfile() != null) {
+            return member.getProfile().getId();
+        } else {
+            return null; // 프로필이 없으면 null 반환
+        }
+    }
+
     @Override //계정 만료 여부
     public boolean isAccountNonExpired() {
         return true;
