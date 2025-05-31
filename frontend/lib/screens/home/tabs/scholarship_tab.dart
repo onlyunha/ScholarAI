@@ -3,7 +3,7 @@
 /// Desc : 장학금 검색 + 추천
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-21
-/// Updt : 2025-05-20
+/// Updt : 2025-06-01
 /// =============================================================
 library;
 
@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:scholarai/constants/app_colors.dart';
 import 'package:scholarai/constants/app_strings.dart';
+import 'package:scholarai/providers/auth_provider.dart';
 import 'package:scholarai/providers/bookmarked_provider.dart'
     show BookmarkedProvider;
 import 'package:scholarai/providers/user_profile_provider.dart';
@@ -52,7 +53,7 @@ class _ScholarshipTabState extends State<ScholarshipTab> {
     selectedPeriod = '모집중';
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final memberId = context.read<UserProfileProvider>().getUserId();
+      final memberId = context.read<AuthProvider>().memberId;
       if (memberId != null) {
         await context.read<BookmarkedProvider>().loadBookmarks(memberId);
       }
@@ -67,6 +68,8 @@ class _ScholarshipTabState extends State<ScholarshipTab> {
     final queryParams = <String, String>{
       if (keyword.isNotEmpty) 'keyword': keyword,
       if (selectedPeriod == '모집중') 'onlyRecruiting': 'true',
+      if (selectedPeriod == '모집예정') 'onlyUpcoming': 'true',
+
       'page': page.toString(),
       'size': '20',
       'sort':
@@ -253,11 +256,23 @@ class _ScholarshipTabState extends State<ScholarshipTab> {
                       spacing: 8,
                       alignment: WrapAlignment.center,
                       children:
-                          ['전체', '모집중'].map((period) {
-                            final isSelected = selectedPeriod == period;
+                          ['전체', '모집중', '모집예정'].map((period) {
+                            final isSelected =
+                                selectedPeriod == period ||
+                                (selectedPeriod == '전체' &&
+                                    (period == '모집중' || period == '모집예정'));
                             return GestureDetector(
                               onTap: () {
-                                setStateDialog(() => selectedPeriod = period);
+                                setStateDialog(() {
+                                  if (period == '전체') {
+                                    selectedPeriod =
+                                        selectedPeriod == '전체'
+                                            ? '모집중'
+                                            : '전체'; // 토글 기능
+                                  } else {
+                                    selectedPeriod = period;
+                                  }
+                                });
                               },
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
@@ -371,7 +386,7 @@ class _ScholarshipTabState extends State<ScholarshipTab> {
   @override
   Widget build(BuildContext context) {
     final bookmarkedProvider = context.watch<BookmarkedProvider>();
-    final memberId = context.read<UserProfileProvider>().getUserId();
+    final memberId = context.read<AuthProvider>().memberId;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const CustomAppBar(),
@@ -473,58 +488,68 @@ class _ScholarshipTabState extends State<ScholarshipTab> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // 🔽 정렬 드롭다운 버튼
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: selectedSort,
-                        onChanged: (value) {
-                          if (value != null) {
-                            setState(() {
-                              selectedSort = value;
-                              handleSearch(); // 정렬 반영
-                            });
-                          }
-                        },
-                        icon: const SizedBox.shrink(), // 기본 아이콘 제거
-                        dropdownColor: Colors.white,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black,
-                          fontFamily: 'Pretendard',
-                        ),
-                        alignment: AlignmentDirectional.centerStart, // 아래로만 펼침
-                        selectedItemBuilder: (context) {
-                          return ['latest', 'deadline'].map((value) {
-                            final text = value == 'latest' ? '최신순' : '마감순';
-                            return Row(
-                              children: [
-                                const Icon(
-                                  Icons.keyboard_arrow_down,
-                                  color: kPrimaryColor,
-                                  size: 18,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(text),
-                              ],
-                            );
-                          }).toList();
-                        },
-                        items: const [
-                          DropdownMenuItem(value: 'latest', child: Text('최신순')),
-                          DropdownMenuItem(
-                            value: 'deadline',
-                            child: Text('마감순'),
+                  Visibility(
+                    visible: false,
+                    maintainSize: true,
+                    maintainAnimation: true,
+                    maintainState: true,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: selectedSort,
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() {
+                                selectedSort = value;
+                                handleSearch(); // 정렬 반영
+                              });
+                            }
+                          },
+                          icon: const SizedBox.shrink(), // 기본 아이콘 제거
+                          dropdownColor: Colors.white,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black,
+                            fontFamily: 'Pretendard',
                           ),
-                        ],
+                          alignment:
+                              AlignmentDirectional.centerStart, // 아래로만 펼침
+                          selectedItemBuilder: (context) {
+                            return ['latest', 'deadline'].map((value) {
+                              final text = value == 'latest' ? '최신순' : '마감순';
+                              return Row(
+                                children: [
+                                  const Icon(
+                                    Icons.keyboard_arrow_down,
+                                    color: kPrimaryColor,
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(text),
+                                ],
+                              );
+                            }).toList();
+                          },
+                          items: const [
+                            DropdownMenuItem(
+                              value: 'latest',
+                              child: Text('최신순'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'deadline',
+                              child: Text('마감순'),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

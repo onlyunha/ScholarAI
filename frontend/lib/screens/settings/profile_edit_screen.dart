@@ -3,7 +3,7 @@
 /// Desc : 프로필 수정
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-21
-/// Updt : 2025-05-20
+/// Updt : 2025-06-01
 /// =============================================================
 library;
 
@@ -15,6 +15,7 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:scholarai/constants/app_colors.dart';
 import 'package:scholarai/constants/config.dart';
+import 'package:scholarai/providers/auth_provider.dart';
 import 'package:scholarai/providers/user_profile_provider.dart';
 
 class ProfileEditScreen extends StatefulWidget {
@@ -43,33 +44,38 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   bool isBasicLiving = false;
   bool isSecondLowest = false;
   String errorMessage = '';
+  int? profileId;
 
   @override
   void initState() {
     super.initState();
-    _loadProfileData(); // 프로필 데이터를 로드합니다.
+    _loadProfileData();
   }
 
-  // 프로필 데이터를 불러오는 함수
   Future<void> _loadProfileData() async {
     try {
-      String? userId =
-          Provider.of<UserProfileProvider>(context, listen: false).getUserId();
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final userId = authProvider.memberId;
+      final token = authProvider.token;
 
       if (userId == null) {
-        // userId가 없으면, 로그인 안된 경우 처리
         setState(() {
           errorMessage = '로그인된 사용자 정보가 없습니다';
         });
         return;
       }
+
       final response = await http.get(
-        Uri.parse('$baseUrl/api/profile?memberId=$userId'),
-        headers: {'Content-Type': 'application/json'},
+        Uri.parse('$baseUrl/api/profile/$userId'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
       );
 
       if (response.statusCode == 200) {
         final profileData = jsonDecode(response.body);
+        profileId = profileData['profileId'];
         selectedYear = profileData['birthYear'];
         selectedGender = profileData['gender'];
         selectedRegion = profileData['residence'];
@@ -77,98 +83,18 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         selectedAcademicStatus = profileData['academicStatus'];
         selectedMajorField = profileData['majorField'];
         selectedMajor = profileData['major'];
+        selectedUniversity = profileData['university'];
         selectedGpa = profileData['gpa']?.toDouble() ?? 0.0;
+        selectedSemester = profileData['semester'];
+        selectedIncomeLevel = profileData['incomeLevel'];
+        isDisabled = profileData['disabled'] ?? false;
+        isMultiChild = profileData['multiChild'] ?? false;
+        isBasicLiving = profileData['basicLivingRecipient'] ?? false;
+        isSecondLowest = profileData['secondLowestIncome'] ?? false;
         setState(() {});
       } else {
         setState(() {
-          errorMessage = '프로필 데이터를 불러오는 데 실패했습니다';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        errorMessage = '네트워크 오류: 연결을 확인해주세요';
-      });
-    }
-  }
-
-  // 수정된 프로필 데이터를 서버로 저장하는 함수
-  Future<void> _saveProfileData() async {
-    try {
-      String? userId =
-          Provider.of<UserProfileProvider>(context, listen: false).getUserId();
-
-      if (userId == null) {
-        setState(() {
-          errorMessage = '로그인된 사용자 정보가 없습니다';
-        });
-        return;
-      }
-
-      final url = Uri.parse('$baseUrl/api/profile?memberId=$userId');
-      final body = jsonEncode({
-        'birthYear': selectedYear,
-        'gender': selectedGender,
-        'residence': selectedRegion,
-        'universityType': selectedUniversityType,
-        'university': selectedUniversity,
-        'academicStatus': selectedAcademicStatus,
-        'majorField': selectedMajorField,
-        'major': selectedMajor,
-        'gpa': selectedGpa,
-        'disabled': isDisabled,
-        'multiChild': isMultiChild,
-        'incomeLevel': selectedIncomeLevel,
-        'basicLivingRecipient': isBasicLiving,
-        'semester': selectedSemester,
-        'secondLowestIncome': isSecondLowest,
-      });
-
-      print('📡 요청 URL: $url');
-      print('📤 전송 내용: $body');
-
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: body,
-      );
-
-      print('📩 응답코드: ${response.statusCode}');
-      print('📩 응답내용: ${response.body}');
-
-      // 모든 항목이 null이면 저장 안 됨
-      if (selectedYear == null ||
-          selectedGender == null ||
-          selectedRegion == null ||
-          selectedUniversityType == null ||
-          selectedAcademicStatus == null ||
-          selectedSemester == null ||
-          selectedMajorField == null ||
-          selectedMajor == null ||
-          selectedUniversity == null ||
-          selectedUniversity!.isEmpty ||
-          selectedGpa == 0.0 ||
-          selectedIncomeLevel == null) {
-        setState(() {
-          errorMessage = '모든 항목을 입력해야 저장할 수 있습니다.';
-        });
-        return;
-      }
-
-      if (response.statusCode == 201) {
-        Provider.of<UserProfileProvider>(context, listen: false).updateProfile(
-          name: nameController.text,
-          birthYear: selectedYear,
-          gender: selectedGender,
-          region: selectedRegion,
-          university: selectedUniversity,
-          universityType: selectedUniversityType,
-          academicStatus: selectedAcademicStatus,
-          memberId: userId, // ← 필요하면 포함
-        );
-        Navigator.pop(context);
-      } else {
-        setState(() {
-          errorMessage = '프로필 업데이트 실패';
+          errorMessage = '프로필 불러오기에 실패했습니다';
         });
       }
     } catch (e) {
@@ -178,6 +104,103 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
       });
     }
   }
+
+  Future<void> _saveProfileData() async {
+    try {
+      final profileProvider = Provider.of<UserProfileProvider>(context, listen: false);
+      final isEmptyProfile = profileProvider.isProfileEmpty;
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final memberId = authProvider.memberId;
+      final token = authProvider.token;
+
+      if (memberId == null) {
+        setState(() {
+          errorMessage = '로그인된 사용자 정보가 없습니다';
+        });
+        return;
+      }
+
+      final Map<String, dynamic> body = {
+        'birthYear': selectedYear,
+        'gender': selectedGender,
+        'residence': selectedRegion,
+        'universityType': selectedUniversityType,
+        'university': selectedUniversity,
+        'academicStatus': selectedAcademicStatus,
+        'semester': selectedSemester,
+        'majorField': selectedMajorField,
+        'major': selectedMajor,
+        'gpa': selectedGpa,
+        'incomeLevel': selectedIncomeLevel,
+        'disabled': isDisabled,
+        'multiChild': isMultiChild,
+        'basicLivingRecipient': isBasicLiving,
+        'secondLowestIncome': isSecondLowest,
+      };
+
+      print('📡 전송할 프로필 정보: $body');
+
+      http.Response response;
+      if (isEmptyProfile) {
+        final url = Uri.parse('$baseUrl/api/profile?memberId=$memberId');
+        print('🛰️ POST URL: $url');
+        print('🔐 Bearer Token: $token');
+
+        response = await http.post(
+          url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          body: jsonEncode(body),
+        );
+      } else {
+        final url = Uri.parse('$baseUrl/api/profile/$profileId');
+        response = await http.patch(
+          url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          body: jsonEncode(body),
+        );
+      }
+
+      print('📩 응답코드: ${response.statusCode}');
+      print('📩 응답내용: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        profileProvider.updateProfile(
+          birthYear: selectedYear,
+          gender: selectedGender,
+          region: selectedRegion,
+          university: selectedUniversity,
+          universityType: selectedUniversityType,
+          academicStatus: selectedAcademicStatus,
+          majorField: selectedMajorField,
+          major: selectedMajor,
+          gpa: selectedGpa,
+          semester: selectedSemester,
+          incomeLevel: selectedIncomeLevel,
+          disabled: isDisabled,
+          multiChild: isMultiChild,
+          basicLivingRecipient: isBasicLiving,
+          secondLowestIncome: isSecondLowest,
+        );
+        context.pop();
+      } else {
+        setState(() {
+          errorMessage = '프로필 저장에 실패했습니다';
+        });
+      }
+    } catch (e) {
+      print('❌ 예외 발생: $e');
+      setState(() {
+        errorMessage = '네트워크 오류: 연결을 확인해주세요';
+      });
+    }
+  }
+
 
   final List<int> yearOptions = List.generate(
     60,
@@ -243,42 +266,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: Column(
-                children: [
-                  const CircleAvatar(
-                    radius: 48,
-                    backgroundColor: Colors.grey,
-                    child: Icon(Icons.person, size: 48, color: Colors.white),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller:
-                        nameController
-                          ..text =
-                              nameController.text.isNotEmpty
-                                  ? nameController.text
-                                  : '이름을 입력하세요',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: kPrimaryColor,
-                    ),
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: '이름을 입력하세요',
-                      hintStyle: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: kPrimaryColor,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                ],
-              ),
-            ),
+            Center(child: Column(children: [const SizedBox(height: 24)])),
             _buildDropdownRow(
               '출생년도',
               selectedYear,

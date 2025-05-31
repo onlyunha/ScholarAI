@@ -1,5 +1,15 @@
+/// =============================================================
+/// File : router.dart
+/// Desc : 라우터
+/// Auth : yunha Hwang (DKU)
+/// Crtd : 2025-04-23
+/// Updt : 2025-06-01
+/// =============================================================
+
 import 'package:go_router/go_router.dart';
+import 'package:scholarai/screens/chatbot/chatbot_screen.dart';
 import 'package:scholarai/screens/onboarding/onboarding_screen.dart';
+import 'package:scholarai/screens/settings/profile_create_screen.dart';
 import 'package:scholarai/screens/settings/profile_view_screen.dart';
 
 // 화면 import
@@ -10,6 +20,7 @@ import 'screens/auth/password_screen.dart';
 import 'screens/auth/welcome_name_screen.dart';
 import 'screens/home/main_screen.dart';
 import 'screens/settings/profile_edit_screen.dart';
+import 'screens/settings/profile_view_screen.dart';
 
 // GoRouter 인스턴스
 GoRouter getRouter(String initialLocation) {
@@ -65,10 +76,20 @@ GoRouter getRouter(String initialLocation) {
         routes: [
           // 프로필 수정 화면이 /profile-view 하위 라우트로 설정
           GoRoute(
-            path: '/profile-edit', // 상대 경로를 이용해 하위 경로로 설정
+            path: 'profile-edit', // 상대 경로를 이용해 하위 경로로 설정
             builder: (context, state) => const ProfileEditScreen(),
           ),
         ],
+      ),
+
+      GoRoute(
+        path: '/profile/create',
+        builder: (context, state) => const CreateProfileScreen(),
+      ),
+      
+      GoRoute(
+        path: '/chatbot',
+        builder: (context, state) => const ChatbotScreen(),
       ),
     ],
   );

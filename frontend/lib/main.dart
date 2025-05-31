@@ -3,12 +3,13 @@
 /// Desc : 메인
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-03-23
-/// Updt : 2025-05-28
+/// Updt : 2025-06-01
 /// =============================================================
 library;
 
 import 'package:flutter/material.dart';
 import 'package:scholarai/constants/app_colors.dart';
+import 'package:scholarai/providers/auth_provider.dart';
 import 'package:scholarai/providers/bookmarked_provider.dart';
 import 'package:scholarai/router.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
@@ -25,10 +26,13 @@ void main() async {
   await initializeDateFormatting('ko_KR', null);
 
   // 카카오 SDK 초기화
-  KakaoSdk.init(nativeAppKey: 'dec207abce195979ff115068369eae7c');
+  KakaoSdk.init(
+    nativeAppKey: 'dec207abce195979ff115068369eae7c',
+    loggingEnabled: true,
+  );
 
   final prefs = await SharedPreferences.getInstance();
-  final token = prefs.getString('token'); // 또는 로그인 여부
+  final token = prefs.getString('auth_token'); // 또는 로그인 여부
   final seenTutorial = prefs.getBool('seenTutorial') ?? false;
 
   String initialRoute;
@@ -51,6 +55,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => UserProfileProvider()),
         ChangeNotifierProvider(create: (_) => BookmarkedProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
       ],
       child: MyApp(initialRoute: initialRoute),
     ),
@@ -63,7 +68,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final userProfile = Provider.of<UserProfileProvider>(
         context,
         listen: false,
@@ -72,10 +77,18 @@ class MyApp extends StatelessWidget {
         context,
         listen: false,
       );
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final profileProvider = Provider.of<UserProfileProvider>(
+        context,
+        listen: false,
+      );
+      await authProvider.loadAuthData();
+      await profileProvider.loadProfileIdFromPrefs();
 
-      final memberId = userProfile.memberId;
+      final memberId = authProvider.memberId;
       if (memberId != null) {
         bookmarkedProvider.loadBookmarks(memberId);
+        await userProfile.fetchProfileIdAndLoad(memberId, authProvider.token!);
       }
     });
 

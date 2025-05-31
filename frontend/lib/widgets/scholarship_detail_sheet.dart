@@ -13,8 +13,8 @@ import 'package:provider/provider.dart';
 import 'package:scholarai/constants/app_colors.dart';
 import 'package:scholarai/constants/config.dart';
 import 'package:http/http.dart' as http;
+import 'package:scholarai/providers/auth_provider.dart';
 import 'package:scholarai/providers/bookmarked_provider.dart';
-import 'package:scholarai/providers/user_profile_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ScholarshipDetailSheet {
@@ -30,11 +30,7 @@ class ScholarshipDetailSheet {
           context,
           listen: false,
         );
-        final memberId =
-            Provider.of<UserProfileProvider>(
-              context,
-              listen: false,
-            ).getUserId();
+        final memberId = context.read<AuthProvider>().memberId;
         final isInitiallyBookmarked = bookmarkedProvider.isBookmarked(id);
         bool isBookmarked = isInitiallyBookmarked;
 

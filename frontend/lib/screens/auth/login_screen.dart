@@ -3,7 +3,7 @@
 /// Desc : 이메일과 비밀번호를 이용한 로그인 화면 UI 및 기능 구현
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-02
-/// Updt : 2025-04-28
+/// Updt : 2025-06-01
 /// =============================================================
 library;
 
@@ -13,6 +13,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:scholarai/constants/app_images.dart';
+import 'package:scholarai/providers/auth_provider.dart';
 import 'package:scholarai/providers/user_profile_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../constants/app_routes.dart';
@@ -88,21 +89,25 @@ class _LoginScreenState extends State<LoginScreen>
 
       final resBody = jsonDecode(response.body);
       final memberId = resBody['data'].toString();
+      final name = resBody['name'] ?? '';
 
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('accessToken', token ?? '');
       await prefs.setString('memberId', memberId);
 
-      // 디버깅용
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      await authProvider.saveAuthData(token!, memberId, email, name);
+      debugPrint('✅ authProvider 저장 완료');
+
+      final userProfileProvider = Provider.of<UserProfileProvider>(
+        context,
+        listen: false,
+      );
+      await userProfileProvider.fetchProfileIdAndLoad(memberId, token);
+
       print('🔐 저장된 토큰: $token');
       print('👤 저장된 memberId: $memberId');
 
-      Provider.of<UserProfileProvider>(
-        context,
-        listen: false,
-      ).updateProfile(memberId: memberId);
-
-      print('🔐 저장된 토큰: $token'); // 디버깅용
       context.go(AppRoutes.main);
 
       // 실패: 에러 메시지 + shake 애니메이션

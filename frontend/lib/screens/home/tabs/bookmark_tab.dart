@@ -3,13 +3,15 @@
 /// Desc : 찜한 장학금 + 캘린더
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-19
-/// Updt : 2025-05-11
+/// Updt : 2025-06-01
 /// =============================================================
 library;
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:scholarai/providers/auth_provider.dart';
 import 'package:scholarai/providers/bookmarked_provider.dart';
 import 'package:scholarai/providers/user_profile_provider.dart';
 import 'package:month_year_picker/month_year_picker.dart';
@@ -63,8 +65,7 @@ class _BookmarkTabState extends State<BookmarkTab> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    memberId ??=
-        Provider.of<UserProfileProvider>(context, listen: false).getUserId();
+    memberId ??= context.read<AuthProvider>().memberId;
   }
 
   @override
@@ -140,12 +141,18 @@ class _BookmarkTabState extends State<BookmarkTab> {
   }
 
   DateTime normalizeDate(String dateStr) {
-    final parts = dateStr.split('.');
-    return DateTime.utc(
-      int.parse(parts[0]),
-      int.parse(parts[1]),
-      int.parse(parts[2]),
-    );
+    if (dateStr.contains('.')) {
+      final parts = dateStr.split('.');
+      return DateTime(
+        int.parse(parts[0]),
+        int.parse(parts[1]),
+        int.parse(parts[2]),
+      );
+    } else if (dateStr.contains('-')) {
+      return DateTime.parse(dateStr);
+    } else {
+      throw FormatException("Unknown date format: $dateStr");
+    }
   }
 
   Map<DateTime, List<Map<String, dynamic>>> getCalendarEvents(
@@ -153,15 +160,22 @@ class _BookmarkTabState extends State<BookmarkTab> {
   ) {
     final Map<DateTime, List<Map<String, dynamic>>> events = {};
     for (var item in data) {
-      final end = item['end'];
-      if (end != null && end is String && end.contains('.')) {
-        final date = normalizeDate(end);
-        if (!events.containsKey(date)) {
-          events[date] = [];
+      final end = item['end'] ?? item['applicationEndDate'];
+
+      if (end != null && end is String) {
+        try {
+          final date = normalizeDate(end);
+          print('✅ Parsed date: $date');
+          if (!events.containsKey(date)) {
+            events[date] = [];
+          }
+          events[date]!.add(item);
+        } catch (e) {
+          print('❌ Failed to parse date: $end');
         }
-        events[date]!.add(item);
       }
     }
+
     return events;
   }
 
@@ -190,7 +204,7 @@ class _BookmarkTabState extends State<BookmarkTab> {
           productName: item['productName'],
           organization: item['organizationName'],
           types: [
-            '#${item['type'] ?? convertToKorean(item['financialAidType'] ?? 'OTHER')}',
+            '${item['type'] ?? convertToKorean(item['financialAidType'] ?? 'OTHER')}',
           ],
           start: item['start'] ?? item['applicationStartDate'] ?? '',
           end: item['end'] ?? item['applicationEndDate'] ?? '',
@@ -215,12 +229,13 @@ class _BookmarkTabState extends State<BookmarkTab> {
   Widget _buildCalendar() {
     final bookmarkedProvider = context.watch<BookmarkedProvider>();
     final bookmarkedData = bookmarkedProvider.bookmarkedData;
-    final memberId = context.read<UserProfileProvider>().getUserId();
+    final memberId = context.read<AuthProvider>().memberId;
 
     final events = getCalendarEvents(bookmarkedData);
 
     List<Map<String, dynamic>> getEventsForDay(DateTime day) {
-      return events[DateTime.utc(day.year, day.month, day.day)] ?? [];
+      final key = DateTime(day.year, day.month, day.day); // 🔥 UTC로 통일
+      return events[key] ?? [];
     }
 
     return StatefulBuilder(
@@ -237,96 +252,157 @@ class _BookmarkTabState extends State<BookmarkTab> {
               child: TableCalendar(
                 locale: 'ko_KR',
                 firstDay: DateTime.utc(2020, 1, 1),
-                lastDay: DateTime.utc(2030, 12, 31),
+                lastDay: DateTime.utc(2040, 12, 31),
                 focusedDay: focusedDay,
                 selectedDayPredicate: (day) => isSameDay(day, selectedDay),
-                eventLoader: getEventsForDay,
-                onDaySelected: (selectedDay, focusedDay) {
+                eventLoader: (day) {
+                  final key = DateTime(day.year, day.month, day.day); // 시간 제거
+                  return getEventsForDay(key);
+                },
+                onDaySelected: (selected, focused) {
                   setState(() {
-                    selectedDay = selectedDay;
-                    focusedDay = focusedDay;
+                    selectedDay = selected;
+                    focusedDay = focused;
                   });
                 },
-                onHeaderTapped: (_) async {
-                  final selectedDate = await showMonthYearPicker(
-                    context: context,
-                    initialDate: focusedDay,
-                    firstDate: DateTime(2020),
-                    lastDate: DateTime(2030),
-                    locale: const Locale('ko'),
-                    builder: (context, child) {
-                      return Theme(
-                        data: Theme.of(context).copyWith(
-                          highlightColor: kPrimaryColor,
-                          colorScheme: ColorScheme.light(
-                            primary: kPrimaryColor.withOpacity(
-                              0.8,
-                            ), // 헤더, 선택 포커스 컬러
-                            onPrimary: Colors.white, // 헤더 텍스트
-                            surface: Colors.white, // 배경색
-                            onSurface: Colors.black87, // 일반 텍스트
-                            secondary: kPrimaryColor.withOpacity(0.8), // 강조 색
-                          ),
 
-                          textTheme: const TextTheme(
-                            titleLarge: TextStyle(
-                              fontFamily: 'Pretendard',
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
+                onHeaderTapped: (_) async {
+                  int tempYear = focusedDay.year;
+                  int tempMonth = focusedDay.month;
+
+                  await showModalBottomSheet(
+                    context: context,
+                    isDismissible: true,
+                    isScrollControlled: false,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(16),
+                      ),
+                    ),
+                    builder: (context) {
+                      return StatefulBuilder(
+                        builder: (context, setModalState) {
+                          return SizedBox(
+                            height: 300,
+                            child: Column(
+                              children: [
+                                const SizedBox(height: 16),
+                                const Text(
+                                  '날짜 선택',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const Divider(),
+                                Expanded(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      // 연도 선택
+                                      SizedBox(
+                                        width: 120,
+                                        child: CupertinoPicker(
+                                          scrollController:
+                                              FixedExtentScrollController(
+                                                initialItem: (tempYear - 2020)
+                                                    .clamp(0, 19),
+                                              ),
+                                          itemExtent: 32.0,
+                                          onSelectedItemChanged: (index) {
+                                            setModalState(() {
+                                              tempYear = 2020 + index;
+                                            });
+                                          },
+                                          children: List.generate(20, (index) {
+                                            return Center(
+                                              child: Text(
+                                                '${2020 + index}년',
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            );
+                                          }),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      // 월 선택
+                                      SizedBox(
+                                        width: 100,
+                                        child: CupertinoPicker(
+                                          scrollController:
+                                              FixedExtentScrollController(
+                                                initialItem: (tempMonth - 1)
+                                                    .clamp(0, 11),
+                                              ),
+                                          itemExtent: 32.0,
+                                          onSelectedItemChanged: (index) {
+                                            setModalState(() {
+                                              tempMonth = index + 1;
+                                            });
+                                          },
+                                          children: List.generate(12, (index) {
+                                            return Center(
+                                              child: Text(
+                                                '${index + 1}월',
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            );
+                                          }),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 24,
+                                    vertical: 16,
+                                  ),
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: kPrimaryColor,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      minimumSize: const Size.fromHeight(48),
+                                    ),
+                                    onPressed: () {
+                                      // 방어 코드: 날짜 유효성 검사
+                                      if (tempYear >= 2020 &&
+                                          tempYear <= 2039 &&
+                                          tempMonth >= 1 &&
+                                          tempMonth <= 12) {
+                                        final pickedDate = DateTime(
+                                          tempYear,
+                                          tempMonth,
+                                          1,
+                                        );
+                                        setState(() {
+                                          focusedDay = pickedDate;
+                                          selectedDay = pickedDate;
+                                        });
+                                      }
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text(
+                                      '확인',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            titleMedium: TextStyle(
-                              fontFamily: 'Pretendard',
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          textButtonTheme: TextButtonThemeData(
-                            style: TextButton.styleFrom(
-                              foregroundColor: kPrimaryColor,
-                              textStyle: const TextStyle(
-                                fontFamily: 'Pretendard',
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                          dialogTheme: DialogTheme(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            alignment: Alignment.center,
-                          ),
-                        ),
-                        child: MediaQuery(
-                          data: MediaQuery.of(
-                            context,
-                          ).copyWith(textScaler: TextScaler.linear(0.95)),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: child!,
-                          ),
-                        ),
+                          );
+                        },
                       );
                     },
                   );
-
-                  if (selectedDate != null) {
-                    setState(() {
-                      focusedDay = DateTime(
-                        selectedDate.year,
-                        selectedDate.month,
-                        1,
-                      );
-                      selectedDay = DateTime(
-                        selectedDate.year,
-                        selectedDate.month,
-                        1,
-                      );
-                    });
-                  }
                 },
+
                 calendarStyle: const CalendarStyle(
                   defaultTextStyle: TextStyle(fontSize: 12),
                   weekendTextStyle: TextStyle(
@@ -360,10 +436,17 @@ class _BookmarkTabState extends State<BookmarkTab> {
                 ),
                 calendarBuilders: CalendarBuilders(
                   markerBuilder: (context, day, events) {
-                    if (events.isNotEmpty) {
-                      return Positioned(
-                        bottom: 1,
+                    final normalizedDay = DateTime(
+                      day.year,
+                      day.month,
+                      day.day,
+                    );
+                    final dayEvents = getEventsForDay(normalizedDay);
+
+                    if (dayEvents.isNotEmpty) {
+                      return Center(
                         child: Container(
+                          margin: const EdgeInsets.only(top: 25),
                           width: 5,
                           height: 5,
                           decoration: const BoxDecoration(
@@ -373,6 +456,7 @@ class _BookmarkTabState extends State<BookmarkTab> {
                         ),
                       );
                     }
+
                     return null;
                   },
                 ),
@@ -381,63 +465,32 @@ class _BookmarkTabState extends State<BookmarkTab> {
             const SizedBox(height: 16),
             if (selectedDay != null && getEventsForDay(selectedDay!).isNotEmpty)
               ...getEventsForDay(selectedDay!).map(
-                (item) => GestureDetector(
+                (item) => ScholarshipCard(
+                  productName: item['productName'],
+                  organization:
+                      item['organization'] ?? item['organizationName'] ?? '',
+                  types: [
+                    item['type'] ??
+                        convertToKorean(item['financialAidType'] ?? 'OTHER'),
+                  ],
+                  start: item['start'] ?? item['applicationStartDate'] ?? '',
+                  end: item['end'] ?? item['applicationEndDate'] ?? '',
+                  isBookmarked: bookmarkedProvider.isBookmarked(
+                    item['scholarshipId'],
+                  ),
+                  onBookmarkToggle: () {
+                    if (memberId != null) {
+                      bookmarkedProvider.toggleBookmark(
+                        memberId!,
+                        item['scholarshipId'],
+                      );
+                    }
+                  },
                   onTap:
                       () => ScholarshipDetailSheet.show(
                         context,
                         item['scholarshipId'],
                       ),
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade300),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          item['productName'] ?? '',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          item['organization'] ??
-                              item['organizationName'] ??
-                              '',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Colors.black54,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              '#${item['type'] ?? '기타'}',
-                              style: const TextStyle(
-                                fontSize: 13,
-                                color: kPrimaryColor,
-                              ),
-                            ),
-                            Text(
-                              '${item['start'] ?? item['applicationStartDate'] ?? ''} ~ ${item['end'] ?? item['applicationEndDate'] ?? ''}',
-                              style: const TextStyle(
-                                fontSize: 13,
-                                color: Colors.black54,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
                 ),
               ),
           ],
