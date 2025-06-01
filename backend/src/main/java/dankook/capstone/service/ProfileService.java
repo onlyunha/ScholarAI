@@ -38,10 +38,10 @@ public class ProfileService {
                 .major(profileRequestDto.getMajor())
                 .gpa(profileRequestDto.getGpa())
                 .incomeLevel(profileRequestDto.getIncomeLevel())
-                .isDisabled(profileRequestDto.isDisabled())
-                .isMultiChild(profileRequestDto.isMultiChild())
-                .isBasicLivingRecipient(profileRequestDto.isBasicLivingRecipient())
-                .isSecondLowestIncome(profileRequestDto.isSecondLowestIncome())
+                .disabled(profileRequestDto.isDisabled())
+                .multiChild(profileRequestDto.isMultiChild())
+                .basicLivingRecipient(profileRequestDto.isBasicLivingRecipient())
+                .secondLowestIncome(profileRequestDto.isSecondLowestIncome())
                 .build();
 
         member.setProfile(profile);

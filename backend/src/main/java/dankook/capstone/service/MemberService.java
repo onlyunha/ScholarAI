@@ -53,7 +53,7 @@ public class MemberService {
         }
     }
 
-    //회원 이름 수정
+    //회원 이름 수정(회원가입 시)
     @Transactional
     public void updateName(String email, String newName){
         Member member = memberRepository.findByEmail(email)
@@ -62,6 +62,19 @@ public class MemberService {
         member.updateName(newName); // 이름 변경
     }
 
+    //회원 이름 조회
+    public String getNameByMemberId(Long memberId){
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원 ID입니다."));
+        return member.getName();
+    }
 
+    //회원 이름 수정(프로필 수정 시)
+    @Transactional
+    public void updateNameByMemberId(Long memberId, String newName) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원 ID입니다."));
+        member.updateName(newName);
+    }
 
 }

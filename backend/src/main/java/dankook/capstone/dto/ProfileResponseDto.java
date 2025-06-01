@@ -23,10 +23,10 @@ public class ProfileResponseDto {
     private String major; //전공명
     private BigDecimal gpa; //성적
     private int incomeLevel; //소득분위
-    private boolean isDisabled; //장애여부
-    private boolean isMultiChild; //다자녀가구여부
-    private boolean isBasicLivingRecipient; //기초생활수급자여부
-    private boolean isSecondLowestIncome; //차상위계층여부
+    private boolean disabled; //장애여부
+    private boolean multiChild; //다자녀가구여부
+    private boolean basicLivingRecipient; //기초생활수급자여부
+    private boolean secondLowestIncome; //차상위계층여부
 
     public static ProfileResponseDto from(Profile profile) {
         return ProfileResponseDto.builder()
@@ -42,10 +42,10 @@ public class ProfileResponseDto {
                 .major(profile.getMajor())
                 .gpa(profile.getGpa())
                 .incomeLevel(profile.getIncomeLevel())
-                .isDisabled(profile.isDisabled())
-                .isMultiChild(profile.isMultiChild())
-                .isBasicLivingRecipient(profile.isBasicLivingRecipient())
-                .isSecondLowestIncome(profile.isSecondLowestIncome())
+                .disabled(profile.isDisabled())
+                .multiChild(profile.isMultiChild())
+                .basicLivingRecipient(profile.isBasicLivingRecipient())
+                .secondLowestIncome(profile.isSecondLowestIncome())
                 .build();
     }
 }
