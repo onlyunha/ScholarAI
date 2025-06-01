@@ -33,11 +33,7 @@ class ChatbotScreen extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go(AppRoutes.main); // 또는 원하는 기본 경로로
-            }
+            context.go(AppRoutes.main);
           },
         ),
         title: null,

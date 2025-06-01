@@ -88,12 +88,12 @@ class _LoginScreenState extends State<LoginScreen>
               : rawToken;
 
       final resBody = jsonDecode(response.body);
-      final memberId = resBody['data'].toString();
-      final name = resBody['name'] ?? '';
-
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('accessToken', token ?? '');
-      await prefs.setString('memberId', memberId);
+      debugPrint('🟢 로그인 응답 전체: $resBody');
+      final data = resBody['data'];
+      final memberId = data['memberId'].toString();
+      final profileId = data['profileId']; // null일 수 있으니 ?. 처리
+      final name = data['name'] ?? '';
+  
 
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       await authProvider.saveAuthData(token!, memberId, email, name);
@@ -103,6 +103,13 @@ class _LoginScreenState extends State<LoginScreen>
         context,
         listen: false,
       );
+      if (profileId != null) {
+        userProfileProvider.setProfileId(profileId);
+        debugPrint('✅ 로그인 시 받아온 profileId: $profileId');
+      } else {
+        debugPrint('⚠️ 로그인 응답에 profileId 없음');
+      }
+
       await userProfileProvider.fetchProfileIdAndLoad(memberId, token);
 
       print('🔐 저장된 토큰: $token');

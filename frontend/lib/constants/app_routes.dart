@@ -8,6 +8,7 @@
 library;
 
 class AppRoutes {
+  static const welcome = '/';
   static const signup = '/signup';
   static const main = '/main';
   static const welcomeName = '/welcome-name';
@@ -17,4 +18,7 @@ class AppRoutes {
   static const profileEdit = '/profile-view/profile-edit'; 
   static const String profileCreate = '/profile/create';
   static const chatbot = '/chatbot';
+  static const tutorial = '/onboarding';
+  static const community = '/main?tab=community';
+  static const postWrite = '/post/write';
 }

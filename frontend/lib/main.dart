@@ -35,6 +35,9 @@ void main() async {
   final token = prefs.getString('auth_token'); // 또는 로그인 여부
   final seenTutorial = prefs.getBool('seenTutorial') ?? false;
 
+  final authProvider = AuthProvider();
+  await authProvider.loadAuthData();
+
   String initialRoute;
   if (token == null) {
     initialRoute = '/'; // Welcome
@@ -55,7 +58,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => UserProfileProvider()),
         ChangeNotifierProvider(create: (_) => BookmarkedProvider()),
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
       ],
       child: MyApp(initialRoute: initialRoute),
     ),

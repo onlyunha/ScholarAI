@@ -58,6 +58,9 @@ class _ProfileViewScreenState extends State<ProfileViewScreen> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        if (data['data'] == null) {
+          debugPrint('🚨 profile["data"]가 null입니다.');
+        }
         final profile = data['data'];
         profileProvider.updateProfile(
           birthYear: profile['birthYear'],
@@ -66,15 +69,18 @@ class _ProfileViewScreenState extends State<ProfileViewScreen> {
           university: profile['university'],
           universityType: profile['universityType'],
           academicStatus: profile['academicStatus'],
-          semester: profile['semester'],
+          semester: profile['semester'] is int ? profile['semester'] : null,
           majorField: profile['majorField'],
           major: profile['major'],
-          gpa: profile['gpa']?.toDouble(),
+          gpa:
+              profile['gpa'] != null
+                  ? double.tryParse(profile['gpa'].toString())
+                  : null,
           incomeLevel: profile['incomeLevel'],
-          secondLowestIncome: profile['secondLowestIncome'],
-          basicLivingRecipient: profile['basicLivingRecipient'],
-          disabled: profile['disabled'],
-          multiChild: profile['multiChild'],
+          secondLowestIncome: profile['secondLowestIncome'] ?? false,
+          basicLivingRecipient: profile['basicLivingRecipient'] ?? false,
+          disabled: profile['disabled'] ?? false,
+          multiChild: profile['multiChild'] ?? false,
         );
         profileProvider.setProfileRegistered(true);
         if (mounted) setState(() {});
@@ -120,14 +126,15 @@ class _ProfileViewScreenState extends State<ProfileViewScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
         child: Column(
           children: [
-            const SizedBox(height: 25),
+            const SizedBox(height: 15),
             CircleAvatar(
               radius: 45,
               backgroundColor: kPrimaryColor.withOpacity(0.1),
               child: const Icon(Icons.person, color: kPrimaryColor, size: 40),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 15),
             Row(
+              mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
@@ -137,9 +144,9 @@ class _ProfileViewScreenState extends State<ProfileViewScreen> {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.edit, size: 20),
-                  onPressed: () async {
+                const SizedBox(width: 6),
+                GestureDetector(
+                  onTap: () async {
                     final auth = context.read<AuthProvider>();
                     final profileProvider = context.read<UserProfileProvider>();
                     final nameController = TextEditingController(
@@ -149,48 +156,128 @@ class _ProfileViewScreenState extends State<ProfileViewScreen> {
                     final newName = await showDialog<String>(
                       context: context,
                       builder: (context) {
-                        return AlertDialog(
-                          title: const Text('이름 수정'),
-                          content: TextField(
-                            controller: nameController,
-                            decoration: const InputDecoration(
-                              hintText: '새 이름 입력',
+                        final nameController = TextEditingController(
+                          text: auth.name ?? '',
+                        );
+
+                        return Dialog(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // 이름 입력 필드
+                                TextField(
+                                  controller: nameController,
+                                  textAlign: TextAlign.center,
+                                  decoration: InputDecoration(
+                                    hintText: '이름을 입력하세요',
+                                    filled: true,
+                                    fillColor: Colors.grey.shade100,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 12,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                                // 취소 & 저장 버튼
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    // 취소 버튼 (흰배경 + 테두리)
+                                    SizedBox(
+                                      width: 100,
+                                      child: ElevatedButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.white,
+                                          foregroundColor: kPrimaryColor,
+                                          side: const BorderSide(
+                                            color: kPrimaryColor,
+                                          ),
+                                          elevation: 0,
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 12,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                        ),
+                                        child: const Text('취소'),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    // 저장 버튼 (컬러 배경)
+                                    SizedBox(
+                                      width: 100,
+                                      child: ElevatedButton(
+                                        onPressed: () async {
+                                          final enteredName =
+                                              nameController.text.trim();
+                                          if (enteredName.isNotEmpty) {
+                                            final response = await http.patch(
+                                              Uri.parse(
+                                                '$baseUrl/api/auth/name',
+                                              ),
+                                              headers: {
+                                                'Content-Type':
+                                                    'application/json',
+                                                'Authorization':
+                                                    'Bearer ${auth.token}',
+                                              },
+                                              body: jsonEncode({
+                                                'name': enteredName,
+                                                'email': auth.email,
+                                              }),
+                                            );
+
+                                            if (response.statusCode == 200) {
+                                              auth.setName(enteredName);
+                                              Navigator.pop(
+                                                context,
+                                                enteredName,
+                                              );
+                                            } else {
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text('이름 수정 실패'),
+                                                ),
+                                              );
+                                            }
+                                          }
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: kPrimaryColor,
+                                          foregroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 12,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                        ),
+                                        child: const Text('저장'),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('취소'),
-                            ),
-                            TextButton(
-                              onPressed: () async {
-                                final enteredName = nameController.text.trim();
-                                if (enteredName.isNotEmpty) {
-                                  final response = await http.post(
-                                    Uri.parse('$baseUrl/api/auth/name'),
-                                    headers: {
-                                      'Content-Type': 'application/json',
-                                      'Authorization': 'Bearer ${auth.token}',
-                                    },
-                                    body: jsonEncode({
-                                      'name': enteredName,
-                                      'email': auth.email,
-                                    }),
-                                  );
-
-                                  if (response.statusCode == 200) {
-                                    auth.setName(enteredName);
-                                    Navigator.pop(context, enteredName);
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('이름 수정 실패')),
-                                    );
-                                  }
-                                }
-                              },
-                              child: const Text('저장'),
-                            ),
-                          ],
                         );
                       },
                     );
@@ -199,10 +286,15 @@ class _ProfileViewScreenState extends State<ProfileViewScreen> {
                       setState(() {});
                     }
                   },
+                  child: const Padding(
+                    padding: EdgeInsets.only(left: 4.0), // 아주 살짝만 띄움
+                    child: Icon(Icons.edit, size: 18, color: kPrimaryColor),
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+
+            const SizedBox(height: 0),
             Expanded(
               child:
                   profile.isProfileRegistered
@@ -212,6 +304,34 @@ class _ProfileViewScreenState extends State<ProfileViewScreen> {
           ],
         ),
       ),
+      bottomNavigationBar:
+          profile.isProfileRegistered
+              ? Padding(
+                padding: const EdgeInsets.fromLTRB(24, 0, 24, 30),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () => context.go(AppRoutes.profileEdit),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: kPrimaryColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    icon: const Icon(Icons.edit, size: 20),
+                    label: const Text(
+                      '프로필 수정하기',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              )
+              : null,
     );
   }
 
@@ -289,19 +409,23 @@ class _ProfileViewScreenState extends State<ProfileViewScreen> {
     return ListView(
       padding: const EdgeInsets.only(top: 20, bottom: 80),
       children: [
-        _infoTitle('거주 지역'),
+        _infoTitle(' 거주 지역'),
         _infoText(profile.region ?? '-'),
-        _infoTitle('학교'),
+        _infoTitle(' 학교'),
         _infoText(
-          '${profile.university ?? '-'} (${profile.universityType ?? '-'})',
+          '${profile.university ?? '-'}(${profile.universityType ?? '-'}), ${_mapAcademicStatus(profile.academicStatus)} · ${profile.semester ?? '-'}학기',
         ),
-        _infoTitle('학과'),
-        _infoText(
-          '${profile.majorField ?? '-'} · ${profile.major ?? '-'} · ${profile.semester ?? '-'}학기',
-        ),
-        _infoTitle('성적 및 소득 분위'),
-        _infoText(
-          'GPA ${profile.gpa?.toStringAsFixed(2) ?? '-'} · ${profile.incomeLevel ?? '-'} 분위',
+        _infoTitle(' 학과'),
+        _infoText('${profile.majorField ?? '-'} · ${profile.major ?? '-'}'),
+        _infoTitle(' 성적 및 소득 분위'),
+        Row(
+          children: [
+            Expanded(
+              child: _infoText('${profile.gpa?.toStringAsFixed(2) ?? '-'}'),
+            ),
+            const SizedBox(width: 12),
+            Expanded(child: _infoText('${profile.incomeLevel ?? '-'} 분위')),
+          ],
         ),
         const SizedBox(height: 16),
         const Divider(),
@@ -329,27 +453,6 @@ class _ProfileViewScreenState extends State<ProfileViewScreen> {
             ],
           ),
         ),
-        const SizedBox(height: 30),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton.icon(
-            onPressed: () => context.go(AppRoutes.profileEdit),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: kPrimaryColor,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            icon: const Icon(Icons.edit, size: 20),
-            label: const Text(
-              '프로필 수정하기',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
-          ),
-        ),
-        const SizedBox(height: 40),
       ],
     );
   }
@@ -385,12 +488,27 @@ class _ProfileViewScreenState extends State<ProfileViewScreen> {
     return Chip(
       avatar: Icon(
         value == true ? Icons.check_circle : Icons.cancel,
-        color: value == true ? Colors.green : Colors.grey,
+        color: value == true ? kPrimaryColor : Colors.grey,
         size: 20,
       ),
       label: Text(label),
       backgroundColor: Colors.white,
       shape: StadiumBorder(side: BorderSide(color: Colors.grey.shade300)),
     );
+  }
+
+  String _mapAcademicStatus(String? status) {
+    switch (status) {
+      case 'ENROLLED':
+        return '재학';
+      case 'LEAVE_OF_ABSENCE':
+        return '휴학';
+      case 'EXPECTED_GRADUATION':
+        return '졸업예정';
+      case 'GRADUATED':
+        return '졸업';
+      default:
+        return '-';
+    }
   }
 }

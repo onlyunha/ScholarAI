@@ -25,7 +25,9 @@ class AuthProvider extends ChangeNotifier {
   /// SharedPreferences에서 토큰과 멤버ID 로드
   Future<void> loadAuthData() async {
     final prefs = await SharedPreferences.getInstance();
-    _token = prefs.getString('auth_token');
+    final rawToken = prefs.getString('auth_token');
+    _token = rawToken != null ? rawToken.replaceAll('Bearer ', '') : null;
+
     _memberId = prefs.getString('auth_memberId');
     _email = prefs.getString('auth_email');
     _name = prefs.getString('auth_name');
@@ -74,8 +76,12 @@ class AuthProvider extends ChangeNotifier {
     _memberId = id;
     notifyListeners();
   }
-  void setName(String name) {
-  _name = name;
-  notifyListeners();
-}
+
+  void setName(String name) async {
+    _name = name;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('auth_name', name);
+    debugPrint('🧠 저장된 이름: $name');
+    notifyListeners();
+  }
 }

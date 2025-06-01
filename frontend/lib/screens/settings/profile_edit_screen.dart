@@ -26,7 +26,8 @@ class ProfileEditScreen extends StatefulWidget {
 }
 
 class _ProfileEditScreenState extends State<ProfileEditScreen> {
-  final TextEditingController nameController = TextEditingController();
+  final TextEditingController uniController = TextEditingController();
+  final TextEditingController majorController = TextEditingController();
 
   int? selectedYear;
   String? selectedGender;
@@ -54,19 +55,30 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
 
   Future<void> _loadProfileData() async {
     try {
+      final profileProvider = Provider.of<UserProfileProvider>(
+        context,
+        listen: false,
+      );
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final userId = authProvider.memberId;
+      final memberId = authProvider.memberId;
       final token = authProvider.token;
+      final currentProfileId = profileProvider.profileId;
 
-      if (userId == null) {
+      debugPrint('🟡 현재 Provider에 저장된 profileId: $currentProfileId');
+      debugPrint(
+        '🟡 현재 isProfileRegistered: ${profileProvider.isProfileRegistered}',
+      );
+
+      if (currentProfileId == null || token == null) {
+        debugPrint('❌ profileId 또는 token이 null입니다');
         setState(() {
-          errorMessage = '로그인된 사용자 정보가 없습니다';
+          errorMessage = '프로필 정보를 불러올 수 없습니다 (ID 또는 토큰 누락)';
         });
         return;
       }
 
       final response = await http.get(
-        Uri.parse('$baseUrl/api/profile/$userId'),
+        Uri.parse('$baseUrl/api/profile/$currentProfileId'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -74,27 +86,62 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
       );
 
       if (response.statusCode == 200) {
-        final profileData = jsonDecode(response.body);
-        profileId = profileData['profileId'];
-        selectedYear = profileData['birthYear'];
-        selectedGender = profileData['gender'];
-        selectedRegion = profileData['residence'];
-        selectedUniversityType = profileData['universityType'];
-        selectedAcademicStatus = profileData['academicStatus'];
-        selectedMajorField = profileData['majorField'];
-        selectedMajor = profileData['major'];
-        selectedUniversity = profileData['university'];
-        selectedGpa = profileData['gpa']?.toDouble() ?? 0.0;
-        selectedSemester = profileData['semester'];
-        selectedIncomeLevel = profileData['incomeLevel'];
-        isDisabled = profileData['disabled'] ?? false;
-        isMultiChild = profileData['multiChild'] ?? false;
-        isBasicLiving = profileData['basicLivingRecipient'] ?? false;
-        isSecondLowest = profileData['secondLowestIncome'] ?? false;
-        setState(() {});
-      } else {
+        final profileData = jsonDecode(response.body)['data'];
+        debugPrint(
+          '✅ 서버 응답 체크박스 데이터: '
+          'disabled=${profileData['disabled']}, '
+          'multiChild=${profileData['multiChild']}, '
+          'basicLivingRecipient=${profileData['basicLivingRecipient']}, '
+          'secondLowestIncome=${profileData['secondLowestIncome']}',
+        );
+        final int? loadedProfileId = profileData['profileId'];
+        if (loadedProfileId != null) {
+          profileProvider.setProfileId(loadedProfileId);
+        } else {
+          debugPrint('⚠️ profileId가 null이라 SharedPreferences에 저장하지 않음');
+        }
+        debugPrint(
+          '✅ 서버 응답 체크박스 데이터: '
+          'disabled=${profileData['disabled']}, '
+          'multiChild=${profileData['multiChild']}, '
+          'basicLivingRecipient=${profileData['basicLivingRecipient']}, '
+          'secondLowestIncome=${profileData['secondLowestIncome']}',
+        );
+
         setState(() {
-          errorMessage = '프로필 불러오기에 실패했습니다';
+          selectedYear = profileData['birthYear'];
+          selectedGender = profileData['gender'];
+          selectedRegion = profileData['residence'];
+          selectedUniversity = profileData['university'];
+          selectedUniversityType = profileData['universityType'];
+          selectedAcademicStatus = profileData['academicStatus'];
+          selectedSemester =
+              profileData['semester'] is int ? profileData['semester'] : null;
+          selectedMajorField = profileData['majorField'];
+          selectedMajor = profileData['major'];
+          selectedGpa = profileData['gpa']?.toDouble() ?? 0.0;
+          selectedIncomeLevel = profileData['incomeLevel'];
+          isDisabled = profileData['disabled'] ?? false;
+          isMultiChild = profileData['multiChild'] ?? false;
+          isBasicLiving = profileData['basicLivingRecipient'] ?? false;
+          isSecondLowest = profileData['secondLowestIncome'] ?? false;
+          uniController.text = selectedUniversity ?? '';
+          majorController.text = selectedMajor ?? '';
+
+          profileProvider.setProfileRegistered(true);
+
+          debugPrint(
+            '✅ UI에 반영될 체크박스 상태: '
+            'isDisabled=$isDisabled, '
+            'isMultiChild=$isMultiChild, '
+            'isBasicLiving=$isBasicLiving, '
+            'isSecondLowest=$isSecondLowest',
+          );
+        });
+      } else {
+        debugPrint('⚠️ 프로필 조회 실패: ${response.statusCode}');
+        setState(() {
+          errorMessage = '프로필 불러오기에 실패했습니다 (${response.statusCode})';
         });
       }
     } catch (e) {
@@ -105,21 +152,39 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
     }
   }
 
+  // 저장
   Future<void> _saveProfileData() async {
+    print('🟡 [DEBUG] 저장 함수 호출됨');
+
+    final profileProvider = Provider.of<UserProfileProvider>(
+      context,
+      listen: false,
+    );
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final profileId = profileProvider.profileId;
+    final rawToken = authProvider.token;
+
+    print('🟡 rawtoken: $rawToken');
+    print('🟡 profileId: $profileId');
+
+    if (profileId == null || rawToken == null) {
+      print('❌ profileId 또는 token이 null입니다');
+      setState(() {
+        errorMessage = '프로필 정보가 없습니다';
+      });
+      return;
+    }
+    final token =
+        rawToken.startsWith('Bearer ') ? rawToken : 'Bearer $rawToken';
+
     try {
-      final profileProvider = Provider.of<UserProfileProvider>(context, listen: false);
-      final isEmptyProfile = profileProvider.isProfileEmpty;
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final memberId = authProvider.memberId;
-      final token = authProvider.token;
-
-      if (memberId == null) {
-        setState(() {
-          errorMessage = '로그인된 사용자 정보가 없습니다';
-        });
-        return;
-      }
-
+      debugPrint(
+        '📤 저장 요청 직전 체크박스 상태: '
+        'isDisabled=$isDisabled, '
+        'isMultiChild=$isMultiChild, '
+        'isBasicLiving=$isBasicLiving, '
+        'isSecondLowest=$isSecondLowest',
+      );
       final Map<String, dynamic> body = {
         'birthYear': selectedYear,
         'gender': selectedGender,
@@ -138,36 +203,14 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         'secondLowestIncome': isSecondLowest,
       };
 
-      print('📡 전송할 프로필 정보: $body');
-
-      http.Response response;
-      if (isEmptyProfile) {
-        final url = Uri.parse('$baseUrl/api/profile?memberId=$memberId');
-        print('🛰️ POST URL: $url');
-        print('🔐 Bearer Token: $token');
-
-        response = await http.post(
-          url,
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $token',
-          },
-          body: jsonEncode(body),
-        );
-      } else {
-        final url = Uri.parse('$baseUrl/api/profile/$profileId');
-        response = await http.patch(
-          url,
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $token',
-          },
-          body: jsonEncode(body),
-        );
-      }
-
-      print('📩 응답코드: ${response.statusCode}');
-      print('📩 응답내용: ${response.body}');
+      final response = await http.patch(
+        Uri.parse('$baseUrl/api/profile/$profileId'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': rawToken,
+        },
+        body: jsonEncode(body),
+      );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         profileProvider.updateProfile(
@@ -189,18 +232,20 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         );
         context.pop();
       } else {
+        print('⚠️ 응답 본문: ${response.body}');
         setState(() {
           errorMessage = '프로필 저장에 실패했습니다';
         });
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       print('❌ 예외 발생: $e');
+      print('📍 Stack Trace: $stackTrace');
+
       setState(() {
         errorMessage = '네트워크 오류: 연결을 확인해주세요';
       });
     }
   }
-
 
   final List<int> yearOptions = List.generate(
     60,
@@ -336,6 +381,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                 ),
                 Expanded(
                   child: TextField(
+                    controller: uniController,
                     onChanged: (value) => selectedUniversity = value,
                     decoration: const InputDecoration(
                       hintText: '입력 안 함',
@@ -364,6 +410,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                 ),
                 Expanded(
                   child: TextField(
+                    controller: majorController,
                     onChanged: (value) => selectedMajor = value,
                     decoration: const InputDecoration(
                       hintText: '입력 안 함',
@@ -422,19 +469,20 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               children: [
                 Expanded(
                   child: CheckboxListTile(
-                    title: const Text('장애 여부'),
+                    title: const Text('장애 유무', style: TextStyle(fontSize: 15)),
                     value: isDisabled,
                     onChanged:
-                        (value) => setState(() => isDisabled = value ?? false),
+                        (bool? value) =>
+                            setState(() => isDisabled = value ?? false),
                     controlAffinity: ListTileControlAffinity.leading,
                   ),
                 ),
                 Expanded(
                   child: CheckboxListTile(
-                    title: const Text('다자녀 가구 여부'),
+                    title: const Text('다자녀 가구', style: TextStyle(fontSize: 15)),
                     value: isMultiChild,
                     onChanged:
-                        (value) =>
+                        (bool? value) =>
                             setState(() => isMultiChild = value ?? false),
                     controlAffinity: ListTileControlAffinity.leading,
                   ),
@@ -445,20 +493,23 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               children: [
                 Expanded(
                   child: CheckboxListTile(
-                    title: const Text('기초생활수급자 여부'),
+                    title: const Text(
+                      '기초생활\n수급자',
+                      style: TextStyle(fontSize: 15),
+                    ),
                     value: isBasicLiving,
                     onChanged:
-                        (value) =>
+                        (bool? value) =>
                             setState(() => isBasicLiving = value ?? false),
                     controlAffinity: ListTileControlAffinity.leading,
                   ),
                 ),
                 Expanded(
                   child: CheckboxListTile(
-                    title: const Text('차상위계층 여부'),
+                    title: const Text('차상위계층', style: TextStyle(fontSize: 15)),
                     value: isSecondLowest,
                     onChanged:
-                        (value) =>
+                        (bool? value) =>
                             setState(() => isSecondLowest = value ?? false),
                     controlAffinity: ListTileControlAffinity.leading,
                   ),
@@ -507,7 +558,17 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
           ),
           Expanded(
             child: DropdownButtonFormField(
-              value: selectedValue,
+              value:
+                  isMap
+                      ? (options.any(
+                            (opt) =>
+                                (opt['value'] ?? opt['code']) == selectedValue,
+                          )
+                          ? selectedValue
+                          : null)
+                      : (options.contains(selectedValue)
+                          ? selectedValue
+                          : null),
               onChanged: onChanged,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),

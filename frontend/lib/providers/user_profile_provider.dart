@@ -27,6 +27,7 @@ class UserProfileProvider extends ChangeNotifier {
 
   void setProfileId(int id) async {
     _profileId = id;
+    _isProfileRegistered = (id != null);
     notifyListeners();
 
     final prefs = await SharedPreferences.getInstance();
@@ -135,6 +136,8 @@ class UserProfileProvider extends ChangeNotifier {
 
         if (profileResponse.statusCode == 200) {
           final profileData = jsonDecode(profileResponse.body)['data'];
+          setProfileId(profileData['profileId']);
+          
           updateProfile(
             birthYear: profileData['birthYear'],
             gender: profileData['gender'],
@@ -142,7 +145,7 @@ class UserProfileProvider extends ChangeNotifier {
             university: profileData['university'],
             universityType: profileData['universityType'],
             academicStatus: profileData['academicStatus'],
-            gpa: profileData['gpa']?.toDouble(),
+            gpa: profileData['gpa'] != null ? (profileData['gpa'] as num).toDouble() : null,
             major: profileData['major'],
             majorField: profileData['majorField'],
             semester: profileData['semester'],

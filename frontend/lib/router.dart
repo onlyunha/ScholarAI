@@ -8,6 +8,8 @@
 
 import 'package:go_router/go_router.dart';
 import 'package:scholarai/screens/chatbot/chatbot_screen.dart';
+import 'package:scholarai/screens/home/tabs/community/community_tab.dart';
+import 'package:scholarai/screens/home/tabs/community/post_write_screen.dart';
 import 'package:scholarai/screens/onboarding/onboarding_screen.dart';
 import 'package:scholarai/screens/settings/profile_create_screen.dart';
 import 'package:scholarai/screens/settings/profile_view_screen.dart';
@@ -86,11 +88,32 @@ GoRouter getRouter(String initialLocation) {
         path: '/profile/create',
         builder: (context, state) => const CreateProfileScreen(),
       ),
-      
+
       GoRoute(
         path: '/chatbot',
         builder: (context, state) => const ChatbotScreen(),
       ),
+
+      /// 커뮤니티
+      GoRoute(
+        path: '/main?tab=community',
+        builder: (context, state) => const CommunityTab(),
+      ),
+
+      /// 커뮤니티 글쓰기
+      GoRoute(
+        path: '/post/write',
+        builder: (context, state) => const PostWriteScreen(),
+      ),
+
+      // /// 커뮤니티 글 상세
+      // GoRoute(
+      //   path: '/post/detail/:id',
+      //   builder: (context, state) {
+      //     final postId = state.pathParameters['id'] ?? '0';
+      //     return PostDetailScreen(postId: postId);
+      //   },
+      // ),
     ],
   );
 }
