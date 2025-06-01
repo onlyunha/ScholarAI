@@ -8,6 +8,7 @@
 library;
 
 class AppRoutes {
+  static const splash = '/splash';
   static const welcome = '/';
   static const signup = '/signup';
   static const main = '/main';

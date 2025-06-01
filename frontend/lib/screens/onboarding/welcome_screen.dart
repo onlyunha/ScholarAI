@@ -20,7 +20,7 @@ import 'package:scholarai/constants/config.dart';
 import 'package:scholarai/providers/auth_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import 'home/main_screen.dart';
+import '../home/main_screen.dart';
 
 // 시작 화면 (Welcome)
 class WelcomeScreen extends StatelessWidget {

@@ -7,15 +7,17 @@
 /// =============================================================
 
 import 'package:go_router/go_router.dart';
+import 'package:scholarai/constants/app_routes.dart';
 import 'package:scholarai/screens/chatbot/chatbot_screen.dart';
 import 'package:scholarai/screens/home/tabs/community/community_tab.dart';
 import 'package:scholarai/screens/home/tabs/community/post_write_screen.dart';
 import 'package:scholarai/screens/onboarding/onboarding_screen.dart';
+import 'package:scholarai/screens/onboarding/splash_screen.dart';
 import 'package:scholarai/screens/settings/profile_create_screen.dart';
 import 'package:scholarai/screens/settings/profile_view_screen.dart';
 
 // 화면 import
-import 'screens/welcome_screen.dart';
+import 'screens/onboarding/welcome_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/signup_screen.dart';
 import 'screens/auth/password_screen.dart';
@@ -27,8 +29,15 @@ import 'screens/settings/profile_view_screen.dart';
 // GoRouter 인스턴스
 GoRouter getRouter(String initialLocation) {
   return GoRouter(
-    initialLocation: initialLocation,
+    initialLocation: AppRoutes.splash,
+
     routes: [
+      // Splash
+      GoRoute(
+        path: AppRoutes.splash,
+        builder: (context, state) => const SplashScreen(),
+      ),
+
       /// Onboarding
       GoRoute(
         path: '/onboarding',
@@ -36,7 +45,10 @@ GoRouter getRouter(String initialLocation) {
       ),
 
       /// Welcome
-      GoRoute(path: '/', builder: (context, state) => const WelcomeScreen()),
+      GoRoute(
+        path: AppRoutes.welcome,
+        builder: (context, state) => const WelcomeScreen(),
+      ),
 
       /// Login
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
