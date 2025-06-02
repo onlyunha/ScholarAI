@@ -1,5 +1,6 @@
 package dankook.capstone.service;
 
+import dankook.capstone.dto.ChatbotAnswer;
 import dankook.capstone.dto.ChatbotRequestDto;
 import dankook.capstone.dto.ChatbotResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -28,14 +29,14 @@ public class ChatbotService {
         HttpEntity<ChatbotRequestDto> entity = new HttpEntity<>(chatbotRequestDto, headers);
 
         try {
-            ResponseEntity<ChatbotResponseDto> response = restTemplate.postForEntity(
+            ResponseEntity<ChatbotAnswer> response = restTemplate.postForEntity(
                     fastApiUrl + "/faq-answer",
                     entity,
-                    ChatbotResponseDto.class
+                    ChatbotAnswer.class
             );
 
             if (response.getStatusCode().is2xxSuccessful()) {
-                return response.getBody();
+                return ChatbotResponseDto.from(response.getBody());
             }
         } catch (Exception e) {
             e.printStackTrace();

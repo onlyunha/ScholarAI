@@ -33,5 +33,4 @@ public class ChatbotController {
         return ResponseEntity.ok(new ResponseDto<>("챗봇 응답 성공", chatbotResponseDto));
     }
 
-
 }
