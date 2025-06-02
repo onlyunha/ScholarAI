@@ -3,7 +3,7 @@
 /// Desc : 메인
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-03-23
-/// Updt : 2025-06-01
+/// Updt : 2025-06-03
 /// =============================================================
 library;
 
@@ -85,7 +85,6 @@ class MyApp extends StatelessWidget {
         context,
         listen: false,
       );
-      await authProvider.loadAuthData();
       await profileProvider.loadProfileIdFromPrefs();
 
       final memberId = authProvider.memberId;

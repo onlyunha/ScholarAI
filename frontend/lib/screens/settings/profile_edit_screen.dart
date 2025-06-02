@@ -87,26 +87,12 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
 
       if (response.statusCode == 200) {
         final profileData = jsonDecode(response.body)['data'];
-        debugPrint(
-          '✅ 서버 응답 체크박스 데이터: '
-          'disabled=${profileData['disabled']}, '
-          'multiChild=${profileData['multiChild']}, '
-          'basicLivingRecipient=${profileData['basicLivingRecipient']}, '
-          'secondLowestIncome=${profileData['secondLowestIncome']}',
-        );
         final int? loadedProfileId = profileData['profileId'];
         if (loadedProfileId != null) {
           profileProvider.setProfileId(loadedProfileId);
         } else {
           debugPrint('⚠️ profileId가 null이라 SharedPreferences에 저장하지 않음');
         }
-        debugPrint(
-          '✅ 서버 응답 체크박스 데이터: '
-          'disabled=${profileData['disabled']}, '
-          'multiChild=${profileData['multiChild']}, '
-          'basicLivingRecipient=${profileData['basicLivingRecipient']}, '
-          'secondLowestIncome=${profileData['secondLowestIncome']}',
-        );
 
         setState(() {
           selectedYear = profileData['birthYear'];
@@ -130,13 +116,6 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
 
           profileProvider.setProfileRegistered(true);
 
-          debugPrint(
-            '✅ UI에 반영될 체크박스 상태: '
-            'isDisabled=$isDisabled, '
-            'isMultiChild=$isMultiChild, '
-            'isBasicLiving=$isBasicLiving, '
-            'isSecondLowest=$isSecondLowest',
-          );
         });
       } else {
         debugPrint('⚠️ 프로필 조회 실패: ${response.statusCode}');

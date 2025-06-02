@@ -3,7 +3,7 @@
 /// Desc : 유저 정보 관리
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-21
-/// Updt : 2025-06-01
+/// Updt : 2025-06-03
 /// =============================================================
 library;
 
@@ -110,12 +110,14 @@ class UserProfileProvider extends ChangeNotifier {
   Future<void> fetchProfileIdAndLoad(String memberId, String token) async {
     try {
       // 1단계: 프로필 ID 조회
+      debugPrint('✅ 최종 Authorization 헤더: Bearer $token');
       final profileIdResponse = await http.get(
         Uri.parse('$baseUrl/api/profile?memberId=$memberId'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
+          'Authorization': '$token',
         },
+        
       );
 
       if (profileIdResponse.statusCode == 200) {
@@ -126,18 +128,19 @@ class UserProfileProvider extends ChangeNotifier {
         setProfileId(profileId);
 
         // 2단계: 프로필 상세 조회
+        debugPrint('✅ 최종 Authorization 헤더: $token');
         final profileResponse = await http.get(
           Uri.parse('$baseUrl/api/profile/$profileId'),
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer $token',
+            'Authorization': ' $token',
           },
         );
 
         if (profileResponse.statusCode == 200) {
           final profileData = jsonDecode(profileResponse.body)['data'];
           setProfileId(profileData['profileId']);
-          
+
           updateProfile(
             birthYear: profileData['birthYear'],
             gender: profileData['gender'],
@@ -145,7 +148,10 @@ class UserProfileProvider extends ChangeNotifier {
             university: profileData['university'],
             universityType: profileData['universityType'],
             academicStatus: profileData['academicStatus'],
-            gpa: profileData['gpa'] != null ? (profileData['gpa'] as num).toDouble() : null,
+            gpa:
+                profileData['gpa'] != null
+                    ? (profileData['gpa'] as num).toDouble()
+                    : null,
             major: profileData['major'],
             majorField: profileData['majorField'],
             semester: profileData['semester'],
@@ -171,17 +177,20 @@ class UserProfileProvider extends ChangeNotifier {
   Future<void> loadProfileIdFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     final storedProfileId = prefs.getInt('profile_id');
-    if (storedProfileId != null) {
+    final storedMemberId = prefs.getString('auth_memberId');
+    final storedToken = prefs.getString('auth_token');
+
+    if (storedProfileId != null &&
+        storedMemberId != null &&
+        storedToken != null) {
       _profileId = storedProfileId;
       _isProfileRegistered = true;
       notifyListeners();
       debugPrint('✅ SharedPreferences에서 profileId 로드됨: $storedProfileId');
-    } else {
-      debugPrint('ℹ️ 저장된 profileId 없음');
-    }
-  }
 
-  bool get isProfileEmpty {
-    return birthYear == null || gender == null || region == null;
+      await fetchProfileIdAndLoad(storedMemberId, storedToken);
+    } else {
+      debugPrint('ℹ️ 저장된 profileId 또는 memberId/token 없음');
+    }
   }
 }

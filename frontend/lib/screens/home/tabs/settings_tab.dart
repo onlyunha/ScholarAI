@@ -26,6 +26,7 @@ class SettingsTab extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 24),
         children: [
+          const SizedBox(height: 40),
           _buildSectionTitle('회원정보'),
           _buildSimpleItem(icon: Icons.email, label: '이메일', trailing: email),
           _buildSimpleItem(icon: Icons.lock, label: '비밀번호 변경', onTap: () {}),

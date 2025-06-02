@@ -93,7 +93,6 @@ class _LoginScreenState extends State<LoginScreen>
       final memberId = data['memberId'].toString();
       final profileId = data['profileId']; // null일 수 있으니 ?. 처리
       final name = data['name'] ?? '';
-  
 
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       await authProvider.saveAuthData(token!, memberId, email, name);
@@ -106,6 +105,10 @@ class _LoginScreenState extends State<LoginScreen>
       if (profileId != null) {
         userProfileProvider.setProfileId(profileId);
         debugPrint('✅ 로그인 시 받아온 profileId: $profileId');
+
+        // 🔽 여기 추가
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setInt('profile_id', profileId);
       } else {
         debugPrint('⚠️ 로그인 응답에 profileId 없음');
       }

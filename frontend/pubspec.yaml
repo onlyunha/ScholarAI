@@ -108,7 +108,7 @@ flutter:
         - asset: assets/fonts/Pretendard-Thin.ttf
   
 flutter_native_splash:
-  color: "#FFFFFF"
+  color: "5E69EE"
   image: assets/images/main_logo.png
   android_gravity: center
   ios_content_mode: center

@@ -3,7 +3,7 @@
 /// Desc : 프로필 보기 화면
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-21
-/// Updt : 2025-06-01
+/// Updt : 2025-06-03
 /// =============================================================
 library;
 
@@ -48,13 +48,40 @@ class _ProfileViewScreenState extends State<ProfileViewScreen> {
       final token = authProvider.token;
       debugPrint('🔍 profileId: $profileId');
 
+      final memberId = authProvider.memberId;
+      debugPrint('🟢 memberId: $memberId');
+      final nameResponse = await http.get(
+        Uri.parse('$baseUrl/api/auth/name/$memberId'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      debugPrint('📥 이름 조회 응답 코드: ${nameResponse.statusCode}');
+      debugPrint('📥 이름 조회 응답 바디: ${nameResponse.body}');
+      if (nameResponse.statusCode == 200) {
+        final nameData = jsonDecode(nameResponse.body);
+        final fetchedName = nameData['data'];
+        debugPrint('✅ 서버로부터 받은 이름: $fetchedName');
+        if (fetchedName != null) {
+          authProvider.setName(fetchedName);
+          debugPrint('🟢 authProvider.name에 저장 완료');
+        } else {
+          debugPrint('⚠️ fetchedName이 null입니다');
+        }
+      } else {
+        debugPrint('❌ 이름 조회 실패 (status: ${nameResponse.statusCode})');
+      }
+
       final response = await http.get(
         Uri.parse('$baseUrl/api/profile/$profileId'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
         },
       );
+
+      debugPrint('📦 프로필 응답 코드: ${response.statusCode}');
+      debugPrint('📦 프로필 응답 바디: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -227,18 +254,21 @@ class _ProfileViewScreenState extends State<ProfileViewScreen> {
                                           if (enteredName.isNotEmpty) {
                                             final response = await http.patch(
                                               Uri.parse(
-                                                '$baseUrl/api/auth/name',
+                                                '$baseUrl/api/auth/name/${auth.memberId}',
                                               ),
                                               headers: {
                                                 'Content-Type':
                                                     'application/json',
-                                                'Authorization':
-                                                    'Bearer ${auth.token}',
                                               },
                                               body: jsonEncode({
                                                 'name': enteredName,
-                                                'email': auth.email,
                                               }),
+                                            );
+                                            debugPrint(
+                                              '🟥 이름 수정 응답 코드: ${response.statusCode}',
+                                            );
+                                            debugPrint(
+                                              '🟥 응답 바디: ${response.body}',
                                             );
 
                                             if (response.statusCode == 200) {
