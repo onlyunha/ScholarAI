@@ -5,6 +5,7 @@ import dankook.capstone.dto.JwtTokenDto;
 import dankook.capstone.domain.Member;
 import dankook.capstone.dto.CustomUserDetails;
 import dankook.capstone.dto.KakaoLoginRequestDto;
+import dankook.capstone.dto.KakaoLoginResponse;
 import dankook.capstone.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,7 @@ public class KakaoLoginService {
     private final JWTUtil jwtUtil;
 
     @Transactional
-    public JwtTokenDto kakaoLogin(KakaoLoginRequestDto kakaoLoginRequestDto){
+    public KakaoLoginResponse kakaoLogin(KakaoLoginRequestDto kakaoLoginRequestDto){
 
         //이메일을 기준으로 기존 회원 조회
         Member member = memberRepository.findByEmail(kakaoLoginRequestDto.getEmail()).orElse(null);
@@ -48,6 +49,11 @@ public class KakaoLoginService {
         CustomUserDetails userDetails = new CustomUserDetails(member);
         String token = jwtUtil.generateJwt(member.getEmail(), member.getRole(), 60*60*10L);
 
-        return new JwtTokenDto(token);
+        Long profileId = null;
+        if (member.getProfile() != null) {
+            profileId = member.getProfile().getId();
+        }
+
+        return new KakaoLoginResponse(new JwtTokenDto(token), member.getId(), profileId);
     }
 }

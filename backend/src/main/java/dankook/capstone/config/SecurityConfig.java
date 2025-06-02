@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .httpBasic(httpBasic -> httpBasic.disable()) // HTTP Basic 인증 비활성화
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/api/auth/**", "/", "/api/scholarships/**", "/api/likes/**",
-                                "/api/profile/**","/api/fcm-token/**","/api/recommend/**").permitAll() //인증 없이 허용
+                                "/api/profile/**","/api/fcm-token/**","/api/recommend/**","/api/chatbot/**").permitAll() //인증 없이 허용
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated()) //그 외는 인증 필요
                 .logout(logout -> logout.disable()) // JWT에서는 별도의 로그아웃 로직 필요

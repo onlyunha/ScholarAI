@@ -46,7 +46,7 @@ public class AiRecommendationService {
             );
 
             // 응답이 200 OK이고, recommendations 필드가 있다면 파싱
-            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+            if (response.getStatusCode().is2xxSuccessful()) {
                 Object recommendationsObj = response.getBody().get("recommendations");
 
                 if (recommendationsObj instanceof List<?>) {

@@ -4,6 +4,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import dankook.capstone.auth.JWTUtil;
+import dankook.capstone.dto.GoogleLoginResponse;
 import dankook.capstone.dto.JwtTokenDto;
 import dankook.capstone.domain.Member;
 import dankook.capstone.dto.CustomUserDetails;
@@ -50,7 +51,7 @@ public class GoogleLoginService {
     }
 
     @Transactional
-    public JwtTokenDto googleLogin(String idTokenString) throws Exception {
+    public GoogleLoginResponse googleLogin(String idTokenString) throws Exception {
         // ID 토큰 검증
         GoogleIdToken.Payload payload = verifyIdToken(idTokenString);
 
@@ -77,6 +78,11 @@ public class GoogleLoginService {
         CustomUserDetails userDetails = new CustomUserDetails(member);
         String token = jwtUtil.generateJwt(member.getEmail(), member.getRole(), 60*60*10L);
 
-        return new JwtTokenDto(token);
+        Long profileId = null;
+        if (member.getProfile() != null) {
+            profileId = member.getProfile().getId();
+        }
+
+        return new GoogleLoginResponse(new JwtTokenDto(token), member.getId(), profileId);
     }
 }
