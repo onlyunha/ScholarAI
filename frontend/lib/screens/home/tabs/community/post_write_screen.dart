@@ -1,5 +1,5 @@
 /// =============================================================
-/// File : post.write_screen.dart
+/// File : post_write_screen.dart
 /// Desc : 커뮤니티 게시판 - 글쓰기 화면
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-06-01

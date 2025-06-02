@@ -16,10 +16,11 @@ class AppRoutes {
   static const password = '/password';
   static const login = '/login';
   static const profileView = '/profile-view';
-  static const profileEdit = '/profile-view/profile-edit'; 
+  static const profileEdit = '/profile-view/profile-edit';
   static const String profileCreate = '/profile/create';
   static const chatbot = '/chatbot';
   static const tutorial = '/onboarding';
   static const community = '/main?tab=community';
   static const postWrite = '/post/write';
+  static const communityRules = '/community/rules';
 }

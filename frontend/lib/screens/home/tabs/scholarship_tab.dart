@@ -20,7 +20,6 @@ import '../../../widgets/custom_app_bar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:scholarai/constants/config.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:scholarai/widgets/scholarship_detail_sheet.dart';
 
 class ScholarshipTab extends StatefulWidget {
@@ -33,7 +32,7 @@ class ScholarshipTab extends StatefulWidget {
 class _ScholarshipTabState extends State<ScholarshipTab> {
   final TextEditingController keywordController = TextEditingController();
   bool isSearchMode = true;
-  bool isRecommendationStarted = true; // default false
+  bool isRecommendationStarted = false; // default false
 
   final List<String> aidTypes = ['성적우수', '소득구분', '지역연고', '장애인', '특기자', '기타'];
   late List<String> selectedTypes;

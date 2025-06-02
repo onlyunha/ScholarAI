@@ -3,12 +3,13 @@
 /// Desc : 라우터
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-23
-/// Updt : 2025-06-01
+/// Updt : 2025-06-03
 /// =============================================================
 
 import 'package:go_router/go_router.dart';
 import 'package:scholarai/constants/app_routes.dart';
 import 'package:scholarai/screens/chatbot/chatbot_screen.dart';
+import 'package:scholarai/screens/home/tabs/community/community_rules_screen.dart';
 import 'package:scholarai/screens/home/tabs/community/community_tab.dart';
 import 'package:scholarai/screens/home/tabs/community/post_write_screen.dart';
 import 'package:scholarai/screens/onboarding/onboarding_screen.dart';
@@ -116,6 +117,12 @@ GoRouter getRouter(String initialLocation) {
       GoRoute(
         path: '/post/write',
         builder: (context, state) => const PostWriteScreen(),
+      ),
+
+       /// 커뮤니티 이용규칙
+      GoRoute(
+        path: '/community/rules',
+        builder: (context, state) => const CommunityRulesScreen(),
       ),
 
       // /// 커뮤니티 글 상세

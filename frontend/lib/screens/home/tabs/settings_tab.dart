@@ -48,7 +48,7 @@ class SettingsTab extends StatelessWidget {
             label: '내가 쓴 댓글',
             onTap: () {},
           ),
-          _buildSimpleItem(icon: Icons.rule, label: '커뮤니티 이용규칙', onTap: () {}),
+          _buildSimpleItem(icon: Icons.rule, label: '커뮤니티 이용규칙', onTap: () => context.push(AppRoutes.communityRules)),
           _sectionDivider(),
 
           _buildSectionTitle('앱 설정'),

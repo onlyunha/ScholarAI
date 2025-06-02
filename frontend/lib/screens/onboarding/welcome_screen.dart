@@ -3,7 +3,7 @@
 /// Desc : 앱의 시작화면 - 로그인/회원가입 진입 제공
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-02
-/// Updt : 2025-06-01
+/// Updt : 2025-06-03
 /// =============================================================
 library;
 
@@ -18,9 +18,9 @@ import 'package:scholarai/constants/app_images.dart';
 import 'package:scholarai/constants/app_routes.dart';
 import 'package:scholarai/constants/config.dart';
 import 'package:scholarai/providers/auth_provider.dart';
+import 'package:scholarai/screens/home/tabs/community/post_detail_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import '../home/main_screen.dart';
 
 // 시작 화면 (Welcome)
 class WelcomeScreen extends StatelessWidget {
@@ -164,7 +164,7 @@ class WelcomeScreen extends StatelessWidget {
 
         final resBody = jsonDecode(response.body);
         final memberId = resBody['data'].toString();
-              final name = resBody['name'] ?? '';
+        final name = resBody['name'] ?? '';
 
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('accessToken', token ?? '');
