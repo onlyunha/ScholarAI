@@ -18,6 +18,7 @@ import 'package:scholarai/constants/app_images.dart';
 import 'package:scholarai/constants/app_routes.dart';
 import 'package:scholarai/constants/config.dart';
 import 'package:scholarai/providers/auth_provider.dart';
+import 'package:scholarai/providers/user_profile_provider.dart';
 import 'package:scholarai/screens/home/tabs/community/post_detail_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -36,7 +37,6 @@ class WelcomeScreen extends StatelessWidget {
   Future<void> handleGoogleSignIn(BuildContext context) async {
     final GoogleSignIn googleSignIn = GoogleSignIn(
       scopes: ['email', 'profile'],
-      // clientId: '538909784173-ivb8pgs0dmr4lfsr7795gu3tvth261kg.apps.googleusercontent.com',
     );
 
     try {
@@ -62,19 +62,55 @@ class WelcomeScreen extends StatelessWidget {
       }
 
       final response = await http.post(
-        Uri.parse('$baseUrl/api/auth/social'),
+        Uri.parse('$baseUrl/api/auth/google-login'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'idToken': idToken,
-          'provider': 'google', // ✅ 반드시 포함
-        }),
+        body: jsonEncode({'idToken': idToken, 'provider': 'google'}),
       );
 
       if (response.statusCode == 200) {
+        final resBody = jsonDecode(response.body);
         final token = response.headers['authorization'];
-        print('JWT 토큰: $token');
+        final data = resBody['data'];
 
-        // TODO: JWT 저장 처리 추가 가능 (SharedPreferences 등)
+        final memberId = data['memberId'].toString();
+        final profileId = data['profileId']?.toString() ?? '';
+        final name = googleUser.displayName ?? '';
+        final email = googleUser.email;
+
+        print('🛰 서버 응답 memberId: $memberId');
+        print('🛰 서버 응답 profileId: $profileId');
+
+        if (profileId.isNotEmpty) {
+          final userProfileProvider = Provider.of<UserProfileProvider>(
+            context,
+            listen: false,
+          );
+          userProfileProvider.setProfileId(int.parse(profileId));
+        }
+
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('accessToken', token ?? '');
+        await prefs.setString('memberId', memberId);
+        await prefs.setString('profileId', profileId);
+        print('💾 SharedPreferences 저장 완료:');
+        print('🔐 token: $token');
+        print('🧍 memberId: $memberId');
+        print('🪪 profileId: $profileId');
+
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        await authProvider.saveAuthData(
+          token!,
+          memberId,
+          email,
+          name,
+          profileId,
+        );
+        final userProfileProvider = Provider.of<UserProfileProvider>(
+          context,
+          listen: false,
+        );
+        await userProfileProvider.fetchProfileIdAndLoad(memberId, token!);
+
         context.go(AppRoutes.main);
       } else {
         String errorMsg = '응답 코드: ${response.statusCode}';
@@ -163,18 +199,42 @@ class WelcomeScreen extends StatelessWidget {
                 : rawToken;
 
         final resBody = jsonDecode(response.body);
-        final memberId = resBody['data'].toString();
-        final name = resBody['name'] ?? '';
+        final data = resBody['data'];
+        final memberId = data['memberId'].toString();
+        final profileId = data['profileId']?.toString() ?? '';
+        final name = nickname;
+        final mail = email;
+
+        if (profileId.isNotEmpty) {
+          final userProfileProvider = Provider.of<UserProfileProvider>(
+            context,
+            listen: false,
+          );
+          userProfileProvider.setProfileId(int.parse(profileId));
+        }
 
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('accessToken', token ?? '');
         await prefs.setString('memberId', memberId);
+        await prefs.setString('profileId', profileId);
 
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
-        await authProvider.saveAuthData(token!, memberId, email, name);
+        await authProvider.saveAuthData(
+          token!,
+          memberId,
+          mail,
+          name,
+          profileId,
+        );
 
         print('🔐 저장된 토큰: $token');
         print('👤 저장된 memberId: $memberId');
+
+        final userProfileProvider = Provider.of<UserProfileProvider>(
+          context,
+          listen: false,
+        );
+        await userProfileProvider.fetchProfileIdAndLoad(memberId, token!);
 
         context.go(AppRoutes.main);
       } else {

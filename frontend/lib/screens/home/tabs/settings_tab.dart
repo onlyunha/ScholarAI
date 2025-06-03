@@ -3,7 +3,7 @@
 /// Desc : 환경설정
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-19
-/// Updt : 2025-06-01
+/// Updt : 2025-06-03
 /// =============================================================
 library;
 
@@ -13,6 +13,8 @@ import 'package:provider/provider.dart';
 import 'package:scholarai/constants/app_colors.dart';
 import 'package:scholarai/constants/app_routes.dart';
 import 'package:scholarai/providers/auth_provider.dart';
+import 'package:scholarai/providers/user_profile_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsTab extends StatelessWidget {
   const SettingsTab({super.key});
@@ -48,7 +50,11 @@ class SettingsTab extends StatelessWidget {
             label: '내가 쓴 댓글',
             onTap: () {},
           ),
-          _buildSimpleItem(icon: Icons.rule, label: '커뮤니티 이용규칙', onTap: () => context.push(AppRoutes.communityRules)),
+          _buildSimpleItem(
+            icon: Icons.rule,
+            label: '커뮤니티 이용규칙',
+            onTap: () => context.push(AppRoutes.communityRules),
+          ),
           _sectionDivider(),
 
           _buildSectionTitle('앱 설정'),
@@ -80,6 +86,9 @@ class SettingsTab extends StatelessWidget {
             onTap: () async {
               final authProvider = context.read<AuthProvider>();
               await authProvider.clearAuthData();
+              context.read<UserProfileProvider>().resetOnLogout();
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.remove('profile_id');
 
               // 로그인 화면으로 이동 (스택 초기화)
               context.go(AppRoutes.welcome);

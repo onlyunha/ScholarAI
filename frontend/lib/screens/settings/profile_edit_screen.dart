@@ -3,7 +3,7 @@
 /// Desc : 프로필 수정
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-21
-/// Updt : 2025-06-01
+/// Updt : 2025-06-03
 /// =============================================================
 library;
 
@@ -54,6 +54,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   }
 
   Future<void> _loadProfileData() async {
+    debugPrint('✅ _loadProfileData() 진입');
     try {
       final profileProvider = Provider.of<UserProfileProvider>(
         context,
@@ -63,6 +64,13 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
       final memberId = authProvider.memberId;
       final token = authProvider.token;
       final currentProfileId = profileProvider.profileId;
+
+      debugPrint('🔍 provider.profileId: $currentProfileId');
+      debugPrint(
+        '🔍 provider.isProfileRegistered: ${profileProvider.isProfileRegistered}',
+      );
+      debugPrint('🔍 auth.token: $token');
+      debugPrint('🔍 auth.memberId: $memberId');
 
       debugPrint('🟡 현재 Provider에 저장된 profileId: $currentProfileId');
       debugPrint(
@@ -76,12 +84,11 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         });
         return;
       }
-
+  debugPrint('📤 GET /api/profile/$currentProfileId 호출 준비');
       final response = await http.get(
         Uri.parse('$baseUrl/api/profile/$currentProfileId'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
         },
       );
 
@@ -115,7 +122,6 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
           majorController.text = selectedMajor ?? '';
 
           profileProvider.setProfileRegistered(true);
-
         });
       } else {
         debugPrint('⚠️ 프로필 조회 실패: ${response.statusCode}');

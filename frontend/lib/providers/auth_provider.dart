@@ -16,21 +16,23 @@ class AuthProvider extends ChangeNotifier {
   String? _memberId;
   String? _email;
   String? _name;
+  String? _profileId;
 
   String? get token => _token;
   String? get memberId => _memberId;
   String? get email => _email;
   String? get name => _name;
+  String? get profileId => _profileId;
 
   /// SharedPreferences에서 토큰과 멤버ID 로드
   Future<void> loadAuthData() async {
     final prefs = await SharedPreferences.getInstance();
     final rawToken = prefs.getString('auth_token');
     _token = rawToken != null ? rawToken.replaceAll('Bearer ', '') : null;
-
     _memberId = prefs.getString('auth_memberId');
     _email = prefs.getString('auth_email');
     _name = prefs.getString('auth_name');
+    _profileId = prefs.getString('profileId');
     notifyListeners();
   }
 
@@ -40,16 +42,19 @@ class AuthProvider extends ChangeNotifier {
     String memberId,
     String email,
     String name,
+    String profileId,
   ) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('auth_token', token);
     await prefs.setString('auth_memberId', memberId);
     await prefs.setString('auth_email', email);
     await prefs.setString('auth_name', name);
+    await prefs.setString('profileId', profileId);
     _token = token;
     _memberId = memberId;
     _email = email;
     _name = name;
+    _profileId = profileId;
     notifyListeners();
   }
 
@@ -60,10 +65,12 @@ class AuthProvider extends ChangeNotifier {
     await prefs.remove('auth_memberId');
     await prefs.remove('auth_email');
     await prefs.remove('auth_name');
+    await prefs.remove('profileId');
     _token = null;
     _memberId = null;
     _email = null;
     _name = null;
+    _profileId = null;
     notifyListeners();
   }
 

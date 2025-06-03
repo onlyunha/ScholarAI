@@ -3,7 +3,7 @@
 /// Desc : 이메일과 비밀번호를 이용한 로그인 화면 UI 및 기능 구현
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-02
-/// Updt : 2025-06-01
+/// Updt : 2025-06-03
 /// =============================================================
 library;
 
@@ -91,11 +91,12 @@ class _LoginScreenState extends State<LoginScreen>
       debugPrint('🟢 로그인 응답 전체: $resBody');
       final data = resBody['data'];
       final memberId = data['memberId'].toString();
-      final profileId = data['profileId']; // null일 수 있으니 ?. 처리
+      final profileId = data['profileId'];
+      final profileIdStr = profileId?.toString() ?? '';
       final name = data['name'] ?? '';
 
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      await authProvider.saveAuthData(token!, memberId, email, name);
+      await authProvider.saveAuthData(token!, memberId, email, name, profileIdStr);
       debugPrint('✅ authProvider 저장 완료');
 
       final userProfileProvider = Provider.of<UserProfileProvider>(
@@ -105,8 +106,7 @@ class _LoginScreenState extends State<LoginScreen>
       if (profileId != null) {
         userProfileProvider.setProfileId(profileId);
         debugPrint('✅ 로그인 시 받아온 profileId: $profileId');
-
-        // 🔽 여기 추가
+        
         final prefs = await SharedPreferences.getInstance();
         await prefs.setInt('profile_id', profileId);
       } else {

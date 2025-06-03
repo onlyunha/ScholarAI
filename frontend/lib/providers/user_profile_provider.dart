@@ -117,7 +117,6 @@ class UserProfileProvider extends ChangeNotifier {
           'Content-Type': 'application/json',
           'Authorization': '$token',
         },
-        
       );
 
       if (profileIdResponse.statusCode == 200) {
@@ -192,5 +191,11 @@ class UserProfileProvider extends ChangeNotifier {
     } else {
       debugPrint('ℹ️ 저장된 profileId 또는 memberId/token 없음');
     }
+  }
+
+  void resetOnLogout() {
+    _profileId = null;
+    _isProfileRegistered = false;
+    notifyListeners();
   }
 }
