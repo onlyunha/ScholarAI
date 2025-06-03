@@ -3,10 +3,14 @@ package dankook.capstone.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE member SET deleted = true WHERE member_id = ?")
+@Where(clause = "deleted = false")
 public class Member {
 
     @Id @GeneratedValue
@@ -26,6 +30,9 @@ public class Member {
     private String provider; //local, kakao, google
 
     private String fcmToken; //FCM 토큰
+
+    @Column(nullable = false)
+    private boolean deleted = false;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "profile_id")
@@ -60,5 +67,10 @@ public class Member {
     //FCM 토큰 업데이트
     public void updateFcmToken(String fcmToken){
         this.fcmToken = fcmToken;
+    }
+
+    //회원 탈퇴 표시
+    public void markAsDeleted() {
+        this.deleted = true;
     }
 }

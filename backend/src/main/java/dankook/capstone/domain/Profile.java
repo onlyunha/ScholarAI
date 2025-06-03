@@ -5,12 +5,16 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE profile SET deleted = true WHERE profile_id = ?")
+@Where(clause = "deleted = false")
 public class Profile {
 
     @Id
@@ -20,6 +24,7 @@ public class Profile {
 
     @OneToOne(mappedBy = "profile", fetch = FetchType.LAZY)
     private Member member;
+
 
     @Column(nullable = false)
     private int birthYear; //출생년도
@@ -68,6 +73,9 @@ public class Profile {
     @Column(nullable = false)
     private boolean secondLowestIncome; //차상위계층 여부
 
+    @Column(nullable = false)
+    private boolean deleted = false;
+
     public void setMember(Member member) {
         this.member = member;
     }
@@ -112,5 +120,10 @@ public class Profile {
         this.multiChild = multiChild;
         this.basicLivingRecipient = basicLivingRecipient;
         this.secondLowestIncome = secondLowestIncome;
+    }
+
+    //회원 탈퇴 시 프로필 soft delete
+    public void markAsDeleted() {
+        this.deleted = true;
     }
 }

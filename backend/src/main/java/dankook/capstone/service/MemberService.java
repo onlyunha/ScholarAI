@@ -5,6 +5,7 @@ import dankook.capstone.domain.Member;
 import dankook.capstone.dto.MemberJoinDto;
 import dankook.capstone.repository.MemberRepository;
 
+import dankook.capstone.repository.ScholarshipLikeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final ScholarshipLikeRepository scholarshipLikeRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JWTUtil jwtUtil;
 
@@ -75,6 +77,28 @@ public class MemberService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원 ID입니다."));
         member.updateName(newName);
+    }
+
+    //회원 탈퇴
+    @Transactional
+    public void deleteMemberSoft(Long memberId){
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원 ID입니다."));
+
+        //이미 탈퇴한 사용자라면 중복 처리 방지
+        if (member.isDeleted()) {
+            throw new IllegalStateException("이미 탈퇴한 회원입니다.");
+        }
+
+        //찜 삭제
+        scholarshipLikeRepository.deleteAllByMember(member);
+
+        //프로필 soft delete
+        if (member.getProfile() != null) { //프로필이 있는 경우에만
+            member.getProfile().markAsDeleted();
+        }
+
+        member.markAsDeleted(); //deleted = true
     }
 
 }

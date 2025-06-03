@@ -56,7 +56,7 @@ public class ScholarshipLikeService {
 
     //찜 목록 조회
     public List<ScholarshipLikeResponseDto> getLikedScholarships(Long memberId){
-        List<ScholarshipLike> scholarshipLikes = scholarshipLikeRepository.findAllByMemberId(memberId);
+        List<ScholarshipLike> scholarshipLikes = scholarshipLikeRepository.findAllByMemberIdWithScholarship(memberId);
 
         return scholarshipLikes.stream()
                 .filter(like -> like.getScholarship() != null)

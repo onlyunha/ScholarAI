@@ -31,14 +31,14 @@ public class PostService {
     //게시글 단건 조회
     @Transactional(readOnly = true)
     public Post getPost(Long id){
-        return postRepository.findById(id)
+        return postRepository.findPostWithAllAssociationsById(id)
                 .orElseThrow(()->new EntityNotFoundException("해당 게시글이 존재하지 않습니다."));
     }
 
     //게시글 전체 조회
     @Transactional(readOnly = true)
     public List<Post> getAllPosts(){
-        return postRepository.findAll();
+        return postRepository.findAllWithMemberAndComments();
     }
 
     //게시글 수정

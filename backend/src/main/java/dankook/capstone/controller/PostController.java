@@ -2,10 +2,7 @@ package dankook.capstone.controller;
 
 import dankook.capstone.domain.Member;
 import dankook.capstone.domain.Post;
-import dankook.capstone.dto.CustomUserDetails;
-import dankook.capstone.dto.PostRequestDto;
-import dankook.capstone.dto.PostResponseDto;
-import dankook.capstone.dto.ResponseDto;
+import dankook.capstone.dto.*;
 import dankook.capstone.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,9 +32,9 @@ public class PostController {
 
     //게시글 단건 조회
     @GetMapping("/{id}")
-    public ResponseEntity<ResponseDto<PostResponseDto>> getPost(@PathVariable Long id){
+    public ResponseEntity<ResponseDto<PostDetailResponseDto>> getPost(@PathVariable Long id){
         Post post = postService.getPost(id);
-        return ResponseEntity.ok(new ResponseDto<>("게시글 조회 성공", PostResponseDto.from(post)));
+        return ResponseEntity.ok(new ResponseDto<>("게시글 조회 성공", PostDetailResponseDto.from(post)));
     }
 
     //게시글 전체 조회
