@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "538909784173-7l5lfudo94tfefkk4ncscrgo1dttm773.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.dku.scholarai.scholarai",
+            "certificate_hash": "ee1f5e9030c8e83b50cb20e6529ef17c4ef5c05e"
+          }
+        },
+        {
           "client_id": "538909784173-ivb8pgs0dmr4lfsr7795gu3tvth261kg.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,6 +37,13 @@
             {
               "client_id": "538909784173-ivb8pgs0dmr4lfsr7795gu3tvth261kg.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "538909784173-3emrpjm84felvmauf0s5bqj64m954021.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "edu.dku.scholarai.scholarai"
+              }
             }
           ]
         }

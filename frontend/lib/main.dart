@@ -7,8 +7,14 @@
 /// =============================================================
 library;
 
+import 'dart:convert';
+
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:scholarai/constants/app_colors.dart';
+import 'package:scholarai/constants/config.dart';
+import 'package:scholarai/firebase_options.dart';
 import 'package:scholarai/providers/auth_provider.dart';
 import 'package:scholarai/providers/bookmarked_provider.dart';
 import 'package:scholarai/router.dart';
@@ -19,11 +25,20 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:month_year_picker/month_year_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'firebase_options.dart';
 
 // 앱의 진입점
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await FirebaseMessaging.instance.requestPermission();
   await initializeDateFormatting('ko_KR', null);
+  // FCM 토큰 가져오기
+  final fcmToken = await FirebaseMessaging.instance.getToken();
 
   // 카카오 SDK 초기화
   KakaoSdk.init(
@@ -45,6 +60,10 @@ void main() async {
     initialRoute = '/onboarding';
   } else {
     initialRoute = '/main';
+    final memberId = authProvider.memberId;
+    if (memberId != null && fcmToken != null) {
+      await sendFcmTokenToServer(memberId, fcmToken, token);
+    }
   }
 
   // Flujtter 오류 처리 설정
@@ -133,5 +152,26 @@ class MyApp extends StatelessWidget {
       // 첫 화면 설정
       routerConfig: getRouter(initialRoute),
     );
+  }
+  
+}
+
+Future<void> sendFcmTokenToServer(String memberId, String fcmToken, String token) async {
+  final response = await http.post(
+    Uri.parse('$baseUrl/api/fcm-token'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': token,
+    },
+    body: jsonEncode({
+      'memberId': memberId,
+      'fcmToken': fcmToken,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    print('✅ FCM 토큰 서버 저장 성공');
+  } else {
+    print('❌ FCM 토큰 서버 저장 실패: ${response.statusCode}');
   }
 }
