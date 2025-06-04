@@ -69,16 +69,13 @@ class _WelcomeNameScreenState extends State<WelcomeNameScreen> {
       // 성공: 메인화면으로 이동
       if (response.statusCode == 200) {
         final authProvider = context.read<AuthProvider>();
-        authProvider.setName(name);
-
         final userProfileProvider = context.read<UserProfileProvider>();
-        await userProfileProvider.fetchProfileIdAndLoad(
-          authProvider.memberId ?? '',
-          authProvider.token ?? '',
-        );
 
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setInt('profile_id', userProfileProvider.profileId!);
+        await prefs.remove('profile_id');
+        userProfileProvider.setProfileRegistered(false);
+
+        authProvider.setName(name); // 이름 저장
 
         context.go(AppRoutes.main);
 
