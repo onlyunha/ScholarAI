@@ -43,7 +43,7 @@ public class ScholarshipLikeService {
         scholarshipLikeRepository.save(scholarshipLike);
 
         //장학금을 찜한 후 알림 예약
-        scholarshipScheduler.scheduleScholarshipReminder(memberId, scholarshipId);
+        scholarshipScheduler.scheduleScholarshipReminder(scholarshipLike);
     }
 
     //찜 취소
@@ -52,6 +52,9 @@ public class ScholarshipLikeService {
         ScholarshipLike scholarshipLike = scholarshipLikeRepository.findByMemberIdAndScholarshipId(memberId, scholarshipId)
                 .orElseThrow(() -> new IllegalArgumentException("찜한 적 없는 장학금입니다."));
         scholarshipLikeRepository.delete(scholarshipLike);
+
+        // 예약된 알림 취소
+        scholarshipScheduler.cancelScheduledReminder(memberId, scholarshipId);
     }
 
     //찜 목록 조회

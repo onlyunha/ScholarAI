@@ -1,10 +1,7 @@
 package dankook.capstone.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -22,6 +19,7 @@ public class Profile {
     @Column(name = "profile_id")
     private Long id;
 
+    @Setter
     @OneToOne(mappedBy = "profile", fetch = FetchType.LAZY)
     private Member member;
 
@@ -76,9 +74,6 @@ public class Profile {
     @Column(nullable = false)
     private boolean deleted = false;
 
-    public void setMember(Member member) {
-        this.member = member;
-    }
 
     @Builder
     public Profile(Member member, int birthYear, Gender gender, String residence, String universityType, String university, AcademicStatus academicStatus, int semester, String majorField, String major, BigDecimal gpa, int incomeLevel, boolean disabled, boolean multiChild, boolean basicLivingRecipient, boolean secondLowestIncome) {

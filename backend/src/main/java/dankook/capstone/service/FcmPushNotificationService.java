@@ -3,6 +3,7 @@ package dankook.capstone.service;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +17,10 @@ public class FcmPushNotificationService {
     public void sendPushNotification(String fcmToken, String message) {
         Message pushMessage = Message.builder()
                 .setToken(fcmToken)
-                .putData("message", message)  // 푸시 알림에 포함할 데이터
+                .setNotification(Notification.builder()
+                        .setTitle("ScholarAI")
+                        .setBody(message)
+                        .build())
                 .build();
 
         try {
