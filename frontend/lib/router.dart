@@ -3,7 +3,7 @@
 /// Desc : 라우터
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-23
-/// Updt : 2025-06-03
+/// Updt : 2025-06-08
 /// =============================================================
 
 import 'package:go_router/go_router.dart';
@@ -11,6 +11,8 @@ import 'package:scholarai/constants/app_routes.dart';
 import 'package:scholarai/screens/chatbot/chatbot_screen.dart';
 import 'package:scholarai/screens/home/tabs/community/community_rules_screen.dart';
 import 'package:scholarai/screens/home/tabs/community/community_tab.dart';
+import 'package:scholarai/screens/home/tabs/community/post_detail_screen.dart';
+import 'package:scholarai/screens/home/tabs/community/post_edit_screen.dart';
 import 'package:scholarai/screens/home/tabs/community/post_write_screen.dart';
 import 'package:scholarai/screens/onboarding/onboarding_screen.dart';
 import 'package:scholarai/screens/onboarding/splash_screen.dart';
@@ -107,6 +109,30 @@ GoRouter getRouter(String initialLocation) {
         builder: (context, state) => const ChatbotScreen(),
       ),
 
+      GoRoute(
+        path: '/post/edit/:postId',
+        builder: (context, state) {
+          final postId = int.parse(state.pathParameters['postId']!);
+          final extra = state.extra as Map<String, dynamic>;
+          final title = extra['title'] as String? ?? '';
+          final content = extra['content'] as String? ?? '';
+
+          return PostEditScreen(
+            postId: postId,
+            initialTitle: extra['title'] ?? '',
+            initialContent: extra['content'] ?? '',
+          );
+        },
+      ),
+
+      GoRoute(
+        path: '/post/detail/:postId',
+        builder: (context, state) {
+          final postId = int.parse(state.pathParameters['postId']!);
+          return PostDetailScreen(postId: postId);
+        },
+      ),
+
       /// 커뮤니티
       GoRoute(
         path: '/main?tab=community',
@@ -119,20 +145,11 @@ GoRouter getRouter(String initialLocation) {
         builder: (context, state) => const PostWriteScreen(),
       ),
 
-       /// 커뮤니티 이용규칙
+      /// 커뮤니티 이용규칙
       GoRoute(
         path: '/community/rules',
         builder: (context, state) => const CommunityRulesScreen(),
       ),
-
-      // /// 커뮤니티 글 상세
-      // GoRoute(
-      //   path: '/post/detail/:id',
-      //   builder: (context, state) {
-      //     final postId = state.pathParameters['id'] ?? '0';
-      //     return PostDetailScreen(postId: postId);
-      //   },
-      // ),
     ],
   );
 }

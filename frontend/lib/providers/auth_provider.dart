@@ -45,7 +45,8 @@ class AuthProvider extends ChangeNotifier {
     String profileId,
   ) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('auth_token', token);
+    final pureToken = token.replaceAll('Bearer ', '');
+    await prefs.setString('auth_token', pureToken);
     await prefs.setString('auth_memberId', memberId);
     await prefs.setString('auth_email', email);
     await prefs.setString('auth_name', name);

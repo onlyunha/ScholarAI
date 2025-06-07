@@ -1,42 +1,57 @@
 /// =============================================================
-/// File : post_write_screen.dart
-/// Desc : 커뮤니티 게시판 - 글쓰기 화면
+/// File : post_detail_screen.dart
+/// Desc : 커뮤니티 게시판 - 글 수정
 /// Auth : yunha Hwang (DKU)
-/// Crtd : 2025-06-01
-/// Updt : 2025-06-07
+/// Crtd : 2025-06-07
+/// Updt : 2025-06-08
 /// =============================================================
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:scholarai/constants/app_colors.dart';
-import 'package:scholarai/constants/app_routes.dart';
 import 'package:scholarai/services/community_board.dart';
 
-class PostWriteScreen extends StatefulWidget {
-  const PostWriteScreen({super.key});
+class PostEditScreen extends StatefulWidget {
+  final int postId;
+  final String initialTitle;
+  final String initialContent;
+
+  const PostEditScreen({
+    super.key,
+    required this.postId,
+    required this.initialTitle,
+    required this.initialContent,
+  });
 
   @override
-  State<PostWriteScreen> createState() => _PostWriteScreenState();
+  State<PostEditScreen> createState() => _PostEditScreenState();
 }
 
-class _PostWriteScreenState extends State<PostWriteScreen> {
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _contentController = TextEditingController();
+class _PostEditScreenState extends State<PostEditScreen> {
+  late TextEditingController _titleController;
+  late TextEditingController _contentController;
   bool _isSubmitting = false;
 
-  Future<void> _submitPost() async {
+  @override
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController(text: widget.initialTitle);
+    _contentController = TextEditingController(text: widget.initialContent);
+  }
+
+  Future<void> _submitEdit() async {
     final title = _titleController.text.trim();
     final content = _contentController.text.trim();
     if (title.isEmpty || content.isEmpty) return;
 
     setState(() => _isSubmitting = true);
     try {
-      await CommunityBoardService.createPost(title, content);
-      if (mounted) context.go(AppRoutes.community);
+      await CommunityBoardService.updatePost(widget.postId, title, content);
+      if (mounted) Navigator.pop(context, true); // true: 수정 완료
     } catch (e) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('게시글 작성 실패: ${e.toString()}')));
+      ).showSnackBar(SnackBar(content: Text('게시글 수정 실패: $e')));
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
@@ -48,8 +63,8 @@ class _PostWriteScreenState extends State<PostWriteScreen> {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // 상단바
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               child: Row(
@@ -57,49 +72,18 @@ class _PostWriteScreenState extends State<PostWriteScreen> {
                 children: [
                   InkWell(
                     borderRadius: BorderRadius.circular(8),
-                    onTap: () {
-                      if (context.canPop()) {
-                        context.pop();
-                      } else {
-                        context.go(AppRoutes.community);
-                      }
-                    },
+                    onTap: () => Navigator.pop(context),
                     child: const Padding(
                       padding: EdgeInsets.all(4),
                       child: Icon(Icons.close, size: 28, color: Colors.black),
                     ),
                   ),
                   const Text(
-                    '글쓰기',
+                    '글 수정',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   GestureDetector(
-                    onTap: () async {
-                      final title = _titleController.text.trim();
-                      final content = _contentController.text.trim();
-
-                      if (title.isEmpty || content.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('제목과 내용을 모두 입력해주세요')),
-                        );
-                        return;
-                      }
-
-                      try {
-                        final postId = await CommunityBoardService.createPost(
-                          title,
-                          content,
-                        );
-                        debugPrint('✅ 등록된 postId: $postId');
-
-                        // 성공 시 상세 페이지로 이동
-                        context.push('/post/detail/$postId');
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('게시글 등록 실패: $e')),
-                        );
-                      }
-                    },
+                    onTap: _submitEdit,
                     child: const Text(
                       '완료',
                       style: TextStyle(
@@ -112,6 +96,8 @@ class _PostWriteScreenState extends State<PostWriteScreen> {
                 ],
               ),
             ),
+
+            // 입력 필드
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
               child: TextField(
@@ -144,7 +130,7 @@ class _PostWriteScreenState extends State<PostWriteScreen> {
                   textAlignVertical: TextAlignVertical.top,
                   style: const TextStyle(fontSize: 14),
                   decoration: const InputDecoration(
-                    hintText: '자유롭게 얘기해보세요.\n#장학금_추천 #꿀팁공유',
+                    hintText: '자유롭게 수정해보세요.',
                     hintStyle: TextStyle(color: Colors.grey),
                     border: InputBorder.none,
                   ),
