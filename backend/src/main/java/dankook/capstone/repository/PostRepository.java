@@ -25,4 +25,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     LEFT JOIN FETCH p.comments
 """)
     List<Post> findAllWithMemberAndComments(); //전체 조회용 fetch join 쿼리
+
+    @Query("SELECT p FROM Post p LEFT JOIN FETCH p.comments WHERE p.id = :id")
+    Optional<Post> findWithComments(@Param("id") Long id);
 }

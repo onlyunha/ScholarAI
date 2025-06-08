@@ -2,6 +2,7 @@ package dankook.capstone.service;
 
 import dankook.capstone.domain.Member;
 import dankook.capstone.domain.Post;
+import dankook.capstone.domain.Comment;
 import dankook.capstone.repository.PostRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -54,10 +55,13 @@ public class PostService {
     //게시글 삭제
     @Transactional
     public void deletePost(Long id, Member currentMember){
-        Post post = getPost(id);
+        Post post = postRepository.findWithComments(id)
+                .orElseThrow(() -> new RuntimeException("해당 게시글이 존재하지 않습니다."));
+
         if (!post.getMember().getId().equals(currentMember.getId())) {
             throw new AccessDeniedException("게시글 삭제 권한이 없습니다.");
         }
+
         postRepository.delete(post);
     }
 

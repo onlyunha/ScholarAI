@@ -36,7 +36,7 @@ public class Post {
     private LocalDateTime createdAt; //게시글 생성 시간
     private LocalDateTime updatedAt; //게시글 업로드 시간
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
     @Builder
