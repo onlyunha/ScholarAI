@@ -94,12 +94,19 @@ class CommunityBoardService {
     if (token == null) {
       throw Exception('로그인 정보가 없습니다.');
     }
+
     final response = await http.delete(
       Uri.parse('$baseUrl/api/posts/$postId'),
-      headers: {'Authorization': 'Bearer $token'},
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
     );
-
-    if (response.statusCode != 200) {
+    debugPrint('📦 DELETE 요청 토큰: $token');
+    debugPrint('📦 요청 URL: $baseUrl/api/posts/$postId');
+    debugPrint('🗑️ DELETE 요청 결과: ${response.statusCode}');
+    debugPrint('🗑️ DELETE 응답 본문: ${response.body}');
+    if (response.statusCode != 200 && response.statusCode != 404) {
       throw Exception('게시글 삭제 실패');
     }
   }

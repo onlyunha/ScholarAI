@@ -24,6 +24,7 @@ class PostDetailScreen extends StatefulWidget {
 
 class _PostDetailScreenState extends State<PostDetailScreen> {
   final TextEditingController _commentController = TextEditingController();
+  bool _isDeleting = false;
 
   Map<String, dynamic>? post;
   List<Map<String, dynamic>> comments = [];
@@ -86,6 +87,13 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final authProvider = context.read<AuthProvider>();
+    if (post != null) {
+      debugPrint('🧾 post.memberId = ${post?['memberId']}');
+      debugPrint('🧾 로그인한 memberId = ${authProvider.memberId}');
+    }
+    final visibleComments =
+        comments.where((comment) => comment['content'] != '삭제된 댓글입니다').toList();
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -104,18 +112,16 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
             PopupMenuButton<String>(
               onSelected: (value) async {
                 if (value == 'edit') {
-                  final changed = await context.push(
+                  final result = await context.push(
                     '/post/edit/${widget.postId}',
                     extra: {
-                      'title': post?['title'] ?? '제목 없음',
-                      'content': post?['content'] ?? '내용 없음',
+                      'title': post?['title'] ?? '',
+                      'content': post?['content'] ?? '',
                     },
                   );
 
-                  // edit 결과일 때만 pop
-                  if (changed == true && mounted) {
-                    _loadPostAndComments();
-                    Navigator.pop(context, true);
+                  if (result == 'updated' && mounted) {
+                    context.go('/main?tab=community'); // 리스트로 강제 이동
                   }
                 } else if (value == 'delete') {
                   final confirm = await showDialog<bool>(
@@ -139,10 +145,21 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                         ),
                   );
 
-                  if (confirm == true) {
-                    await CommunityBoardService.deletePost(widget.postId);
-                    if (!mounted) return;
-                    Navigator.pop(context, 'deleted'); // 정확하게 상태 전달
+                  if (confirm == true && !_isDeleting) {
+                    setState(() => _isDeleting = true);
+                    try {
+                      await CommunityBoardService.deletePost(widget.postId);
+                      if (!mounted) return;
+                      context.go('/main?tab=3');
+                    } catch (e) {
+                      debugPrint('❌ 삭제 중 오류 발생: $e');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                         SnackBar(content: Text('삭제 실패: ${e.toString()}')), // 디버깅용
+                        // const SnackBar(content: Text('게시글 삭제에 실패했어요')),
+                      );
+                    } finally {
+                      if (mounted) setState(() => _isDeleting = false);
+                    }
                   }
                 }
               },
@@ -206,28 +223,26 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                           ),
                         ),
                         Text(
-                          ' ${comments.length}개의 댓글',
+                          ' ${visibleComments.length}개의 댓글',
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
                         ),
                         const SizedBox(height: 12),
-                        ...comments
-                            .map(
-                              (comment) => CommentCard(
-                                comment: comment,
-                                onChanged: _loadPostAndComments,
-                                onEdit: (commentId, content) {
-                                  setState(() {
-                                    editingCommentId = commentId;
-                                    _commentController.text = content;
-                                  });
-                                },
-                                onDelete: _removeCommentById,
-                              ),
-                            )
-                            .toList(),
+                        ...visibleComments.map(
+                          (comment) => CommentCard(
+                            comment: comment,
+                            onChanged: _loadPostAndComments,
+                            onEdit: (commentId, content) {
+                              setState(() {
+                                editingCommentId = commentId;
+                                _commentController.text = content;
+                              });
+                            },
+                            onDelete: _removeCommentById,
+                          ),
+                        ),
                       ],
                     ),
                   ),

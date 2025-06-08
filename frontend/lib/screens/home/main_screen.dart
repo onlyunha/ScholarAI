@@ -26,12 +26,18 @@ class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
   bool _initializedFromQuery = false;
 
-  final List<Widget> _tabs = const [
-    HomeTab(),
-    ScholarshipTab(),
-    BookmarkTab(),
-    CommunityTab(),
-    SettingsTab(),
+  List<Widget> get _tabs => [
+    const HomeTab(),
+    const ScholarshipTab(),
+    const BookmarkTab(),
+    // 커뮤니티 탭만 새로 빌드되도록 Key 부여
+    KeyedSubtree(
+      key: ValueKey(
+        _currentIndex == 3 ? DateTime.now().millisecondsSinceEpoch : 0,
+      ),
+      child: const CommunityTab(),
+    ),
+    const SettingsTab(),
   ];
 
   @override
@@ -42,34 +48,41 @@ class _MainScreenState extends State<MainScreen> {
     _initializedFromQuery = true;
 
     final tabParam = GoRouterState.of(context).uri.queryParameters['tab'];
-    if (tabParam != null) {
-      // 숫자형으로 전달된 경우 (예: /main?tab=2)
-      final parsedIndex = int.tryParse(tabParam);
-      if (parsedIndex != null &&
-          parsedIndex >= 0 &&
-          parsedIndex < _tabs.length) {
-        setState(() {
-          _currentIndex = parsedIndex;
-        });
-        return;
-      }
+    final refreshParam =
+        GoRouterState.of(context).uri.queryParameters['refresh'];
 
-      // 문자형으로 전달된 경우 (예: /main?tab=community)
-      switch (tabParam) {
-        case 'scholarship':
-          setState(() => _currentIndex = 1);
-          break;
-        case 'bookmark':
-          setState(() => _currentIndex = 2);
-          break;
-        case 'community':
-          setState(() => _currentIndex = 3);
-          break;
-        case 'settings':
-          setState(() => _currentIndex = 4);
-          break;
-        default:
-          setState(() => _currentIndex = 0);
+    if (!_initializedFromQuery || refreshParam == 'true') {
+      _initializedFromQuery = true;
+
+      if (tabParam != null) {
+        // 숫자형으로 전달된 경우 (예: /main?tab=2)
+        final parsedIndex = int.tryParse(tabParam);
+        if (parsedIndex != null &&
+            parsedIndex >= 0 &&
+            parsedIndex < _tabs.length) {
+          setState(() {
+            _currentIndex = parsedIndex;
+          });
+          return;
+        }
+
+        // 문자형으로 전달된 경우 (예: /main?tab=community)
+        switch (tabParam) {
+          case 'scholarship':
+            setState(() => _currentIndex = 1);
+            break;
+          case 'bookmark':
+            setState(() => _currentIndex = 2);
+            break;
+          case 'community':
+            setState(() => _currentIndex = 3);
+            break;
+          case 'settings':
+            setState(() => _currentIndex = 4);
+            break;
+          default:
+            setState(() => _currentIndex = 0);
+        }
       }
     }
   }
