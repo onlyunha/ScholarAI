@@ -17,10 +17,11 @@ ScholarAI는 장학금 정보를 제공하고 관리하는 모바일 어플리�
 - **장학금 정보 상세보기**: 장학금에 대한 상세 정보를 제공합니다.
 - **장학금 신청 관리**: 장학금 신청 상태를 추적하고 관리합니다.
 
-## 기술 스택
+## ⚙️기술 스택
 
+![Image](https://github.com/user-attachments/assets/e93c206a-3115-4260-841e-f9dd5cd255e9)
 - **프론트엔드**: Flutter
-- **백엔드**: 
-- **AI**:
+- **백엔드**: Spring Boot, Spring Data JPA
+- **AI**: OpenAI(GPT), LangChain, Chroma
 
 ## 프로젝트 구조
