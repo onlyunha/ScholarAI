@@ -127,3 +127,10 @@ def preprocess_scholarship_json(input_path: str, output_path: str):
 
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(processed, f, ensure_ascii=False, indent=2)
+
+
+if __name__ == "__main__":
+    input_file = "data/scholarship_new.json"       # 원본 데이터 파일 경로
+    output_file = "data/scholarship_new_processed.json"  # 전처리 결과 저장 파일 경로
+
+    preprocess_scholarship_json(input_file, output_file)

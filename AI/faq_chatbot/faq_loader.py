@@ -1,6 +1,6 @@
 import json
 
-def load_faq_json(path="data/faq.json"):
+def load_faq_json(path="data/faq_normalized.json"):
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 

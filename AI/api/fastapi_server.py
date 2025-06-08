@@ -8,7 +8,7 @@ from utils.uesrInput_format import format_user_input_as_query
 from models.user_input import UserInput
 
 # 최초 실행 시 한번만 실행
-'''docs = load_processed_scholarship_documents("data/scholarships_cleaned.json")
+'''docs = load_processed_scholarship_documents("data/scholarship_new_processed.json")
 store_embeddings(docs, persist_directory="chroma_db")'''
 retriever = get_retriever()
 rag_chain = get_qa_chain()
@@ -52,5 +52,14 @@ def recommend(user_input: UserInput):
     else:
         recommendations = gpt_output
 
-    return {"recommendations": recommendations}
+  # 👉 후처리: scholarship_id만 추출
+    id_list = []
+    for item in recommendations:
+        if isinstance(item, dict) and "scholarship_id" in item:
+            try:
+                id_list.append(int(item["scholarship_id"]))
+            except ValueError:
+                continue  # 정수 변환 실패 시 무시
+
+    return {"recommendations": id_list}
 
