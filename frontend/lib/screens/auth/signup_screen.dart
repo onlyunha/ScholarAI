@@ -3,8 +3,9 @@
 /// Desc : 이메일 인증 회원가입 화면
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-02
-/// Updt : 2025-04-28
+/// Updt : 2025-06-04
 /// =============================================================
+library;
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -44,8 +45,9 @@ class _SignupScreenState extends State<SignupScreen> {
       return;
     }
 
+    print('📧 최종 전송 이메일: $email');
     final response = await http.post(
-      Uri.parse('$baseUrl/api/auth/send-code'),
+      Uri.parse('$baseUrl/api/auth/sendEmail'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'email': email}),
     );
@@ -66,7 +68,7 @@ class _SignupScreenState extends State<SignupScreen> {
     final code = codeController.text.trim();
 
     final response = await http.post(
-      Uri.parse('$baseUrl/api/auth/verify-code'),
+      Uri.parse('$baseUrl/api/auth/verifyEmail'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'email': email, 'authCode': code}),
     );
@@ -196,70 +198,70 @@ class _SignupScreenState extends State<SignupScreen> {
                     onPressed: handleSendCode,
                     child: const Text(AppStrings.sendAuthCodeButton),
                   ),
+                ],
 
-                  // 인증코드 입력 및 검증
-                  if (codeStep) ...[
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: codeController,
-                      decoration: InputDecoration(
-                        labelText: AppStrings.authCode,
-                        hintText: AppStrings.authCodeHint,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                // 인증코드 입력 및 검증
+                if (codeStep) ...[
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: codeController,
+                    decoration: InputDecoration(
+                      labelText: AppStrings.authCode,
+                      hintText: AppStrings.authCodeHint,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    const SizedBox(height: 12),
+                  ),
+                  const SizedBox(height: 12),
 
-                    // 코드 재전송 & 인증하기 버튼
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: showResendPopup,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              foregroundColor: kPrimaryColor,
-                              side: BorderSide(color: kPrimaryColor),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
+                  // 코드 재전송 & 인증하기 버튼
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: showResendPopup,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: kPrimaryColor,
+                            side: BorderSide(color: kPrimaryColor),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                            child: const Text(AppStrings.sendCodeResendTitle),
                           ),
+                          child: const Text(AppStrings.sendCodeResendTitle),
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: handleVerifyCode,
-                            child: const Text(AppStrings.verifyCodeButton),
-                          ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: handleVerifyCode,
+                          child: const Text(AppStrings.verifyCodeButton),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
 
-                    // 이메일 재입력 링크
-                    Center(
-                      child: TextButton(
-                        onPressed: () {
-                          setState(() {
-                            codeStep = false;
-                            codeController.clear();
-                            errorMessage = '';
-                          });
-                        },
-                        child: const Text(
-                          AppStrings.reenterEmailButton,
-                          style: TextStyle(
-                            decoration: TextDecoration.underline,
-                            color: Colors.black54,
-                          ),
+                  // 이메일 재입력 링크
+                  Center(
+                    child: TextButton(
+                      onPressed: () {
+                        setState(() {
+                          codeStep = false;
+                          codeController.clear();
+                          errorMessage = '';
+                        });
+                      },
+                      child: const Text(
+                        AppStrings.reenterEmailButton,
+                        style: TextStyle(
+                          decoration: TextDecoration.underline,
+                          color: Colors.black54,
                         ),
                       ),
                     ),
-                  ],
+                  ),
                 ],
               ],
             ),

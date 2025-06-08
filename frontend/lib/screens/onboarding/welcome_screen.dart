@@ -3,20 +3,25 @@
 /// Desc : 앱의 시작화면 - 로그인/회원가입 진입 제공
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-02
-/// Updt : 2025-04-28
+/// Updt : 2025-06-03
 /// =============================================================
+library;
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:scholarai/constants/app_colors.dart';
 import 'package:scholarai/constants/app_images.dart';
 import 'package:scholarai/constants/app_routes.dart';
 import 'package:scholarai/constants/config.dart';
+import 'package:scholarai/providers/auth_provider.dart';
+import 'package:scholarai/providers/user_profile_provider.dart';
+import 'package:scholarai/screens/home/tabs/community/post_detail_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import 'home/main_screen.dart';
 
 // 시작 화면 (Welcome)
 class WelcomeScreen extends StatelessWidget {
@@ -28,45 +33,106 @@ class WelcomeScreen extends StatelessWidget {
   }
 
   // 구글 로그인 처리
+
   Future<void> handleGoogleSignIn(BuildContext context) async {
-    final GoogleSignIn _googleSignIn = GoogleSignIn(
+    final GoogleSignIn googleSignIn = GoogleSignIn(
       scopes: ['email', 'profile'],
     );
 
     try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
       if (googleUser == null) return;
 
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
 
       final idToken = googleAuth.idToken;
+      print('ID Token: $idToken');
 
-      if (idToken != null) {
-        final response = await http.post(
-          Uri.parse('$baseUrl/api/auth/google'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({'idToken': idToken}),
+      if (idToken == null) {
+        showDialog(
+          context: context,
+          builder:
+              (_) => const AlertDialog(
+                title: Text('에러'),
+                content: Text('Google 인증 토큰이 없습니다.'),
+              ),
         );
+        return;
+      }
 
-        if (response.statusCode == 200) {
-          context.go(AppRoutes.main);
-        } else {
-          showDialog(
-            context: context,
-            builder:
-                (_) => AlertDialog(
-                  title: const Text('로그인 실패'),
-                  content: Text('Google 로그인 실패: ${response.body}'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('확인'),
-                    ),
-                  ],
-                ),
+      final response = await http.post(
+        Uri.parse('$baseUrl/api/auth/google-login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'idToken': idToken, 'provider': 'google'}),
+      );
+
+      if (response.statusCode == 200) {
+        final resBody = jsonDecode(response.body);
+        final token = response.headers['authorization'];
+        final data = resBody['data'];
+
+        final memberId = data['memberId'].toString();
+        final profileId = data['profileId']?.toString() ?? '';
+        final name = googleUser.displayName ?? '';
+        final email = googleUser.email;
+
+        print('🛰 서버 응답 memberId: $memberId');
+        print('🛰 서버 응답 profileId: $profileId');
+
+        if (profileId.isNotEmpty) {
+          final userProfileProvider = Provider.of<UserProfileProvider>(
+            context,
+            listen: false,
           );
+          userProfileProvider.setProfileId(int.parse(profileId));
         }
+
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('accessToken', token ?? '');
+        await prefs.setString('memberId', memberId);
+        await prefs.setString('profileId', profileId);
+        print('💾 SharedPreferences 저장 완료:');
+        print('🔐 token: $token');
+        print('🧍 memberId: $memberId');
+        print('🪪 profileId: $profileId');
+
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        await authProvider.saveAuthData(
+          token!,
+          memberId,
+          email,
+          name,
+          profileId,
+        );
+        final userProfileProvider = Provider.of<UserProfileProvider>(
+          context,
+          listen: false,
+        );
+        await userProfileProvider.fetchProfileIdAndLoad(memberId, token!);
+
+        context.go(AppRoutes.main);
+      } else {
+        String errorMsg = '응답 코드: ${response.statusCode}';
+        try {
+          final decoded = jsonDecode(response.body);
+          errorMsg = decoded['message'] ?? errorMsg;
+        } catch (_) {}
+
+        showDialog(
+          context: context,
+          builder:
+              (_) => AlertDialog(
+                title: const Text('로그인 실패'),
+                content: Text(errorMsg),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('확인'),
+                  ),
+                ],
+              ),
+        );
       }
     } catch (e) {
       print('구글 로그인 실패: $e');
@@ -93,45 +159,118 @@ class WelcomeScreen extends StatelessWidget {
       // 카카오톡 설치 여부에 따라 로그인 방식 분기
       OAuthToken token;
       if (await isKakaoTalkInstalled()) {
+        print('[로그] 카카오톡 설치됨 → loginWithKakaoTalk');
         token = await UserApi.instance.loginWithKakaoTalk();
       } else {
+        print('[로그] 카카오톡 미설치 → loginWithKakaoAccount');
         token = await UserApi.instance.loginWithKakaoAccount();
       }
+      print('[로그] 로그인 성공, accessToken: ${token.accessToken}');
 
-      // idToken이 필요할 경우 추가로 가져올 수 있음
       final user = await UserApi.instance.me();
+      final nickname = user.kakaoAccount?.profile?.nickname ?? '이름 없음';
+      final email = user.kakaoAccount?.email ?? 'unknown@email.com';
 
-      // 토큰 서버로 전달
-      final response = await http.post(
-        Uri.parse('$baseUrl/api/auth/kakao'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'accessToken': token.accessToken}),
+      print(
+        '[로그] 사용자 정보 조회 성공 → nickname: ${user.kakaoAccount?.profile?.nickname}',
       );
 
- if (response.statusCode == 200) {
-      context.go(AppRoutes.main);
-    } else {
+      // 사용자 정보 서버에 전달
+      final response = await http.post(
+        Uri.parse('$baseUrl/api/auth/kakao-login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'name': nickname,
+          'email': email,
+          'provider': 'kakao',
+        }),
+      );
+
+      print('[로그] 백엔드 응답 코드: ${response.statusCode}');
+      print('[로그] 백엔드 응답 body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final rawToken =
+            response.headers['authorization'] ??
+            response.headers['Authorization'];
+        final token =
+            rawToken != null && !rawToken.startsWith('Bearer ')
+                ? 'Bearer $rawToken'
+                : rawToken;
+
+        final resBody = jsonDecode(response.body);
+        final data = resBody['data'];
+        final memberId = data['memberId'].toString();
+        final profileId = data['profileId']?.toString() ?? '';
+        final name = nickname;
+        final mail = email;
+
+        if (profileId.isNotEmpty) {
+          final userProfileProvider = Provider.of<UserProfileProvider>(
+            context,
+            listen: false,
+          );
+          userProfileProvider.setProfileId(int.parse(profileId));
+        }
+
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('accessToken', token ?? '');
+        await prefs.setString('memberId', memberId);
+        await prefs.setString('profileId', profileId);
+
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        await authProvider.saveAuthData(
+          token!,
+          memberId,
+          mail,
+          name,
+          profileId,
+        );
+
+        print('🔐 저장된 토큰: $token');
+        print('👤 저장된 memberId: $memberId');
+
+        final userProfileProvider = Provider.of<UserProfileProvider>(
+          context,
+          listen: false,
+        );
+        await userProfileProvider.fetchProfileIdAndLoad(memberId, token!);
+
+        context.go(AppRoutes.main);
+      } else {
+        showDialog(
+          context: context,
+          builder:
+              (_) => AlertDialog(
+                title: const Text('로그인 실패'),
+                content: Text('Kakao 로그인 실패: ${response.body}'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('확인'),
+                  ),
+                ],
+              ),
+        );
+      }
+    } catch (e) {
+      print('카카오 로그인 실패: $e');
       showDialog(
         context: context,
-        builder: (_) => AlertDialog(
-          title: const Text('로그인 실패'),
-          content: Text('Kakao 로그인 실패: ${response.body}'),
-          actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('확인'))],
-        ),
+        builder:
+            (_) => AlertDialog(
+              title: const Text('에러'),
+              content: Text('Kakao 로그인 중 문제가 발생했습니다.\n\n$e'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('확인'),
+                ),
+              ],
+            ),
       );
     }
-  } catch (e) {
-    print('카카오 로그인 실패: $e');
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('에러'),
-        content: Text('Kakao 로그인 중 문제가 발생했습니다.\n\n$e'),
-        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('확인'))],
-      ),
-    );
   }
-}
 
   @override
   Widget build(BuildContext context) {

@@ -3,8 +3,10 @@
 /// Desc : 프로필 수정
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-21
-/// Updt : 2025-05-07
+/// Updt : 2025-06-03
 /// =============================================================
+library;
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -13,6 +15,7 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:scholarai/constants/app_colors.dart';
 import 'package:scholarai/constants/config.dart';
+import 'package:scholarai/providers/auth_provider.dart';
 import 'package:scholarai/providers/user_profile_provider.dart';
 
 class ProfileEditScreen extends StatefulWidget {
@@ -23,7 +26,8 @@ class ProfileEditScreen extends StatefulWidget {
 }
 
 class _ProfileEditScreenState extends State<ProfileEditScreen> {
-  final TextEditingController nameController = TextEditingController();
+  final TextEditingController uniController = TextEditingController();
+  final TextEditingController majorController = TextEditingController();
 
   int? selectedYear;
   String? selectedGender;
@@ -41,94 +45,187 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   bool isBasicLiving = false;
   bool isSecondLowest = false;
   String errorMessage = '';
+  int? profileId;
 
-    @override
+  @override
   void initState() {
     super.initState();
-    _loadProfileData(); // 프로필 데이터를 로드합니다.
+    _loadProfileData();
   }
-  // 프로필 데이터를 불러오는 함수
-  Future<void> _loadProfileData() async {
-    try {
-      String? userId = Provider.of<UserProfileProvider>(context, listen: false).getUserId();
 
-    if (userId == null) {
-      // userId가 없으면, 로그인 안된 경우 처리
-      setState(() {
-        errorMessage = '로그인된 사용자 정보가 없습니다';
-      });
-      return;
-    }
+  Future<void> _loadProfileData() async {
+    debugPrint('✅ _loadProfileData() 진입');
+    try {
+      final profileProvider = Provider.of<UserProfileProvider>(
+        context,
+        listen: false,
+      );
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final memberId = authProvider.memberId;
+      final token = authProvider.token;
+      final currentProfileId = profileProvider.profileId;
+
+      debugPrint('🔍 provider.profileId: $currentProfileId');
+      debugPrint(
+        '🔍 provider.isProfileRegistered: ${profileProvider.isProfileRegistered}',
+      );
+      debugPrint('🔍 auth.token: $token');
+      debugPrint('🔍 auth.memberId: $memberId');
+
+      debugPrint('🟡 현재 Provider에 저장된 profileId: $currentProfileId');
+      debugPrint(
+        '🟡 현재 isProfileRegistered: ${profileProvider.isProfileRegistered}',
+      );
+
+      if (currentProfileId == null || token == null) {
+        debugPrint('❌ profileId 또는 token이 null입니다');
+        setState(() {
+          errorMessage = '프로필 정보를 불러올 수 없습니다 (ID 또는 토큰 누락)';
+        });
+        return;
+      }
+  debugPrint('📤 GET /api/profile/$currentProfileId 호출 준비');
       final response = await http.get(
-        Uri.parse('$baseUrl/api/profile/$userId'),
-        headers: {'Content-Type': 'application/json'},
+        Uri.parse('$baseUrl/api/profile/$currentProfileId'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
       );
 
       if (response.statusCode == 200) {
-        final profileData = jsonDecode(response.body);
-        nameController.text = profileData['name'] ?? ''; // 이름 데이터를 불러와서 nameController에 설정
-        selectedYear = profileData['year'];
-        selectedGender = profileData['gender'];
-        selectedRegion = profileData['region'];
-        selectedUniversityType = profileData['universityType'];
-        selectedAcademicStatus = profileData['academicStatus'];
-        selectedMajorField = profileData['majorField'];
-        selectedMajor = profileData['major'];
-        selectedGpa = profileData['gpa']?.toDouble() ?? 0.0;
-        setState(() {});
-      } else {
+        final profileData = jsonDecode(response.body)['data'];
+        final int? loadedProfileId = profileData['profileId'];
+        if (loadedProfileId != null) {
+          profileProvider.setProfileId(loadedProfileId);
+        } else {
+          debugPrint('⚠️ profileId가 null이라 SharedPreferences에 저장하지 않음');
+        }
+
         setState(() {
-          errorMessage = '프로필 데이터를 불러오는 데 실패했습니다';
+          selectedYear = profileData['birthYear'];
+          selectedGender = profileData['gender'];
+          selectedRegion = profileData['residence'];
+          selectedUniversity = profileData['university'];
+          selectedUniversityType = profileData['universityType'];
+          selectedAcademicStatus = profileData['academicStatus'];
+          selectedSemester =
+              profileData['semester'] is int ? profileData['semester'] : null;
+          selectedMajorField = profileData['majorField'];
+          selectedMajor = profileData['major'];
+          selectedGpa = profileData['gpa']?.toDouble() ?? 0.0;
+          selectedIncomeLevel = profileData['incomeLevel'];
+          isDisabled = profileData['disabled'] ?? false;
+          isMultiChild = profileData['multiChild'] ?? false;
+          isBasicLiving = profileData['basicLivingRecipient'] ?? false;
+          isSecondLowest = profileData['secondLowestIncome'] ?? false;
+          uniController.text = selectedUniversity ?? '';
+          majorController.text = selectedMajor ?? '';
+
+          profileProvider.setProfileRegistered(true);
+        });
+      } else {
+        debugPrint('⚠️ 프로필 조회 실패: ${response.statusCode}');
+        setState(() {
+          errorMessage = '프로필 불러오기에 실패했습니다 (${response.statusCode})';
         });
       }
     } catch (e) {
+      print('❌ 예외 발생: $e');
       setState(() {
         errorMessage = '네트워크 오류: 연결을 확인해주세요';
       });
     }
   }
 
-  // 수정된 프로필 데이터를 서버로 저장하는 함수
+  // 저장
   Future<void> _saveProfileData() async {
-    try {
-      String? userId = Provider.of<UserProfileProvider>(context, listen: false).getUserId();
+    print('🟡 [DEBUG] 저장 함수 호출됨');
 
-      if (userId == null) {
-        setState(() {
-          errorMessage = '로그인된 사용자 정보가 없습니다';
-        });
-        return;
-      }
+    final profileProvider = Provider.of<UserProfileProvider>(
+      context,
+      listen: false,
+    );
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final profileId = profileProvider.profileId;
+    final rawToken = authProvider.token;
+
+    print('🟡 rawtoken: $rawToken');
+    print('🟡 profileId: $profileId');
+
+    if (profileId == null || rawToken == null) {
+      print('❌ profileId 또는 token이 null입니다');
+      setState(() {
+        errorMessage = '프로필 정보가 없습니다';
+      });
+      return;
+    }
+    final token =
+        rawToken.startsWith('Bearer ') ? rawToken : 'Bearer $rawToken';
+
+    try {
+      debugPrint(
+        '📤 저장 요청 직전 체크박스 상태: '
+        'isDisabled=$isDisabled, '
+        'isMultiChild=$isMultiChild, '
+        'isBasicLiving=$isBasicLiving, '
+        'isSecondLowest=$isSecondLowest',
+      );
+      final Map<String, dynamic> body = {
+        'birthYear': selectedYear,
+        'gender': selectedGender,
+        'residence': selectedRegion,
+        'universityType': selectedUniversityType,
+        'university': selectedUniversity,
+        'academicStatus': selectedAcademicStatus,
+        'semester': selectedSemester,
+        'majorField': selectedMajorField,
+        'major': selectedMajor,
+        'gpa': selectedGpa,
+        'incomeLevel': selectedIncomeLevel,
+        'disabled': isDisabled,
+        'multiChild': isMultiChild,
+        'basicLivingRecipient': isBasicLiving,
+        'secondLowestIncome': isSecondLowest,
+      };
+
       final response = await http.patch(
-        Uri.parse('$baseUrl/api/profile/$userId'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'name': nameController.text,
-          "age": selectedYear != null ? DateTime.now().year - selectedYear! : null,
-          'gender': selectedGender,
-          'residence': selectedRegion,
-          'universityType': selectedUniversityType,
-          'university': selectedUniversity,
-          'academicStatus': selectedAcademicStatus,
-          'majorField': selectedMajorField,
-          'major': selectedMajor,
-          'gpa': selectedGpa,
-          'isDisabled': isDisabled,
-          'isMultiChild': isMultiChild,
-          'isBasicLiving': isBasicLiving,
-          'isSecondLowest': isSecondLowest,
-        }),
+        Uri.parse('$baseUrl/api/profile/$profileId'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': rawToken,
+        },
+        body: jsonEncode(body),
       );
 
-      if (response.statusCode == 201) {
-        // 성공적으로 업데이트되면 이전 화면으로 돌아가기
-        Navigator.pop(context);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        profileProvider.updateProfile(
+          birthYear: selectedYear,
+          gender: selectedGender,
+          region: selectedRegion,
+          university: selectedUniversity,
+          universityType: selectedUniversityType,
+          academicStatus: selectedAcademicStatus,
+          majorField: selectedMajorField,
+          major: selectedMajor,
+          gpa: selectedGpa,
+          semester: selectedSemester,
+          incomeLevel: selectedIncomeLevel,
+          disabled: isDisabled,
+          multiChild: isMultiChild,
+          basicLivingRecipient: isBasicLiving,
+          secondLowestIncome: isSecondLowest,
+        );
+        context.pop();
       } else {
+        print('⚠️ 응답 본문: ${response.body}');
         setState(() {
-          errorMessage = '프로필 업데이트 실패';
+          errorMessage = '프로필 저장에 실패했습니다';
         });
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('❌ 예외 발생: $e');
+      print('📍 Stack Trace: $stackTrace');
+
       setState(() {
         errorMessage = '네트워크 오류: 연결을 확인해주세요';
       });
@@ -192,49 +289,14 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: kPrimaryColor),
           onPressed: () => context.pop(),
-        )
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: Column(
-                children: [
-                  const CircleAvatar(
-                    radius: 48,
-                    backgroundColor: Colors.grey,
-                    child: Icon(Icons.person, size: 48, color: Colors.white),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller:
-                        nameController
-                          ..text =
-                              nameController.text.isNotEmpty
-                                  ? nameController.text
-                                  : 'NAME',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: kPrimaryColor,
-                    ),
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'NAME',
-                      hintStyle: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: kPrimaryColor,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                ],
-              ),
-            ),
+            Center(child: Column(children: [const SizedBox(height: 24)])),
             _buildDropdownRow(
               '출생년도',
               selectedYear,
@@ -248,6 +310,13 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               genderOptions,
               (val) => setState(() => selectedGender = val),
               isMap: true,
+            ),
+            _buildDropdownRow(
+              '소득 분위',
+              selectedIncomeLevel,
+              incomeLevels,
+              (val) => setState(() => selectedIncomeLevel = val),
+              isInt: true,
             ),
             _buildDropdownRow(
               '거주지',
@@ -284,33 +353,34 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
 
             const SizedBox(height: 24),
             Row(
-  children: [
-    SizedBox(
-      width: MediaQuery.of(context).size.width * 0.3,
-      child: const Text(
-        '대학명',
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          color: kPrimaryColor,
-        ),
-      ),
-    ),
-    Expanded(
-      child: TextField(
-        onChanged: (value) => selectedUniversity = value,
-        decoration: const InputDecoration(
-          hintText: '입력 안 함',
-          border: OutlineInputBorder(),
-          contentPadding: EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 10,
-          ),
-        ),
-      ),
-    ),
-  ],
-),
-const SizedBox(height: 24),
+              children: [
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.3,
+                  child: const Text(
+                    '대학명',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: kPrimaryColor,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: TextField(
+                    controller: uniController,
+                    onChanged: (value) => selectedUniversity = value,
+                    decoration: const InputDecoration(
+                      hintText: '입력 안 함',
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
             Row(
               children: [
                 SizedBox(
@@ -325,6 +395,7 @@ const SizedBox(height: 24),
                 ),
                 Expanded(
                   child: TextField(
+                    controller: majorController,
                     onChanged: (value) => selectedMajor = value,
                     decoration: const InputDecoration(
                       hintText: '입력 안 함',
@@ -383,19 +454,20 @@ const SizedBox(height: 24),
               children: [
                 Expanded(
                   child: CheckboxListTile(
-                    title: const Text('장애 여부'),
+                    title: const Text('장애 유무', style: TextStyle(fontSize: 15)),
                     value: isDisabled,
                     onChanged:
-                        (value) => setState(() => isDisabled = value ?? false),
+                        (bool? value) =>
+                            setState(() => isDisabled = value ?? false),
                     controlAffinity: ListTileControlAffinity.leading,
                   ),
                 ),
                 Expanded(
                   child: CheckboxListTile(
-                    title: const Text('다자녀 가구 여부'),
+                    title: const Text('다자녀 가구', style: TextStyle(fontSize: 15)),
                     value: isMultiChild,
                     onChanged:
-                        (value) =>
+                        (bool? value) =>
                             setState(() => isMultiChild = value ?? false),
                     controlAffinity: ListTileControlAffinity.leading,
                   ),
@@ -406,20 +478,23 @@ const SizedBox(height: 24),
               children: [
                 Expanded(
                   child: CheckboxListTile(
-                    title: const Text('기초생활수급자 여부'),
+                    title: const Text(
+                      '기초생활\n수급자',
+                      style: TextStyle(fontSize: 15),
+                    ),
                     value: isBasicLiving,
                     onChanged:
-                        (value) =>
+                        (bool? value) =>
                             setState(() => isBasicLiving = value ?? false),
                     controlAffinity: ListTileControlAffinity.leading,
                   ),
                 ),
                 Expanded(
                   child: CheckboxListTile(
-                    title: const Text('차상위계층 여부'),
+                    title: const Text('차상위계층', style: TextStyle(fontSize: 15)),
                     value: isSecondLowest,
                     onChanged:
-                        (value) =>
+                        (bool? value) =>
                             setState(() => isSecondLowest = value ?? false),
                     controlAffinity: ListTileControlAffinity.leading,
                   ),
@@ -427,16 +502,16 @@ const SizedBox(height: 24),
               ],
             ),
             Padding(
-  padding: const EdgeInsets.all(24),
-  child: ElevatedButton(
-    onPressed: _saveProfileData, 
-    style: ElevatedButton.styleFrom(
-      backgroundColor: kPrimaryColor,
-      minimumSize: const Size.fromHeight(48),
-    ),
-    child: const Text('저장', style: TextStyle(fontSize: 16)),
-  ),
-),
+              padding: const EdgeInsets.all(24),
+              child: ElevatedButton(
+                onPressed: _saveProfileData,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: kPrimaryColor,
+                  minimumSize: const Size.fromHeight(48),
+                ),
+                child: const Text('저장', style: TextStyle(fontSize: 16)),
+              ),
+            ),
           ],
         ),
       ),
@@ -468,7 +543,17 @@ const SizedBox(height: 24),
           ),
           Expanded(
             child: DropdownButtonFormField(
-              value: selectedValue,
+              value:
+                  isMap
+                      ? (options.any(
+                            (opt) =>
+                                (opt['value'] ?? opt['code']) == selectedValue,
+                          )
+                          ? selectedValue
+                          : null)
+                      : (options.contains(selectedValue)
+                          ? selectedValue
+                          : null),
               onChanged: onChanged,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
@@ -492,7 +577,7 @@ const SizedBox(height: 24),
                       child: Text(isInt ? '$option' : option.toString()),
                     );
                   }
-                }).toList(),
+                }),
               ],
             ),
           ),
@@ -509,5 +594,4 @@ const SizedBox(height: 24),
       controlAffinity: ListTileControlAffinity.leading,
     );
   }
-  
 }

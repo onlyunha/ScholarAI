@@ -3,6 +3,7 @@ package dankook.capstone.auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dankook.capstone.dto.CustomUserDetails;
 import dankook.capstone.dto.LoginRequestDto;
+import dankook.capstone.dto.LoginResponseDto;
 import dankook.capstone.dto.ResponseDto;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletInputStream;
@@ -69,6 +70,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String email = customUserDetails.getUsername(); //이메일(아이디)
         Long memberId = customUserDetails.getMemberId(); //memberId 추출
+        Long profileId = customUserDetails.getProfileId();
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
@@ -83,7 +85,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         response.addHeader("Authorization", "Bearer " + token);
 
         // 응답 메시지 작성
-        ResponseDto<Long> responseDto = new ResponseDto<>("로그인에 성공하였습니다.", memberId);
+        ResponseDto<LoginResponseDto> responseDto = new ResponseDto<>("로그인에 성공하였습니다.", new LoginResponseDto(memberId, profileId));
 
         // 응답 본문 작성
         try {

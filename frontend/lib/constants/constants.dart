@@ -5,6 +5,7 @@
 /// Crtd : 2025-04-01
 /// Updt : 2025-04-07
 /// =============================================================
+library;
 
 const double kDefaultButtonHeight = 48.0;
 const double kDefaultBorderRadius = 12.0;

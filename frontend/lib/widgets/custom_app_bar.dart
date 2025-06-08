@@ -3,13 +3,17 @@
 /// Desc : 앱 상단바
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-19
-/// Updt : 2025-04-28
+/// Updt : 2025-06-01
 /// =============================================================
+library;
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:scholarai/constants/app_colors.dart';
 import 'package:scholarai/constants/app_images.dart';
+import 'package:scholarai/constants/app_routes.dart';
 import 'package:scholarai/screens/settings/profile_edit_screen.dart';
+import 'package:scholarai/screens/settings/profile_view_screen.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({super.key});
@@ -39,7 +43,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   color: kPrimaryColor,
                 ),
                 onPressed: () {
-                  // TODO: AI 챗봇 연결
+                  context.go(AppRoutes.chatbot);
                 },
               ),
               const SizedBox(width: 0), // 아이콘 사이 간격 조절
@@ -47,12 +51,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 iconSize: 30,
                 icon: const Icon(Icons.person, color: kPrimaryColor),
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const ProfileEditScreen(),
-                    ),
-                  );
+                  context.go(AppRoutes.profileView);
                 },
               ),
             ],

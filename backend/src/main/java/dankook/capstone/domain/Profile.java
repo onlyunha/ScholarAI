@@ -1,16 +1,17 @@
 package dankook.capstone.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE profile SET deleted = true WHERE profile_id = ?")
+@Where(clause = "deleted = false")
 public class Profile {
 
     @Id
@@ -18,11 +19,13 @@ public class Profile {
     @Column(name = "profile_id")
     private Long id;
 
+    @Setter
     @OneToOne(mappedBy = "profile", fetch = FetchType.LAZY)
     private Member member;
 
+
     @Column(nullable = false)
-    private int age; //나이
+    private int birthYear; //출생년도
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -57,25 +60,25 @@ public class Profile {
     private int incomeLevel; //소득분위
 
     @Column(nullable = false)
-    private boolean isDisabled; //장애 여부
+    private boolean disabled; //장애 여부
 
     @Column(nullable = false)
-    private boolean isMultiChild; //다자녀 가구 여부
+    private boolean multiChild; //다자녀 가구 여부
 
     @Column(nullable = false)
-    private boolean isBasicLivingRecipient; //기초생활수급자 여부
+    private boolean basicLivingRecipient; //기초생활수급자 여부
 
     @Column(nullable = false)
-    private boolean isSecondLowestIncome; //차상위계층 여부
+    private boolean secondLowestIncome; //차상위계층 여부
 
-    public void setMember(Member member) {
-        this.member = member;
-    }
+    @Column(nullable = false)
+    private boolean deleted = false;
+
 
     @Builder
-    public Profile(Member member, int age, Gender gender, String residence, String universityType, String university, AcademicStatus academicStatus, int semester, String majorField, String major, BigDecimal gpa, int incomeLevel, boolean isDisabled, boolean isMultiChild, boolean isBasicLivingRecipient, boolean isSecondLowestIncome) {
+    public Profile(Member member, int birthYear, Gender gender, String residence, String universityType, String university, AcademicStatus academicStatus, int semester, String majorField, String major, BigDecimal gpa, int incomeLevel, boolean disabled, boolean multiChild, boolean basicLivingRecipient, boolean secondLowestIncome) {
         this.member = member;
-        this.age = age;
+        this.birthYear = birthYear;
         this.gender = gender;
         this.residence = residence;
         this.universityType = universityType;
@@ -86,9 +89,36 @@ public class Profile {
         this.major = major;
         this.gpa = gpa;
         this.incomeLevel = incomeLevel;
-        this.isDisabled = isDisabled;
-        this.isMultiChild = isMultiChild;
-        this.isBasicLivingRecipient = isBasicLivingRecipient;
-        this.isSecondLowestIncome = isSecondLowestIncome;
+        this.disabled = disabled;
+        this.multiChild = multiChild;
+        this.basicLivingRecipient = basicLivingRecipient;
+        this.secondLowestIncome = secondLowestIncome;
+    }
+
+    //회원 프로필 수정
+    public void update(int birthYear, Gender gender, String residence, String universityType,
+                       String university, AcademicStatus academicStatus, int semester,
+                       String majorField, String major, BigDecimal gpa, int incomeLevel,
+                       boolean disabled, boolean multiChild, boolean basicLivingRecipient, boolean secondLowestIncome) {
+        this.birthYear = birthYear;
+        this.gender = gender;
+        this.residence = residence;
+        this.universityType = universityType;
+        this.university = university;
+        this.academicStatus = academicStatus;
+        this.semester = semester;
+        this.majorField = majorField;
+        this.major = major;
+        this.gpa = gpa;
+        this.incomeLevel = incomeLevel;
+        this.disabled = disabled;
+        this.multiChild = multiChild;
+        this.basicLivingRecipient = basicLivingRecipient;
+        this.secondLowestIncome = secondLowestIncome;
+    }
+
+    //회원 탈퇴 시 프로필 soft delete
+    public void markAsDeleted() {
+        this.deleted = true;
     }
 }

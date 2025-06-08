@@ -1,8 +1,10 @@
 package dankook.capstone.controller;
 
 import dankook.capstone.dto.ProfileRequestDto;
+import dankook.capstone.dto.ProfileResponseDto;
 import dankook.capstone.dto.ResponseDto;
 import dankook.capstone.service.ProfileService;
+import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,4 +25,21 @@ public class ProfileController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ResponseDto<>("회원 프로필이 저장되었습니다.", profileId));
     }
+
+    //회원 프로필 조회 API
+    @GetMapping("/{profileId}")
+    public ResponseEntity<ResponseDto<ProfileResponseDto>> getProfile(@PathVariable Long profileId){
+        ProfileResponseDto profile = profileService.getProfileResponseById(profileId);
+        return ResponseEntity.ok(new ResponseDto<>("회원 프로필 조회에 성공하셨습니다", profile));
+    }
+
+
+    //회원 프로필 수정 API
+    @PatchMapping("/{profileId}")
+    public ResponseEntity<ResponseDto<Void>> updateProfile(@PathVariable Long profileId,
+                                                           @RequestBody ProfileRequestDto profileRequestDto){
+        profileService.updateProfile(profileId, profileRequestDto);
+        return ResponseEntity.ok(new ResponseDto<>("회원 프로필이 수정되었습니다.", null));
+    }
+
 }

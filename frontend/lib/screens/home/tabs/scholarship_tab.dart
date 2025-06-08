@@ -3,13 +3,24 @@
 /// Desc : 장학금 검색 + 추천
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-21
-/// Updt : 2025-04-28
+/// Updt : 2025-06-01
 /// =============================================================
+library;
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:scholarai/constants/app_colors.dart';
 import 'package:scholarai/constants/app_strings.dart';
+import 'package:scholarai/providers/auth_provider.dart';
+import 'package:scholarai/providers/bookmarked_provider.dart'
+    show BookmarkedProvider;
+import 'package:scholarai/providers/user_profile_provider.dart';
+import 'package:scholarai/widgets/scholarship_card.dart';
 import '../../../widgets/custom_app_bar.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:scholarai/constants/config.dart';
+import 'package:scholarai/widgets/scholarship_detail_sheet.dart';
 
 class ScholarshipTab extends StatefulWidget {
   const ScholarshipTab({super.key});
@@ -21,80 +32,120 @@ class ScholarshipTab extends StatefulWidget {
 class _ScholarshipTabState extends State<ScholarshipTab> {
   final TextEditingController keywordController = TextEditingController();
   bool isSearchMode = true;
-
-  final List<Map<String, dynamic>> mockScholarships = [
-    {
-      'organization': '인천인재평생교육진흥원',
-      'productName': '인천시 청년 해외배낭연수 장학',
-      'type': ['성적우수', '지연연고'],
-      'start': '2025.03.01',
-      'end': '2025.04.30',
-    },
-    {
-      'organization': 'MG새마을금고 지역희망나눔재단',
-      'productName': '청년누리 장학생',
-      'type': ['소득구분'],
-      'start': '2025.03.15',
-      'end': '2025.04.15',
-    },
-    {
-      'organization': '이영주한중인재양성장학재단',
-      'productName': '한중 미래리더 장학',
-      'type': ['소득구분', '특기자'],
-      'start': '2025.04.15',
-      'end': '2025.05.15',
-    },
-    {
-      'organization': '보건복지부',
-      'productName': '보건복지부 공주보건장학',
-      'type': ['성적우수'],
-      'start': '2025.04.15',
-      'end': '2025.04.25',
-    },
-  ];
+  bool isRecommendationStarted = false; // default false
 
   final List<String> aidTypes = ['성적우수', '소득구분', '지역연고', '장애인', '특기자', '기타'];
   late List<String> selectedTypes;
   String selectedPeriod = '전체';
   bool isAllSelected = true;
+
   List<Map<String, dynamic>> filteredScholarships = [];
+  List<Map<String, dynamic>> recommendedScholarships = [];
+
+  int currentPage = 0;
+  int totalPages = 1;
+  String selectedSort = 'latest';
 
   @override
   void initState() {
     super.initState();
     selectedTypes = List.from(aidTypes);
-    filteredScholarships = List.from(mockScholarships);
+    selectedPeriod = '모집중';
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final memberId = context.read<AuthProvider>().memberId;
+      if (memberId != null) {
+        await context.read<BookmarkedProvider>().loadBookmarks(memberId);
+      }
+      handleSearch(); // 북마크 로딩 완료 후 장학금 검색
+    });
   }
 
-  void handleSearch() {
-    final keyword = keywordController.text.toLowerCase();
-    final now = DateTime.now();
+  Future<void> handleSearch({int page = 0}) async {
+    final keyword = keywordController.text.trim();
 
-    final filtered =
-        mockScholarships.where((item) {
-          // 키워드 검색 조건 (비어 있으면 무시)
-          final matchesKeyword =
-              keyword.isEmpty ||
-              item['productName'].toLowerCase().contains(keyword) ||
-              item['organization'].toLowerCase().contains(keyword);
+    // 기본 쿼리
+    final queryParams = <String, String>{
+      if (keyword.isNotEmpty) 'keyword': keyword,
+      if (selectedPeriod == '모집중') 'onlyRecruiting': 'true',
+      if (selectedPeriod == '모집예정') 'onlyUpcoming': 'true',
 
-          // 타입 필터 (하나라도 포함되어야 함)
-          final matchesType = (item['type'] as List<String>).any(
-            (t) => selectedTypes.contains(t),
-          );
+      'page': page.toString(),
+      'size': '20',
+      'sort':
+          selectedSort == 'latest'
+              ? 'applicationStartDate,asc'
+              : 'applicationEndDate,asc',
+    };
 
-          // 기간 필터
-          final endDate = DateTime.tryParse(item['end'].replaceAll('.', '-'));
-          final matchesPeriod =
-              selectedPeriod == '전체' ||
-              (endDate != null && endDate.isAfter(now));
+    // 복수 필터를 따로 문자열로 조합
+    final financialAidParams = selectedTypes
+        .where((t) => !isAllSelected) // 전체 선택이면 생략
+        .map((t) => 'financialAidType=${_convertToCode(t)}')
+        .join('&');
 
-          return matchesKeyword && matchesType && matchesPeriod;
-        }).toList();
+    // 최종 URL 직접 조립
+    final base = Uri.parse(baseUrl);
+    final queryString = Uri(queryParameters: queryParams).query;
+    final url =
+        '${base.origin}/api/scholarships/search?$queryString&$financialAidParams';
 
-    setState(() {
-      filteredScholarships = filtered;
-    });
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        final List<dynamic> content = json['content'];
+        setState(() {
+          filteredScholarships = content.cast<Map<String, dynamic>>();
+          totalPages = json['totalPages'] ?? 1;
+          currentPage = page;
+        });
+      } else {
+        debugPrint('서버 오류: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('요청 실패: $e');
+    }
+  }
+
+  String _convertToCode(String type) {
+    switch (type) {
+      case '성적우수':
+        return 'MERIT';
+      case '소득구분':
+        return 'INCOME';
+      case '지역연고':
+        return 'REGIONAL';
+      case '장애인':
+        return 'DISABILITY';
+      case '특기자':
+        return 'SPECIAL';
+      case '기타':
+        return 'OTHER';
+      default:
+        return 'NONE';
+    }
+  }
+
+  String convertToKorean(String code) {
+    switch (code) {
+      case 'MERIT':
+        return '성적우수';
+      case 'INCOME':
+        return '소득구분';
+      case 'REGIONAL':
+        return '지역연고';
+      case 'DISABILITY':
+        return '장애인';
+      case 'SPECIAL':
+        return '특기자';
+      case 'OTHER':
+        return '기타';
+      case 'NONE':
+        return '해당없음';
+      default:
+        return code;
+    }
   }
 
   void toggleAllTypes(
@@ -188,7 +239,7 @@ class _ScholarshipTabState extends State<ScholarshipTab> {
                               ),
                             ),
                           );
-                        }).toList(),
+                        }),
                       ],
                     ),
                     const SizedBox(height: 28),
@@ -205,11 +256,23 @@ class _ScholarshipTabState extends State<ScholarshipTab> {
                       spacing: 8,
                       alignment: WrapAlignment.center,
                       children:
-                          ['전체', '모집중'].map((period) {
-                            final isSelected = selectedPeriod == period;
+                          ['전체', '모집중', '모집예정'].map((period) {
+                            final isSelected =
+                                selectedPeriod == period ||
+                                (selectedPeriod == '전체' &&
+                                    (period == '모집중' || period == '모집예정'));
                             return GestureDetector(
                               onTap: () {
-                                setStateDialog(() => selectedPeriod = period);
+                                setStateDialog(() {
+                                  if (period == '전체') {
+                                    selectedPeriod =
+                                        selectedPeriod == '전체'
+                                            ? '모집중'
+                                            : '전체'; // 토글 기능
+                                  } else {
+                                    selectedPeriod = period;
+                                  }
+                                });
                               },
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
@@ -249,6 +312,8 @@ class _ScholarshipTabState extends State<ScholarshipTab> {
                                 isAllSelected = true;
                                 selectedPeriod = '전체';
                               });
+                              Navigator.pop(context);
+                              handleSearch();
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white,
@@ -298,101 +363,6 @@ class _ScholarshipTabState extends State<ScholarshipTab> {
     );
   }
 
-  void showScholarshipDetail(BuildContext context, Map<String, dynamic> item) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return DraggableScrollableSheet(
-          expand: false,
-          builder: (context, scrollController) {
-            return SingleChildScrollView(
-              controller: scrollController,
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ),
-                  Text(
-                    item['productName'],
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: kPrimaryColor,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    item['organization'],
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w300,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  Text(
-                    '${item['start']} ~ ${item['end']}',
-                    style: const TextStyle(fontWeight: FontWeight.w300),
-                  ),
-                  const SizedBox(height: 8),
-
-                  Text(
-                    (item['type'] as List<String>).map((t) => '#$t').join(' '),
-                    style: const TextStyle(color: kPrimaryColor),
-                  ),
-                  const SizedBox(height: 20),
-                  const Divider(height: 32),
-                  const SizedBox(height: 20),
-
-                  // 아래는 예쁜 목업 형태로 간단 출력
-                  const Text(
-                    '상세 정보',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 20),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildDetailRow('기관유형', '지자체(출자출연기관)'),
-                      _buildDetailRow('장학금유형', '장학금'),
-                      _buildDetailRow('대학 유형', '4년제(5~6년제포함)'),
-                      _buildDetailRow('대상 학기', '대학2~8학기 이상'),
-                      _buildDetailRow(
-                        '지원 계열',
-                        '공학, 교육, 사회, 예체능, 의약, 인문, 자연, 제한없음',
-                      ),
-                      _buildDetailRow('학업 요건', '직전학기 12학점 이상 + 평균 2.75 이상'),
-                      _buildDetailRow('소득 요건', '중위소득 150% 이하'),
-                      _buildDetailRow('지원 금액', '1인당 100만원 (생활비 지원 포함)'),
-                      _buildDetailRow('특별 요건', '광주광역시 남구 주민등록 1년 이상 + 조건 충족'),
-                      _buildDetailRow('선발 인원', '11명'),
-                      _buildDetailRow('심사 방법', '서류심사 + 심사위원회 의결'),
-                      _buildDetailRow('필요 서류', '신청서, 주민등록등본 등 10종'),
-                      _buildDetailRow(
-                        '지원 사이트',
-                        'https://itle.or.kr/user/main.do',
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
   Widget _buildDetailRow(String title, String content) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -415,6 +385,9 @@ class _ScholarshipTabState extends State<ScholarshipTab> {
 
   @override
   Widget build(BuildContext context) {
+    final bookmarkedProvider = context.watch<BookmarkedProvider>();
+    final memberId = context.read<AuthProvider>().memberId;
+    final name = context.watch<AuthProvider>().name ?? '회원';
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: const CustomAppBar(),
@@ -496,7 +469,10 @@ class _ScholarshipTabState extends State<ScholarshipTab> {
                         ),
                         suffixIcon: IconButton(
                           icon: Icon(Icons.search, color: kPrimaryColor),
-                          onPressed: handleSearch,
+                          onPressed: () {
+                            FocusScope.of(context).unfocus();
+                            handleSearch();
+                          },
                         ),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
@@ -509,112 +485,449 @@ class _ScholarshipTabState extends State<ScholarshipTab> {
               ),
             const SizedBox(height: 8),
             if (isSearchMode)
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton.icon(
-                  onPressed: showFilterPopup,
-                  icon: Icon(Icons.tune, color: kPrimaryColor, size: 18),
-                  label: Text(
-                    '검색 필터',
-                    style: TextStyle(color: kPrimaryColor, fontSize: 13),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // 🔽 정렬 드롭다운 버튼
+                  Visibility(
+                    visible: false,
+                    maintainSize: true,
+                    maintainAnimation: true,
+                    maintainState: true,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: selectedSort,
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() {
+                                selectedSort = value;
+                                handleSearch(); // 정렬 반영
+                              });
+                            }
+                          },
+                          icon: const SizedBox.shrink(), // 기본 아이콘 제거
+                          dropdownColor: Colors.white,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black,
+                            fontFamily: 'Pretendard',
+                          ),
+                          alignment:
+                              AlignmentDirectional.centerStart, // 아래로만 펼침
+                          selectedItemBuilder: (context) {
+                            return ['latest', 'deadline'].map((value) {
+                              final text = value == 'latest' ? '최신순' : '마감순';
+                              return Row(
+                                children: [
+                                  const Icon(
+                                    Icons.keyboard_arrow_down,
+                                    color: kPrimaryColor,
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(text),
+                                ],
+                              );
+                            }).toList();
+                          },
+                          items: const [
+                            DropdownMenuItem(
+                              value: 'latest',
+                              child: Text('최신순'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'deadline',
+                              child: Text('마감순'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+
+                  // 🔧 검색 필터 버튼
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: InkWell(
+                      onTap: showFilterPopup,
+                      borderRadius: BorderRadius.circular(20),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.tune,
+                            color: kPrimaryColor,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '검색 필터',
+                            style: TextStyle(
+                              color: kPrimaryColor,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             const SizedBox(height: 24),
 
             Expanded(
               child:
                   isSearchMode
-                      ? ListView.builder(
-                        itemCount: filteredScholarships.length,
-                        itemBuilder: (context, index) {
-                          final item = filteredScholarships[index];
-                          return GestureDetector(
-                            onTap: () => showScholarshipDetail(context, item),
-                            child: Container(
-                              margin: const EdgeInsets.only(bottom: 16),
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.grey.shade300),
+                      ? (filteredScholarships.isEmpty
+                          ? const Center(
+                            child: Text(
+                              '검색 결과가 없습니다.',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
                               ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    item['productName'] ?? '',
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    item['organization'] ?? '',
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.black54,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        (item['type'] as List<String>)
-                                            .map((t) => '#$t')
-                                            .join(' '),
-                                        style: const TextStyle(
-                                          fontSize: 13,
-                                          color: kPrimaryColor,
-                                        ),
-                                      ),
-                                      Text(
-                                        '${item['start']} ~ ${item['end']}',
-                                        style: const TextStyle(
-                                          fontSize: 13,
-                                          color: Colors.black54,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                            ),
+                          )
+                          : ListView.builder(
+                            itemCount: filteredScholarships.length,
+                            itemBuilder: (context, index) {
+                              final item = filteredScholarships[index];
+                              return ScholarshipCard(
+                                productName: item['productName'],
+                                organization: item['organizationName'],
+                                types: [
+                                  convertToKorean(item['financialAidType']),
                                 ],
+                                start: item['applicationStartDate'],
+                                end: item['applicationEndDate'],
+                                onTap:
+                                    () => ScholarshipDetailSheet.show(
+                                      context,
+                                      item['id'],
+                                    ),
+                                isBookmarked: context
+                                    .watch<BookmarkedProvider>()
+                                    .isBookmarked(item['id']),
+                                onBookmarkToggle: () {
+                                  if (memberId != null) {
+                                    bookmarkedProvider.toggleBookmark(
+                                      memberId,
+                                      item['id'],
+                                    );
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('로그인이 필요합니다.'),
+                                      ),
+                                    );
+                                  }
+                                },
+                              );
+                            },
+                          ))
+                      : isRecommendationStarted
+                      ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const Icon(
+                            Icons.emoji_objects,
+                            size: 48,
+                            color: kPrimaryColor,
+                          ),
+                          const SizedBox(height: 16),
+
+                          RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontFamily: 'Pretendard',
+                                color: Colors.black,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: name,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: kPrimaryColor,
+                                  ),
+                                ),
+                                const TextSpan(
+                                  text: '님을 위한\n',
+                                  style: TextStyle(fontWeight: FontWeight.w300),
+                                ),
+                                const TextSpan(
+                                  text: '추천 장학금',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                const TextSpan(
+                                  text: '이에요!',
+                                  style: TextStyle(fontWeight: FontWeight.w300),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          const Divider(thickness: 1, color: Colors.grey),
+                          const SizedBox(height: 16),
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: recommendedScholarships.length,
+                              itemBuilder: (context, index) {
+                                final item = recommendedScholarships[index];
+                                return ScholarshipCard(
+                                  productName: item['productName'],
+                                  organization: item['organizationName'],
+                                  types: [
+                                    convertToKorean(item['financialAidType']),
+                                  ],
+                                  start: item['applicationStartDate'],
+                                  end: item['applicationEndDate'],
+                                  isBookmarked: context
+                                      .watch<BookmarkedProvider>()
+                                      .isBookmarked(item['id']),
+                                  onTap: () {
+                                    ScholarshipDetailSheet.show(
+                                      context,
+                                      item['id'],
+                                    );
+                                  },
+                                  onBookmarkToggle: () {
+                                    final memberId =
+                                        context.read<AuthProvider>().memberId;
+                                    if (memberId != null) {
+                                      context
+                                          .read<BookmarkedProvider>()
+                                          .toggleBookmark(memberId, item['id']);
+                                    } else {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text('로그인이 필요합니다.'),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      )
+                      : Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const Icon(
+                            Icons.search,
+                            size: 48,
+                            color: kPrimaryColor,
+                          ),
+                          const SizedBox(height: 16),
+                          RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontFamily: 'Pretendard',
+                                color: Colors.black,
+                              ),
+                              children: [
+                                const TextSpan(
+                                  text: '나에게 딱 맞는\n',
+                                  style: TextStyle(fontWeight: FontWeight.w300),
+                                ),
+                                TextSpan(
+                                  text: '장학금',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: kPrimaryColor,
+                                  ),
+                                ),
+                                const TextSpan(
+                                  text: ' 찾기!',
+                                  style: TextStyle(fontWeight: FontWeight.w300),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          const Divider(thickness: 1, color: Colors.grey),
+                          const SizedBox(height: 12),
+                          const Text(
+                            '입력된 프로필을 기반으로\nAI가 적합한 장학금을 추천해드려요!',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black54,
+                              height: 1.4,
+                            ),
+                          ),
+                          const Spacer(),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 48,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                final profileProvider =
+                                    context.read<UserProfileProvider>();
+                                if (!profileProvider.isProfileRegistered) {
+                                  showDialog(
+                                    context: context,
+                                    builder:
+                                        (_) => AlertDialog(
+                                          title: const Text(
+                                            '프로필 생성이 필요해요!',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(fontSize: 16),
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed:
+                                                  () => Navigator.pop(context),
+                                              child: const Text('확인'),
+                                            ),
+                                          ],
+                                        ),
+                                  );
+                                } else {
+                                  await fetchRecommendations();
+                                  setState(() {
+                                    isRecommendationStarted = true;
+                                  });
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: kPrimaryColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: const Text(
+                                '시작하기',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
-                          );
-                        },
-                      )
-                      : Center(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // TODO: 추천 로직 구현
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: kPrimaryColor,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 32,
-                              vertical: 16,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
                           ),
-                          child: const Text(
-                            '장학금 추천받기',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
+                        ],
                       ),
             ),
+
+            if (isSearchMode)
+              SizedBox(
+                height: 48,
+                child: Center(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.keyboard_double_arrow_left),
+                          color: kPrimaryColor,
+                          onPressed:
+                              currentPage >= 10
+                                  ? () => handleSearch(page: currentPage - 10)
+                                  : null,
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.chevron_left),
+                          color: kPrimaryColor,
+                          onPressed:
+                              currentPage > 0
+                                  ? () => handleSearch(page: currentPage - 1)
+                                  : null,
+                        ),
+                        ..._buildPageButtons(),
+                        IconButton(
+                          icon: const Icon(Icons.chevron_right),
+                          color: kPrimaryColor,
+                          onPressed:
+                              currentPage < totalPages - 1
+                                  ? () => handleSearch(page: currentPage + 1)
+                                  : null,
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.keyboard_double_arrow_right),
+                          color: kPrimaryColor,
+                          onPressed:
+                              currentPage + 10 < totalPages
+                                  ? () => handleSearch(page: currentPage + 10)
+                                  : null,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
     );
+  }
+
+  List<Widget> _buildPageButtons() {
+    int start = (currentPage ~/ 10) * 10;
+    int end = (start + 5).clamp(0, totalPages);
+
+    return List.generate(end - start, (i) {
+      final pageNum = start + i;
+      final isCurrent = pageNum == currentPage;
+
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+        child: GestureDetector(
+          onTap: () => handleSearch(page: pageNum),
+          child: Text(
+            '${pageNum + 1}',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
+              color: isCurrent ? kPrimaryColor : Colors.black,
+            ),
+          ),
+        ),
+      );
+    });
+  }
+
+  Future<void> fetchRecommendations() async {
+    final profileId = context.read<UserProfileProvider>().profileId;
+    if (profileId == null) return;
+
+    final url = '$baseUrl/api/recommend?profileId=$profileId';
+
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body)['data'];
+        setState(() {
+          recommendedScholarships = List<Map<String, dynamic>>.from(data);
+        });
+      } else {
+        debugPrint('❌ 추천 API 실패: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('❌ 추천 API 예외: $e');
+    }
   }
 }

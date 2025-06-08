@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -47,11 +48,11 @@ public class MemberController {
         }
     }
 
-    //회원 이름 수정
+    //회원 이름 수정(회원가입 시)
     @PatchMapping("/auth/name")
-    public ResponseEntity<ResponseDto<Void>> updateName(@RequestBody @Valid UpdateNameRequestDto updateNameRequestDto){
+    public ResponseEntity<ResponseDto<Void>> updateName(@RequestBody @Valid SignupNameUpdateRequestDto signupNameUpdateRequestDto){
         try {
-            memberService.updateName(updateNameRequestDto.getEmail(), updateNameRequestDto.getName());
+            memberService.updateName(signupNameUpdateRequestDto.getEmail(), signupNameUpdateRequestDto.getName());
             return ResponseEntity.ok(new ResponseDto<>("이름이 성공적으로 변경되었습니다.", null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -59,5 +60,44 @@ public class MemberController {
         }
     }
 
+    //회원 이름 조회
+    @GetMapping("/auth/name/{memberId}")
+    public ResponseEntity<ResponseDto<String>> getName(@PathVariable Long memberId){
+        try {
+            String name = memberService.getNameByMemberId(memberId);
+            return ResponseEntity.ok(new ResponseDto<>("회원 이름 조회에 성공하셨습니다.", name));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ResponseDto<>(e.getMessage(), null));
+        }
+    }
 
+    //회원 이름 수정(프로필 수정 시)
+    @PatchMapping("/auth/name/{memberId}")
+    public ResponseEntity<ResponseDto<Void>> updateNameByMemberId(
+            @PathVariable Long memberId,
+            @RequestBody @Valid ProfileNameUpdateRequestDto profileNameUpdateRequestDto){
+        try {
+            memberService.updateNameByMemberId(memberId, profileNameUpdateRequestDto.getName());
+            return ResponseEntity.ok(new ResponseDto<>("이름이 성공적으로 변경되었습니다.", null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseDto<>("이름 변경에 실패했습니다: " + e.getMessage(), null));
+        }
+    }
+
+    //회원 탈퇴
+    @DeleteMapping("/members/me")
+    public ResponseEntity<ResponseDto<Void>> deleteMyAccount(@AuthenticationPrincipal CustomUserDetails userDetails){
+        try {
+            memberService.deleteMemberSoft(userDetails.getMemberId());
+            return ResponseEntity.ok(new ResponseDto<>("회원 탈퇴가 완료되었습니다.", null));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseDto<>(e.getMessage(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseDto<>("회원 탈퇴 중 오류가 발생했습니다: " + e.getMessage(), null));
+        }
+    }
 }

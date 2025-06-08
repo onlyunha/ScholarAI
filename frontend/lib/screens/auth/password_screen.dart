@@ -3,14 +3,19 @@
 /// Desc : 회원가입 - 비밀번호 설정
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-04
-/// Updt : 2025-04-28
+/// Updt : 2025-06-04
 /// =============================================================
+library;
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:scholarai/constants/app_images.dart';
+import 'package:scholarai/providers/auth_provider.dart';
+import 'package:scholarai/providers/user_profile_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../constants/app_routes.dart';
 import '../../constants/app_strings.dart';
 import '../../constants/app_colors.dart';
@@ -102,7 +107,24 @@ class _PasswordScreenState extends State<PasswordScreen>
 
       // 회원가입 성공: 이름 설정 화면으로 이동
       if (response.statusCode == 201) {
-        context.go(AppRoutes.welcomeName, extra: {'email': widget.email});
+
+        final authProvider = context.read<AuthProvider>();
+        final userProfileProvider = context.read<UserProfileProvider>();
+
+        // ✅ 모든 정보 초기화
+        authProvider.clearAuthData();
+        userProfileProvider.clearProfile(); // provider 상태 초기화
+       
+        final resBody = jsonDecode(response.body);
+        final memberId = resBody['data'].toString();
+        await authProvider.saveAuthData(
+          '',
+          memberId,
+          widget.email,
+          'unknown',
+          '',
+        );
+         context.go(AppRoutes.welcomeName, extra: {'email': widget.email});
 
         // 회원가입 실패: 에러 메시지
       } else {

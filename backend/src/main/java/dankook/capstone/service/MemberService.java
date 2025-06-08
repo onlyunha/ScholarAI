@@ -5,6 +5,7 @@ import dankook.capstone.domain.Member;
 import dankook.capstone.dto.MemberJoinDto;
 import dankook.capstone.repository.MemberRepository;
 
+import dankook.capstone.repository.ScholarshipLikeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final ScholarshipLikeRepository scholarshipLikeRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JWTUtil jwtUtil;
 
@@ -53,7 +55,7 @@ public class MemberService {
         }
     }
 
-    //회원 이름 수정
+    //회원 이름 수정(회원가입 시)
     @Transactional
     public void updateName(String email, String newName){
         Member member = memberRepository.findByEmail(email)
@@ -62,6 +64,41 @@ public class MemberService {
         member.updateName(newName); // 이름 변경
     }
 
+    //회원 이름 조회
+    public String getNameByMemberId(Long memberId){
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원 ID입니다."));
+        return member.getName();
+    }
 
+    //회원 이름 수정(프로필 수정 시)
+    @Transactional
+    public void updateNameByMemberId(Long memberId, String newName) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원 ID입니다."));
+        member.updateName(newName);
+    }
+
+    //회원 탈퇴
+    @Transactional
+    public void deleteMemberSoft(Long memberId){
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원 ID입니다."));
+
+        //이미 탈퇴한 사용자라면 중복 처리 방지
+        if (member.isDeleted()) {
+            throw new IllegalStateException("이미 탈퇴한 회원입니다.");
+        }
+
+        //찜 삭제
+        scholarshipLikeRepository.deleteAllByMember(member);
+
+        //프로필 soft delete
+        if (member.getProfile() != null) { //프로필이 있는 경우에만
+            member.getProfile().markAsDeleted();
+        }
+
+        member.markAsDeleted(); //deleted = true
+    }
 
 }

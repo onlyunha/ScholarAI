@@ -5,6 +5,7 @@
 /// Crtd : 2025-04-28
 /// Updt : 2025-04-28
 /// =============================================================
+library;
 
 class AppImages {
   static const mainLogo = 'assets/images/main_logo.png';
@@ -12,4 +13,9 @@ class AppImages {
 
   static const googleLogo = 'assets/images/google_logo.png';
   static const kakaoLogo = 'assets/images/kakao_logo.png';
+
+  static const homeCard1 = 'assets/images/home_card1.png';
+  static const homeCard2 = 'assets/images/home_card2.png';
+  static const homeCard3 = 'assets/images/home_card3.png';
+  
 }

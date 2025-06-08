@@ -5,16 +5,21 @@
 /// Crtd : 2025-04-04
 /// Updt : 2025-04-28
 /// =============================================================
+library;
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:scholarai/constants/app_colors.dart';
 import 'package:scholarai/constants/app_images.dart';
 import 'package:scholarai/constants/app_routes.dart';
 import 'package:scholarai/constants/app_strings.dart';
 import 'package:scholarai/constants/config.dart';
+import 'package:scholarai/providers/auth_provider.dart';
+import 'package:scholarai/providers/user_profile_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../constants/constants.dart';
 
 // 회원가입 - 이름 설정 화면
@@ -63,6 +68,15 @@ class _WelcomeNameScreenState extends State<WelcomeNameScreen> {
 
       // 성공: 메인화면으로 이동
       if (response.statusCode == 200) {
+        final authProvider = context.read<AuthProvider>();
+        final userProfileProvider = context.read<UserProfileProvider>();
+
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove('profile_id');
+        userProfileProvider.setProfileRegistered(false);
+
+        authProvider.setName(name); // 이름 저장
+
         context.go(AppRoutes.main);
 
         // 실패: 오류 메시지

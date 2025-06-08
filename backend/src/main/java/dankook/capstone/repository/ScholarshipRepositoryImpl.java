@@ -45,12 +45,32 @@ public class ScholarshipRepositoryImpl implements ScholarshipRepositoryCustom{
             builder.and(s.financialAidType.in(labels)); //equals
         }
 
-        //현재 모집중인 장학금
-        if (condition.isOnlyRecruiting()) { //사용자가 '모집중인 장학금 보기'를 선택
-            LocalDate today = LocalDate.now();
-            builder.and(s.applicationStartDate.loe(today)) //모집시작일<=오늘
-                    .and(s.applicationEndDate.goe(today)); //모집종료일>=오늘
+        LocalDate today = LocalDate.now();
+        boolean onlyRecruiting = condition.isOnlyRecruiting(); //사용자가 '모집중인 장학금 보기'를 선택
+        boolean onlyUpcoming = condition.isOnlyUpcoming(); //사용자가 '모집예정 장학금 보기'를 선택
+
+        if (onlyRecruiting && onlyUpcoming) {
+            // 모집중 + 모집예정
+            builder.and(
+                    s.applicationStartDate.loe(today)
+                            .and(s.applicationEndDate.goe(today)) //모집중
+                            .or(s.applicationStartDate.gt(today)) //모집예정                             // 모집예정
+            );
+        } else if (onlyRecruiting) {
+            // 모집중만
+            builder.and(s.applicationStartDate.loe(today) //모집시작일<=오늘
+                    .and(s.applicationEndDate.goe(today))); //모집종료일>=오늘
+        } else if (onlyUpcoming) {
+            // 모집예정만
+            builder.and(s.applicationStartDate.gt(today)); //모집 시작일>오늘
         }
+
+//        //현재 모집중인 장학금
+//        if (condition.isOnlyRecruiting()) { //사용자가 '모집중인 장학금 보기'를 선택
+//            LocalDate today = LocalDate.now();
+//            builder.and(s.applicationStartDate.loe(today)) //모집시작일<=오늘
+//                    .and(s.applicationEndDate.goe(today)); //모집종료일>=오늘
+//        }
 
         // 페이징 쿼리
         List<Scholarship> content = queryFactory

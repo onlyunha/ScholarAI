@@ -3,14 +3,19 @@
 /// Desc : 이메일과 비밀번호를 이용한 로그인 화면 UI 및 기능 구현
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-02
-/// Updt : 2025-04-28
+/// Updt : 2025-06-03
 /// =============================================================
+library;
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:scholarai/constants/app_images.dart';
+import 'package:scholarai/providers/auth_provider.dart';
+import 'package:scholarai/providers/user_profile_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../constants/app_routes.dart';
 import '../../constants/app_strings.dart';
 import '../../constants/app_colors.dart';
@@ -27,7 +32,6 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen>
     with SingleTickerProviderStateMixin {
-
   // 이메일, 비밀번호 입력을 위한 컨트롤러
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -73,12 +77,50 @@ class _LoginScreenState extends State<LoginScreen>
       body: jsonEncode({'email': email, 'password': password}),
     );
 
-    // 성공: 메인 화면으로 이동 
+    // 성공: 메인 화면으로 이동
     if (response.statusCode == 200) {
+      final rawToken =
+          response.headers['authorization'] ??
+          response.headers['Authorization'];
+      final token =
+          rawToken != null && !rawToken.startsWith('Bearer ')
+              ? 'Bearer $rawToken'
+              : rawToken;
+
+      final resBody = jsonDecode(response.body);
+      debugPrint('🟢 로그인 응답 전체: $resBody');
+      final data = resBody['data'];
+      final memberId = data['memberId'].toString();
+      final profileId = data['profileId'];
+      final profileIdStr = profileId?.toString() ?? '';
+      final name = data['name'] ?? '';
+
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      await authProvider.saveAuthData(token!, memberId, email, name, profileIdStr);
+      debugPrint('✅ authProvider 저장 완료');
+
+      final userProfileProvider = Provider.of<UserProfileProvider>(
+        context,
+        listen: false,
+      );
+      if (profileId != null) {
+        userProfileProvider.setProfileId(profileId);
+        debugPrint('✅ 로그인 시 받아온 profileId: $profileId');
+        
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setInt('profile_id', profileId);
+      } else {
+        debugPrint('⚠️ 로그인 응답에 profileId 없음');
+      }
+
+      await userProfileProvider.fetchProfileIdAndLoad(memberId, token);
+
+      print('🔐 저장된 토큰: $token');
+      print('👤 저장된 memberId: $memberId');
+
       context.go(AppRoutes.main);
 
-
-    // 실패: 에러 메시지 + shake 애니메이션 
+      // 실패: 에러 메시지 + shake 애니메이션
     } else {
       final resBody = jsonDecode(response.body);
       if (resBody['message'].toString().contains('이메일')) {
@@ -88,6 +130,7 @@ class _LoginScreenState extends State<LoginScreen>
       }
       _shakeController.forward(from: 0);
     }
+    print('🔴 response.headers: ${response.headers}');
   }
 
   // 회원 가입 화면 이동 함수
@@ -108,7 +151,6 @@ class _LoginScreenState extends State<LoginScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-
                 // 어플 로고
                 Image.asset(
                   AppImages.mainLogo,
@@ -154,7 +196,7 @@ class _LoginScreenState extends State<LoginScreen>
                   ),
                 ),
                 const SizedBox(height: 16),
-                
+
                 // 오류 메시지 + shake 애니메이션
                 AnimatedBuilder(
                   animation: _shakeController,

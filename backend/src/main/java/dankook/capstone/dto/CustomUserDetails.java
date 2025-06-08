@@ -14,6 +14,10 @@ public class CustomUserDetails implements UserDetails {
 
     private final Member member;
 
+    public Member getMember() {
+        return member;
+    }
+
     /*
      * member 객체를 기반으로 이메일(아이디), 비밀번호, 역할(role) 등의 정보 반환
      */
@@ -44,6 +48,14 @@ public class CustomUserDetails implements UserDetails {
 
     public Long getMemberId(){
         return member.getId();
+    }
+
+    public Long getProfileId(){
+        if (member.getProfile() != null) {
+            return member.getProfile().getId();
+        } else {
+            return null; // 프로필이 없으면 null 반환
+        }
     }
 
     @Override //계정 만료 여부
