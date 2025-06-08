@@ -395,19 +395,19 @@ class WelcomeScreen extends StatelessWidget {
                 ),
 
                 // ✅ 임시 버튼
-                TextButton(
-                  onPressed: () {
-                    context.go(AppRoutes.main);
-                  },
-                  child: const Text(
-                    '메인화면으로 이동 →',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey,
-                      decoration: TextDecoration.underline,
-                    ),
-                  ),
-                ),
+                // TextButton(
+                //   onPressed: () {
+                //     context.go(AppRoutes.main);
+                //   },
+                //   child: const Text(
+                //     '메인화면으로 이동 →',
+                //     style: TextStyle(
+                //       fontSize: 12,
+                //       color: Colors.grey,
+                //       decoration: TextDecoration.underline,
+                //     ),
+                //   ),
+                // ),
 
                 const Spacer(flex: 1),
               ],

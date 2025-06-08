@@ -3,7 +3,7 @@
 /// Desc : 찜한 장학금 + 캘린더
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-19
-/// Updt : 2025-06-01
+/// Updt : 2025-06-08
 /// =============================================================
 library;
 
@@ -14,6 +14,7 @@ import 'package:provider/provider.dart';
 import 'package:scholarai/providers/auth_provider.dart';
 import 'package:scholarai/providers/bookmarked_provider.dart';
 import 'package:scholarai/providers/user_profile_provider.dart';
+import 'package:scholarai/services/notification_service.dart';
 import 'package:scholarai/widgets/scholarship_card.dart';
 import 'package:scholarai/widgets/scholarship_detail_sheet.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -193,11 +194,59 @@ class _BookmarkTabState extends State<BookmarkTab> {
     return ListView.builder(
       itemCount: bookmarkedData.length,
       itemBuilder: (context, index) {
+        // 테스트용
+        // if (index == 0) {
+        //   NotificationService.showNow(
+        //     id: 8888,
+        //     title: '⏰',
+        //     body: '-',
+        //   );
+        // }
         final item = bookmarkedData[index];
 
         final sid = item['scholarshipId'];
         if (sid == null) return const SizedBox.shrink();
         final int id = sid is int ? sid : int.tryParse(sid.toString()) ?? -1;
+
+        // 🔔 알림 예약 로직
+        final now = DateTime.now();
+        try {
+          print('📦 알림 예약 시도: ${item['productName']}');
+          final startDateStr = item['start'] ?? item['applicationStartDate'];
+          final endDateStr = item['end'] ?? item['applicationEndDate'];
+
+          if (startDateStr != null) {
+            final startDate = normalizeDate(startDateStr);
+            if (startDate.isAfter(now)) {
+              NotificationService.scheduleSafeNotification(
+                id: id * 2,
+                title: '📢 장학금 접수 시작!',
+                body: '${item['productName']} 장학금의 접수가 시작돼요!',
+                scheduledTime: startDate,
+              ).catchError((e) {
+                print('❌ 알림 예약 실패 (시작일): $e');
+              });
+            }
+          }
+
+          if (endDateStr != null) {
+            final endDate = normalizeDate(
+              endDateStr,
+            ).subtract(const Duration(days: 1));
+            if (endDate.isAfter(now)) {
+              NotificationService.scheduleSafeNotification(
+                id: id * 2 + 1,
+                title: '⏰ 마감 하루 전!',
+                body: '${item['productName']} 장학금의 마감이 임박했어요!',
+                scheduledTime: endDate,
+              ).catchError((e) {
+                print('❌ 알림 예약 실패 (마감일): $e');
+              });
+            }
+          }
+        } catch (e) {
+          print('❌ 알림 예약 실패: ${e.toString()}');
+        }
 
         return ScholarshipCard(
           productName: item['productName'],

@@ -3,7 +3,7 @@
 /// Desc : 메인
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-03-23
-/// Updt : 2025-06-03
+/// Updt : 2025-06-08
 /// =============================================================
 library;
 
@@ -24,21 +24,57 @@ import 'package:scholarai/providers/user_profile_provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:month_year_picker/month_year_picker.dart';
+import 'package:scholarai/services/notification_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'firebase_options.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
+const AndroidNotificationChannel channel = AndroidNotificationChannel(
+  'high_importance_channel', // ID
+  'High Importance Notifications', // 이름
+  description: 'This channel is used for important notifications.',
+  importance: Importance.high,
+);
 
 // 앱의 진입점
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await NotificationService.initialize();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  tz.initializeTimeZones(); 
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await FirebaseMessaging.instance.requestPermission();
+  await NotificationService.requestExactAlarmPermission();
   await initializeDateFormatting('ko_KR', null);
+
   // FCM 토큰 가져오기
   final fcmToken = await FirebaseMessaging.instance.getToken();
+  print('✅ Device FCM Token: $fcmToken');
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin
+      >()
+      ?.createNotificationChannel(channel);
+
+  await flutterLocalNotificationsPlugin.initialize(
+    const InitializationSettings(
+      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+      iOS: DarwinInitializationSettings(),
+    ),
+  );
+
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
 
   // 카카오 SDK 초기화
   KakaoSdk.init(
@@ -84,9 +120,46 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   final String initialRoute;
   const MyApp({super.key, required this.initialRoute});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      final notification = message.notification;
+      final android = message.notification?.android;
+
+      if (notification != null && android != null) {
+        flutterLocalNotificationsPlugin.show(
+          notification.hashCode,
+          notification.title,
+          notification.body,
+          NotificationDetails(
+            android: AndroidNotificationDetails(
+              channel.id,
+              channel.name,
+              channelDescription: channel.description,
+              icon: '@mipmap/ic_launcher',
+            ),
+            iOS: const DarwinNotificationDetails(),
+          ),
+        );
+      }
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print('🟢 사용자가 알림을 클릭했습니다!');
+      // TODO: 특정 화면으로 라우팅하려면 여기에 context.push(...) 추가
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -150,23 +223,23 @@ class MyApp extends StatelessWidget {
       ],
 
       // 첫 화면 설정
-      routerConfig: getRouter(initialRoute),
+      routerConfig: getRouter(widget.initialRoute),
     );
   }
-  
 }
 
-Future<void> sendFcmTokenToServer(String memberId, String fcmToken, String token) async {
+Future<void> sendFcmTokenToServer(
+  String memberId,
+  String fcmToken,
+  String token,
+) async {
   final response = await http.post(
     Uri.parse('$baseUrl/api/fcm-token'),
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': token,
+      'Authorization': 'Bearer $token',
     },
-    body: jsonEncode({
-      'memberId': memberId,
-      'fcmToken': fcmToken,
-    }),
+    body: jsonEncode({'memberId': memberId, 'fcmToken': fcmToken}),
   );
 
   if (response.statusCode == 200) {
@@ -174,4 +247,9 @@ Future<void> sendFcmTokenToServer(String memberId, String fcmToken, String token
   } else {
     print('❌ FCM 토큰 서버 저장 실패: ${response.statusCode}');
   }
+}
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print('Handling a background message ${message.messageId}');
 }
