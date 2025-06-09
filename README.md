@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/669b34b0-9d33-4e13-b0f9-c84dda51e862" width="500"
-    style="border: 3px solid black; border-radius: 12px;"/><br><br>
+  <img src="https://github.com/user-attachments/assets/669b34b0-9d33-4e13-b0f9-c84dda51e862" width="1000"
+    /><br><br>
 
   <h1>🎓 ScholarAI</h1>
 
