@@ -6,7 +6,7 @@
 
   <p><strong>ScholarAI</strong>는 장학금 정보 탐색의 복잡함을 덜고,<br>
   <strong>개인 맞춤형 추천</strong>을 통해 사용자가 <strong>가장 알맞은 장학금</strong>을<br>
-  쉽고 빠르게 찾을 수 있도록 도와주는 <strong>모바일 애플리케이션</strong>입니다.<br><br><br></p>
+  쉽고 빠르게 찾을 수 있도록 도와주는 <strong>모바일 애플리케이션</strong>입니다.<br><br><br><br></p>
 
 
 ## 🧑‍💻 Team Members
@@ -36,21 +36,39 @@
     </tr>
   </tbody>
 </table>
+<br><br>
+<br><br>
+
+## 🛠️ Tech Stack
+
+#### Frontend
+[![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
+
+#### Backend
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Spring Security](https://img.shields.io/badge/Spring_Security-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white)](https://spring.io/projects/spring-security)
+[![Spring Data JPA](https://img.shields.io/badge/Spring_Data_JPA-007396?style=for-the-badge)](https://spring.io/projects/spring-data-jpa)
+[![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)](https://jwt.io)
+
+#### AI & Chatbot
+[![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com)
+[![LangChain](https://img.shields.io/badge/LangChain-000000?style=for-the-badge)](https://www.langchain.com)
+[![ChromaDB](https://img.shields.io/badge/Chroma-FF6F61?style=for-the-badge)](https://www.trychroma.com)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+
+#### Database & API Protocol
+[![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com)
+[![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io)
+[![REST API](https://img.shields.io/badge/REST%20API-02569B?style=for-the-badge)]()
+
+### External Services & Authentication
+[![Google](https://img.shields.io/badge/Google-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://developers.google.com/identity)
+[![KakaoTalk](https://img.shields.io/badge/KakaoTalk-FFCD00?style=for-the-badge&logo=kakaotalk&logoColor=black)](https://developers.kakao.com)
+[![Gmail](https://img.shields.io/badge/Gmail-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](https://gmail.com)
+[![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com)
+<br><br>
+<sub>📌 [ScholarAI 시스템 구조도 보기](https://github.com/user-attachments/assets/e93c206a-3115-4260-841e-f9dd5cd255e9)</sub>
+
+
 
 </div>
-
-## 주요 기능
-
-- **장학금 검색**: 다양한 조건에 맞는 장학금을 검색할 수 있습니다.
-- **장학금 추천**: 사용자의 프로필을 기반으로 맞춤형 장학금을 추천합니다.
-- **장학금 정보 상세보기**: 장학금에 대한 상세 정보를 제공합니다.
-- **장학금 신청 관리**: 장학금 신청 상태를 추적하고 관리합니다.
-
-## ⚙️기술 스택
-
-![Image](https://github.com/user-attachments/assets/e93c206a-3115-4260-841e-f9dd5cd255e9)
-- **프론트엔드**: Flutter
-- **백엔드**: Spring Boot, Spring Data JPA
-- **AI**: OpenAI(GPT), LangChain, Chroma
-
-## 프로젝트 구조
