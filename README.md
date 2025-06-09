@@ -1,3 +1,4 @@
+![Image](https://github.com/user-attachments/assets/669b34b0-9d33-4e13-b0f9-c84dda51e862)
 # ScholarAI
 
 ScholarAI는 장학금 정보를 제공하고 관리하는 모바일 어플리케이션입니다. 사용자에게 다양한 장학금 정보를 제공하며, 개인화된 추천 기능을 통해 장학금을 보다 쉽게 찾을 수 있도록 도와줍니다.
