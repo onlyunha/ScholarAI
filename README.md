@@ -1,15 +1,43 @@
-![Image](https://github.com/user-attachments/assets/669b34b0-9d33-4e13-b0f9-c84dda51e862)
-# ScholarAI
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/669b34b0-9d33-4e13-b0f9-c84dda51e862" width="500"
+    style="border: 3px solid black; border-radius: 12px;"/><br><br>
 
-ScholarAI는 장학금 정보를 제공하고 관리하는 모바일 어플리케이션입니다. 사용자에게 다양한 장학금 정보를 제공하며, 개인화된 추천 기능을 통해 장학금을 보다 쉽게 찾을 수 있도록 도와줍니다.
+  <h1>🎓 ScholarAI</h1>
 
-## 👩‍💻팀 구성 및 역할 분담
+  <p><strong>ScholarAI</strong>는 장학금 정보 탐색의 복잡함을 덜고,<br>
+  <strong>개인 맞춤형 추천</strong>을 통해 사용자가 <strong>가장 알맞은 장학금</strong>을<br>
+  쉽고 빠르게 찾을 수 있도록 도와주는 <strong>모바일 애플리케이션</strong>입니다.<br><br><br></p>
 
-황윤하(조장/Frontend): 사용자 인터페이스 구현
 
-고희연(Backend): 데이터 관리 및 API 구축
+## 🧑‍💻 Team Members
+<table>
+  <thead>
+    <tr>
+      <th>이름</th>
+      <th>역할</th>
+      <th>담당 업무</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>🧭 <strong>황윤하</strong></td>
+      <td><strong>팀장 / Frontend</strong></td>
+      <td>Flutter 기반 UI/UX 개발 및 앱 구조 설계</td>
+    </tr>
+    <tr>
+      <td>🗄️ <strong>고희연</strong></td>
+      <td><strong>Backend</strong></td>
+      <td>Spring Boot 기반 API 설계 및 DB 관리</td>
+    </tr>
+    <tr>
+      <td>🤖 <strong>곽나현</strong></td>
+      <td><strong>AI</strong></td>
+      <td>챗봇 구축 및 장학금 추천 알고리즘 개발</td>
+    </tr>
+  </tbody>
+</table>
 
-곽나현(AI): 맞춤형 추천 시스템 및 챗봇 개발
+</div>
 
 ## 주요 기능
 
