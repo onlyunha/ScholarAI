@@ -1,4 +1,4 @@
-package dankook.capstone.dto;
+package dankook.capstone.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentRequestDto {
-    private String content;
+public class ChatbotRequestDto {
+    private String category;
+    private String question;
 }

@@ -1,13 +1,11 @@
 package dankook.capstone.service;
 
 import dankook.capstone.domain.Member;
-import dankook.capstone.dto.FcmTokenRequestDto;
+import dankook.capstone.dto.request.FcmTokenRequestDto;
 import dankook.capstone.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

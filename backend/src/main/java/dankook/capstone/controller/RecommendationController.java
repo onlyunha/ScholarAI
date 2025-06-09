@@ -1,9 +1,9 @@
 package dankook.capstone.controller;
 
-import dankook.capstone.dto.ProfileRequestDto;
-import dankook.capstone.dto.ProfileResponseDto;
-import dankook.capstone.dto.ResponseDto;
-import dankook.capstone.dto.ScholarshipResponseDto;
+import dankook.capstone.dto.request.ProfileRequestDto;
+import dankook.capstone.dto.response.ProfileResponseDto;
+import dankook.capstone.dto.response.ResponseDto;
+import dankook.capstone.dto.response.ScholarshipResponseDto;
 import dankook.capstone.service.AiRecommendationService;
 import dankook.capstone.service.ProfileService;
 import dankook.capstone.service.ScholarshipService;

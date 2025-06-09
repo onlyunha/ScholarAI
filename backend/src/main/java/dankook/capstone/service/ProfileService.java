@@ -2,15 +2,13 @@ package dankook.capstone.service;
 
 import dankook.capstone.domain.Member;
 import dankook.capstone.domain.Profile;
-import dankook.capstone.dto.ProfileRequestDto;
-import dankook.capstone.dto.ProfileResponseDto;
+import dankook.capstone.dto.request.ProfileRequestDto;
+import dankook.capstone.dto.response.ProfileResponseDto;
 import dankook.capstone.repository.MemberRepository;
 import dankook.capstone.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

@@ -1,6 +1,8 @@
 package dankook.capstone.controller;
 
-import dankook.capstone.dto.*;
+import dankook.capstone.dto.request.*;
+import dankook.capstone.dto.response.CustomUserDetails;
+import dankook.capstone.dto.response.ResponseDto;
 import dankook.capstone.service.EmailService;
 import dankook.capstone.service.MemberService;
 import jakarta.validation.Valid;

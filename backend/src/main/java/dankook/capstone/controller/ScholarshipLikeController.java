@@ -1,8 +1,7 @@
 package dankook.capstone.controller;
 
-import dankook.capstone.domain.ScholarshipLike;
-import dankook.capstone.dto.ResponseDto;
-import dankook.capstone.dto.ScholarshipLikeResponseDto;
+import dankook.capstone.dto.response.ResponseDto;
+import dankook.capstone.dto.response.ScholarshipLikeResponseDto;
 import dankook.capstone.service.ScholarshipLikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

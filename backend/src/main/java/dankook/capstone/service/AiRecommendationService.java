@@ -1,6 +1,6 @@
 package dankook.capstone.service;
 
-import dankook.capstone.dto.ProfileRequestDto;
+import dankook.capstone.dto.request.ProfileRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

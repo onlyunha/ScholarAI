@@ -1,7 +1,5 @@
-package dankook.capstone.dto;
+package dankook.capstone.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import dankook.capstone.domain.Comment;
 import lombok.Builder;
 import lombok.Getter;
 

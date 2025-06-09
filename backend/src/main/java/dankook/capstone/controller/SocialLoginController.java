@@ -1,6 +1,11 @@
 package dankook.capstone.controller;
 
-import dankook.capstone.dto.*;
+import dankook.capstone.dto.request.GoogleLoginRequestDto;
+import dankook.capstone.dto.request.KakaoLoginRequestDto;
+import dankook.capstone.dto.response.GoogleLoginResponse;
+import dankook.capstone.dto.response.KakaoLoginResponse;
+import dankook.capstone.dto.response.LoginResponseDto;
+import dankook.capstone.dto.response.ResponseDto;
 import dankook.capstone.service.GoogleLoginService;
 import dankook.capstone.service.KakaoLoginService;
 import jakarta.validation.Valid;

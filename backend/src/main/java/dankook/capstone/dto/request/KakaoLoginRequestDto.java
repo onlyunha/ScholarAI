@@ -1,4 +1,4 @@
-package dankook.capstone.dto;
+package dankook.capstone.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

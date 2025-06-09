@@ -1,7 +1,7 @@
 package dankook.capstone.controller;
 
-import dankook.capstone.dto.FcmTokenRequestDto;
-import dankook.capstone.dto.ResponseDto;
+import dankook.capstone.dto.request.FcmTokenRequestDto;
+import dankook.capstone.dto.response.ResponseDto;
 import dankook.capstone.service.FcmTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
