@@ -171,6 +171,7 @@ cd backend
 <sub>💡 기본 포트: `8080`<br></sub>
 <sub>💡 설정파일 위치: `backend/src/main/resources/application.yml`<br></sub>
 <sub>💡 JDK 17 이상 권장<br></sub>
+<sub>💡 Gradle 8.12.1<br></sub>
 
 <br><br>
 ### AI
