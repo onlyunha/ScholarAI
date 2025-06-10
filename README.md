@@ -178,6 +178,7 @@ cd backend
 <sub>💡 설정파일 위치: `backend/src/main/resources/application.yml`<br></sub>
 <sub>💡 JDK 17 이상 권장<br></sub>
 <sub>💡 Gradle 8.12.1<br></sub>
+<sub>💡 IntelliJ 또는 CLI<br></sub>
 
 <br><br>
 ### AI
