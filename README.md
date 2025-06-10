@@ -125,11 +125,11 @@ ScholarAI/
 <div align = "left">
   
 ## 🚀 How to Run
-### Requirements
+## Requirements
 For building and running the application you need:
 - Python 3.8
 
-### Installation
+## Installation
 <div align="left">
   
 ```bash
@@ -138,7 +138,7 @@ cd ScholarAI
 ```
 </div>
 
-#### 1. Frontend (Flutter)
+### Frontend (Flutter)
 
 ```bash
 cd frontend
@@ -149,7 +149,7 @@ flutter run
 <sub>💡 Android Emulator 또는 iOS Simulator 필요<br></sub>
 <br><br>
 
-#### 2. Backend (Spring Boot)
+#### Backend (Spring Boot)
 
 ```bash
 cd backend
@@ -161,7 +161,7 @@ cd backend
 <sub>💡 JDK 17 이상 권장<br></sub>
 
 <br><br>
-#### 3. AI
+#### AI
 
 <div align="left">
   
