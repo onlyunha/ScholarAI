@@ -39,7 +39,6 @@
   </tbody>
 </table>
 <br><br>
-<br><br>
 
 ## 🛠️ Tech Stack
    
@@ -70,10 +69,9 @@
 [![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com)
 <br><br>
 
-<sub> #### 📌시스템 구조도<img src="https://github.com/user-attachments/assets/e93c206a-3115-4260-841e-f9dd5cd255e9" width="1000"
-    /><br><br></sub>
+#### <sub>📌시스템 구조도<img src="https://github.com/user-attachments/assets/e93c206a-3115-4260-841e-f9dd5cd255e9" width="1000"/><br><br></sub>
 
-<br><br>
+<br>
 ## 💡 Main Features
   
 ### 🔍 장학금 통합 검색 및 상세정보 조회
@@ -104,7 +102,7 @@
 ### 💬 챗봇 FAQ
 <p>
   <img src="https://github.com/user-attachments/assets/c4f745c8-6ff0-418f-8ff0-abbd5f6e7e48" width="200"/>
-  <img src="https://github.com/user-attachments/assets/ca9b3918-2807-40f2-947c-d81d59a1dd82" width="200"/>
+  <img src="https://github.com/user-attachments/assets/f4b7ad27-2027-4de6-801a-fabd28a8e4172" width="200"/>
 </p>
 자주 묻는 질문에 대해 빠른 응답을 제공받을 수 있습니다.
 
@@ -233,7 +231,7 @@ pip install -r requirements.txt
 uvicorn api.chatbot_server:app --reload
 uvicorn api.recommend_server:app --reload --port 8001
 ```
-
+<sub>💡 Pythhon 3.8 이상 권장<br></sub>
 
 <br><br>
  
