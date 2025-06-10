@@ -164,8 +164,14 @@ flutter run
 ### Backend (Spring Boot)
 
 ```bash
+# CLI로 실행
 cd backend
-./gradlew bootRun
+./gradlew build     # 처음 실행 시 의존성 설치
+./gradlew bootRun   # 서버 실행
+
+# IntelliJ로 실행
+1. 'backend/' 폴더 열기
+2. `CapstoneApplication.java`에서 실행
 ```
 
 <sub>💡 기본 포트: `8080`<br></sub>
