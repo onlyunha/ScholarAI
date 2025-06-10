@@ -98,6 +98,7 @@
 <br><br>
 ### 🤖 맞춤형 장학금 추천
 <p>
+  <img src="https://github.com/user-attachments/assets/90414cb9-3d66-44fd-98ea-e30947570504" width="200"/>
   <img src="https://github.com/user-attachments/assets/fa186138-cffe-4daa-838a-5ceab132f535" width="200"/>
 </p>
 사용자 프로필 기반 신청할 수 있는 장학금을 추천받을 수 있습니다. 
@@ -114,6 +115,7 @@
 ### 📱 커뮤니티 
 <p>
   <img src="https://github.com/user-attachments/assets/87fb03ac-d49d-4c12-8b30-3ccc8c308967" width="200"/>
+  <img src="https://github.com/user-attachments/assets/3cc02b9e-2703-4d71-937b-dc8627556cf1" width="200"/>
 </p>
 사용자들끼리 정보를 공유하면서 소통할 수 있습니다.
 
