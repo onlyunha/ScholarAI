@@ -69,7 +69,8 @@
 [![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com)
 <br><br>
 
-### <sub>📌시스템 구조도<img src="https://github.com/user-attachments/assets/e93c206a-3115-4260-841e-f9dd5cd255e9" width="800"/><br><br></sub>
+### <sub>📌시스템 구조도 <br> 
+<img src="https://github.com/user-attachments/assets/e93c206a-3115-4260-841e-f9dd5cd255e9" width="800"/><br><br></sub>
 
 <br>
 
