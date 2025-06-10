@@ -32,7 +32,7 @@
     <tr>
       <td>🤖 <strong>곽나현</strong></td>
       <td><strong>AI</strong></td>
-      <td>챗봇 구축 및 장학금 추천 알고리즘 개발</td>
+      <td>장학금 추천 알고리즘 및 챗봇 개발</td>
     </tr>
   </tbody>
 </table>
@@ -108,6 +108,16 @@ ScholarAI/
 <br><br>
 <br><br>
 ## 🚀 How to Run
+### Requirments
+For building and running the application you need:
+- Python 3.8
+
+### Installation
+<div align="left">
+```bash
+git clone https://github.com/onlyunha/ScholarAI.git
+cd ScholarAI
+</div>```
 
 #### 1. Frontend (Flutter)
 
@@ -132,17 +142,16 @@ cd backend
 <sub>💡 JDK 17 이상 권장<br></sub>
 
 <br><br>
-#### 3. AI Server (FastAPI)
+#### 3. AI
 
+<div align="left">
 ```bash
-cd ai
+cd AI
 pip install -r requirements.txt
-uvicorn api:app --reload --port 8000
-```
+uvicorn api.chatbot_server:app --reload
+uvicorn api.recommend_server:app --reload --port 8001
+</div>```
 
-<sub>💡 Python 3.8 이상 권장<br></sub>
-<sub>💡 기본 포트: `8000`<br></sub>
-<sub>💡 API 문서는 `/docs` 에서 Swagger UI 제공<br></sub>
 <br><br>
 <br><br>
 
