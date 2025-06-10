@@ -92,16 +92,31 @@ ScholarAI/
 │   ├── src/main/resources/           설정 파일, application.yml 등
 │   └── build.gradle / pom.xml        빌드 설정
 │
-├── ai/                               FastAPI 기반 추천 시스템 및 챗봇
-│   ├── api.py                        FastAPI 엔트리포인트
-│   ├── model.py                      장학금 추천 모델 로직
-│   ├── chatbot/                      챗봇 질문 분류, 응답 처리 모듈
-│   └── requirements.txt              의존성 리스트
-│
-├── docs/                             시스템 구조도, 설계서, 발표자료
+├── ai/                               # FastAPI 기반 추천 시스템 및 챗봇 서버
+│   ├── .gitignore                    # Git에 포함하지 않을 파일/폴더 목록
+│   ├── requirements.txt              # Python 패키지 의존성 목록
+│   ├── api/                          # FastAPI 서버 엔트리포인트
+│   │   ├── chatbot_server.py         # 챗봇 API 서버
+│   │   └── recommend_server.py       # 장학금 추천 API 서버
+│   ├── config/                       # 설정 관련 모듈
+│   │   └── settings.py               # 환경 변수 및 설정 파일
+│   ├── faq_chatbot/                  # FAQ 챗봇 로직
+│   │   └── faq_loader.py             # FAQ 데이터 로더 및 전처리
+│   ├── langchain_app/                # LangChain 기반 추천 시스템
+│   │   ├── chain.py                  # LangChain 체인 구성
+│   │   ├── embedder.py               # 문장 임베딩 모듈
+│   │   ├── loader.py                 # 문서 로딩 및 가공
+│   │   ├── prompt_template.py        # GPT 프롬프트 정의
+│   │   └── retriever.py              # 벡터 검색 및 검색기능
+│   ├── models/                       # Pydantic 모델 정의
+│   │   └── user_input.py             # 사용자 입력 모델
+│   └── utils/                        # 전처리 및 유틸성 스크립트
+│       ├── convert_xlsx_to_json.py   # 엑셀 → JSON 변환기
+│       ├── faq_preprocessing.py      # FAQ 전처리
+│       ├── recommend_preprocessing.py# 추천 데이터 전처리
+│       └── scholarship_fetcher.py    # 장학금 크롤러 또는 수집기
 ├── .gitignore                        Git 제외 파일 설정
 └── README.md                         프로젝트 개요 및 실행 가이드
-
 ```
 <div align="center">
 
