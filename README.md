@@ -92,7 +92,7 @@ ScholarAI/
 │   ├── src/main/resources/           설정 파일, application.yml 등
 │   └── build.gradle / pom.xml        빌드 설정
 │
-├── ai/                               # FastAPI 기반 추천 시스템 및 챗봇 서버
+├── AI/                               # FastAPI 기반 추천 시스템 및 챗봇 서버
 │   ├── .gitignore                    # Git에 포함하지 않을 파일/폴더 목록
 │   ├── requirements.txt              # Python 패키지 의존성 목록
 │   ├── api/                          # FastAPI 서버 엔트리포인트
