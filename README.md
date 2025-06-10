@@ -242,4 +242,7 @@ uvicorn api.recommend_server:app --reload --port 8001
 
 <br><br>
 <br><br>
+<img src="https://github.com/user-attachments/assets/a17910e6-e5bc-449e-9bdf-e1246efc4650" width="1000"/>
+
+
 </div>
