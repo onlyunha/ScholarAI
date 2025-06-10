@@ -149,7 +149,7 @@ flutter run
 <sub>💡 Android Emulator 또는 iOS Simulator 필요<br></sub>
 <br><br>
 
-#### Backend (Spring Boot)
+### Backend (Spring Boot)
 
 ```bash
 cd backend
@@ -161,7 +161,7 @@ cd backend
 <sub>💡 JDK 17 이상 권장<br></sub>
 
 <br><br>
-#### AI
+### AI
 
 <div align="left">
   
