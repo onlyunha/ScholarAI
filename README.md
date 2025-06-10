@@ -1,5 +1,5 @@
 <div align="left">
-  # 🎓 ScholarAI
+  <h1>🎓 ScholarAI</h1> 
   <img src="https://github.com/user-attachments/assets/669b34b0-9d33-4e13-b0f9-c84dda51e862" width="1000"
     /><br><br>
 </div>
