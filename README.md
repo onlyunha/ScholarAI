@@ -46,16 +46,16 @@
 <sub> <img src="https://github.com/user-attachments/assets/e93c206a-3115-4260-841e-f9dd5cd255e9" width="1000"
     /><br><br></sub>
     
-#### Frontend
+## Frontend
 [![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
 
-#### Backend
+## Backend
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![Spring Security](https://img.shields.io/badge/Spring_Security-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white)](https://spring.io/projects/spring-security)
 [![Spring Data JPA](https://img.shields.io/badge/Spring_Data_JPA-007396?style=for-the-badge)](https://spring.io/projects/spring-data-jpa)
 [![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)](https://jwt.io)
 
-#### AI & Chatbot
+## AI & Chatbot
 [![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com)
 [![LangChain](https://img.shields.io/badge/LangChain-000000?style=for-the-badge)](https://www.langchain.com)
 [![ChromaDB](https://img.shields.io/badge/Chroma-FF6F61?style=for-the-badge)](https://www.trychroma.com)
