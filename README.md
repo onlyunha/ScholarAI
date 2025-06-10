@@ -83,16 +83,16 @@
 
 ```
 ScholarAI/
-├── frontend/                         Flutter 모바일 앱 (크로스 플랫폼)
+├── frontend/                         # Flutter 모바일 앱 (크로스 플랫폼)
 │   ├── lib/
-│   │   ├── screens/                  로그인, 홈, 프로필 등 각 페이지 UI
-│   │   ├── widgets/                  재사용 가능한 UI 컴포넌트
-│   │   ├── providers/                상태 관리 (Auth, Profile 등)
-│   │   ├── services/                 알림, 게시판, API 연동
-│   │   ├── constants/                색상, 문자열, 이미지 등 전역 상수
-│   │   └── main.dart                 앱 진입점
-│   ├── ios/, android/, macos/...     플랫폼별 빌드 설정
-│   └── web/                          PWA용 리소스 (icons, manifest 등)
+│   │   ├── screens/                  # 로그인, 홈, 프로필 등 각 페이지 UI
+│   │   ├── widgets/                  # 재사용 가능한 UI 컴포넌트
+│   │   ├── providers/                # 상태 관리 (Auth, Profile 등)
+│   │   ├── services/                 # 알림, 게시판, API 연동
+│   │   ├── constants/                # 색상, 문자열, 이미지 등 전역 상수
+│   │   └── main.dart                 # 앱 진입점
+│   ├── ios/, android/, macos/...     # 플랫폼별 빌드 설정
+│   └── web/                          # PWA용 리소스 (icons, manifest 등)
 │
 ├── backend/                          # Spring Boot 기반 REST API 서버
 │   ├─ Dockerfile                     # 도커 이미지 빌드 설정
