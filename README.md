@@ -1,4 +1,4 @@
-<div align="center">
+<div align="left">
   <img src="https://github.com/user-attachments/assets/669b34b0-9d33-4e13-b0f9-c84dda51e862" width="1000"
     /><br><br>
 
@@ -81,7 +81,7 @@
   <img src="https://github.com/user-attachments/assets/4d719330-c391-440d-a144-dda534ad80a1" width="200"/>
 </p>
 
-<i> 장학금 통합 검색 기능을 통해 장학금 상세 정보를 조회할 수 있습니다. </i>
+장학금 통합 검색 기능을 통해 장학금 상세 정보를 조회할 수 있습니다.
 
 <br><br>
 ### ❤ 관심 장학금 찜 기능 및 일정 관리
@@ -89,7 +89,7 @@
   <img src="https://github.com/user-attachments/assets/a579450e-2191-4059-ad99-6cf1d8f74ee4" width="200"/>
   <img src="https://github.com/user-attachments/assets/eff42b16-c25d-4c2a-8988-ec90b5844892" width="200"/>
 </p>
-<i> 관심 장학금을 찜하고, 일정 관리 기능을 통해 모집 마감일 하루 전에 알림을 받을 수 있습니다. </i>  
+관심 장학금을 찜하고, 일정 관리 기능을 통해 모집 마감일 하루 전에 알림을 받을 수 있습니다. 
 
 <br><br>
 ### 🤖 맞춤형 장학금 추천
@@ -104,14 +104,14 @@
   <img src="https://github.com/user-attachments/assets/c4f745c8-6ff0-418f-8ff0-abbd5f6e7e48" width="200"/>
   <img src="https://github.com/user-attachments/assets/ca9b3918-2807-40f2-947c-d81d59a1dd82" width="200"/>
 </p>
-<i> 자주 묻는 질문에 대해 빠른 응답을 제공받을 수 있습니다. </i>
+자주 묻는 질문에 대해 빠른 응답을 제공받을 수 있습니다.
 
 <br><br>
 ### 📱 커뮤니티 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/87fb03ac-d49d-4c12-8b30-3ccc8c308967" width="200"/>
 </p>
-<i> 사용자들끼리 정보를 공유하면서 소통할 수 있습니다. </i>
+사용자들끼리 정보를 공유하면서 소통할 수 있습니다.
 
 
 <br><br>
@@ -227,6 +227,7 @@ cd backend
 <sub>💡 IntelliJ 또는 CLI<br></sub>
 
 <br>
+
 ### AI
 
 <div align="left">
