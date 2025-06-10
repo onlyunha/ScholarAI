@@ -1,7 +1,9 @@
-<div align="center">
-  <h1>🎓 ScholarAI</h1>
+<div align="left">
+  # 🎓 ScholarAI
   <img src="https://github.com/user-attachments/assets/669b34b0-9d33-4e13-b0f9-c84dda51e862" width="1000"
     /><br><br>
+</div>
+<div align ="center">
   <p><strong>ScholarAI</strong>는 장학금 정보 탐색의 복잡함을 덜고,<br>
   <strong>개인 맞춤형 추천</strong>을 통해 사용자가 <strong>가장 알맞은 장학금</strong>을<br>
   쉽고 빠르게 찾을 수 있도록 도와주는 <strong>모바일 애플리케이션</strong>입니다.<br><br><br><br></p>
