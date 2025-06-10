@@ -114,10 +114,12 @@ For building and running the application you need:
 
 ### Installation
 <div align="left">
+  
 ```bash
 git clone https://github.com/onlyunha/ScholarAI.git
 cd ScholarAI
-</div>```
+```
+</div>
 
 #### 1. Frontend (Flutter)
 
@@ -145,12 +147,15 @@ cd backend
 #### 3. AI
 
 <div align="left">
-```bash
+  
+``` bash
 cd AI
 pip install -r requirements.txt
 uvicorn api.chatbot_server:app --reload
 uvicorn api.recommend_server:app --reload --port 8001
-</div>```
+```
+</div>
+
 
 <br><br>
 <br><br>
