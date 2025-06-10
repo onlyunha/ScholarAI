@@ -90,8 +90,6 @@ ScholarAI/
 ├── backend/                          # Spring Boot 기반 REST API 서버
 │   ├─ Dockerfile                     # 도커 이미지 빌드 설정
 │   ├─ docker-compose.yml             # 컨테이너 구성 파일
-│   ├─ .env                           # 환경변수 파일
-│   ├─ README.md
 │   ├─ build.gradle                   # Gradle 빌드 설정
 │   ├─ settings.gradle
 │   ├── src/main/java/dankook.capstone    
@@ -104,7 +102,7 @@ ScholarAI/
 │   │   │  └─ response
 │   │   ├─ repository                 # 데이터베이스 접근
 │   │   └─ service                    # 비즈니스 로직
-│   ├── src/main/resources/           #설정 파일, application.yml 등
+│   ├── src/main/resources/           # 설정 파일, application.yml 등
 │
 ├── AI/                               # FastAPI 기반 추천 시스템 및 챗봇 서버
 │   ├── .gitignore                    # Git에 포함하지 않을 파일/폴더 목록
