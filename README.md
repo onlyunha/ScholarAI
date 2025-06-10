@@ -80,7 +80,7 @@
 ## 💡 Main Features
   
 ### 🔍 장학금 통합 검색 및 상세정보 조회
-<p align="center">
+<p>
   <img src="https://github.com/user-attachments/assets/7b9e80f4-f60a-47ed-b269-cd6e953f3110" width="200"/>
   <img src="https://github.com/user-attachments/assets/4d719330-c391-440d-a144-dda534ad80a1" width="200"/>
 </p>
@@ -89,7 +89,7 @@
 
 <br><br>
 ### ❤ 관심 장학금 찜 기능 및 일정 관리
-<p align="center">
+<p>
   <img src="https://github.com/user-attachments/assets/a579450e-2191-4059-ad99-6cf1d8f74ee4" width="200"/>
   <img src="https://github.com/user-attachments/assets/eff42b16-c25d-4c2a-8988-ec90b5844892" width="200"/>
 </p>
@@ -97,7 +97,7 @@
 
 <br><br>
 ### 🤖 맞춤형 장학금 추천
-<p align="center">
+<p>
   <img src="https://github.com/user-attachments/assets/fa186138-cffe-4daa-838a-5ceab132f535" width="200"/>
 </p>
 <i> 사용자 프로필 기반 신청할 수 있는 장학금을 추천받을 수 있습니다. </i>  
@@ -112,7 +112,7 @@
 
 <br><br>
 ### 📱 커뮤니티 
-<p align="center">
+<p>
   <img src="https://github.com/user-attachments/assets/87fb03ac-d49d-4c12-8b30-3ccc8c308967" width="200"/>
 </p>
 사용자들끼리 정보를 공유하면서 소통할 수 있습니다.
