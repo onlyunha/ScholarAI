@@ -237,12 +237,11 @@ uvicorn api.recommend_server:app --reload --port 8001
  
 ## 🔗 Related Links
 **Github** https://github.com/onlyunha/ScholarAI <br>
-**📝 Notion**:<br>
-**🎥 시연 영상**: <br>
+**📝 Notion**: https://enchanted-peripheral-3f3.notion.site/ScholarAI-Project-Plan-1b6f77a0e08e80209e6aeb0ea395fd47 <br>
+**🎥 시연 영상**: https://youtu.be/b5SWrRfFYVU?feature=shared
 
 <br><br>
 <br><br>
-<img src="https://github.com/user-attachments/assets/a17910e6-e5bc-449e-9bdf-e1246efc4650" width="1000"/>
 
 
 </div>
