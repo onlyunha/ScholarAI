@@ -1,4 +1,4 @@
-package dankook.capstone.dto;
+package dankook.capstone.dto.response;
 
 import dankook.capstone.domain.Member;
 import lombok.RequiredArgsConstructor;

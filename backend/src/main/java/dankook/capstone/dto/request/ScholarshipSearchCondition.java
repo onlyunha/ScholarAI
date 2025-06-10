@@ -1,4 +1,4 @@
-package dankook.capstone.dto;
+package dankook.capstone.dto.request;
 
 import dankook.capstone.domain.FinancialAidType;
 import lombok.AllArgsConstructor;

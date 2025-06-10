@@ -1,10 +1,9 @@
 package dankook.capstone.controller;
 
-import dankook.capstone.dto.ProfileRequestDto;
-import dankook.capstone.dto.ProfileResponseDto;
-import dankook.capstone.dto.ResponseDto;
+import dankook.capstone.dto.request.ProfileRequestDto;
+import dankook.capstone.dto.response.ProfileResponseDto;
+import dankook.capstone.dto.response.ResponseDto;
 import dankook.capstone.service.ProfileService;
-import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

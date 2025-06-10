@@ -1,7 +1,7 @@
 package dankook.capstone.auth;
 
 import dankook.capstone.domain.Member;
-import dankook.capstone.dto.CustomUserDetails;
+import dankook.capstone.dto.response.CustomUserDetails;
 import dankook.capstone.repository.MemberRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

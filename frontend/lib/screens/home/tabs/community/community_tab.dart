@@ -142,13 +142,13 @@ class _CommunityTabState extends State<CommunityTab> {
                                 color: Colors.grey,
                               ),
                               const SizedBox(width: 4),
-                              Text(
-                                '${post['commentCount']}',
-                                style: const TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 13,
-                                ),
-                              ),
+                              // Text(
+                              //   '${post['commentCount']}',
+                              //   style: const TextStyle(
+                              //     color: Colors.grey,
+                              //     fontSize: 13,
+                              //   ),
+                              // ),
                               const SizedBox(width: 12),
                               Text(
                                 post['createdAt'].substring(0, 10),

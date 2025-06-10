@@ -2,7 +2,11 @@ package dankook.capstone.controller;
 
 import dankook.capstone.domain.Member;
 import dankook.capstone.domain.Post;
-import dankook.capstone.dto.*;
+import dankook.capstone.dto.request.PostRequestDto;
+import dankook.capstone.dto.response.CustomUserDetails;
+import dankook.capstone.dto.response.PostDetailResponseDto;
+import dankook.capstone.dto.response.PostResponseDto;
+import dankook.capstone.dto.response.ResponseDto;
 import dankook.capstone.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

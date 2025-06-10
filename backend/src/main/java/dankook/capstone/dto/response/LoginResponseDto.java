@@ -1,12 +1,12 @@
-package dankook.capstone.dto;
+package dankook.capstone.dto.response;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class KakaoLoginResponse {
-    private JwtTokenDto jwtTokenDto;
+public class LoginResponseDto {
     private Long memberId;
     private Long profileId;
 }

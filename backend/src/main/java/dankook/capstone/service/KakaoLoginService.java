@@ -1,11 +1,11 @@
 package dankook.capstone.service;
 
 import dankook.capstone.auth.JWTUtil;
-import dankook.capstone.dto.JwtTokenDto;
+import dankook.capstone.dto.response.JwtTokenDto;
 import dankook.capstone.domain.Member;
-import dankook.capstone.dto.CustomUserDetails;
-import dankook.capstone.dto.KakaoLoginRequestDto;
-import dankook.capstone.dto.KakaoLoginResponse;
+import dankook.capstone.dto.response.CustomUserDetails;
+import dankook.capstone.dto.request.KakaoLoginRequestDto;
+import dankook.capstone.dto.response.KakaoLoginResponse;
 import dankook.capstone.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

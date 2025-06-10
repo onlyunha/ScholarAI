@@ -3,7 +3,7 @@ package dankook.capstone.service;
 import dankook.capstone.domain.Member;
 import dankook.capstone.domain.Scholarship;
 import dankook.capstone.domain.ScholarshipLike;
-import dankook.capstone.dto.ScholarshipLikeResponseDto;
+import dankook.capstone.dto.response.ScholarshipLikeResponseDto;
 import dankook.capstone.repository.MemberRepository;
 import dankook.capstone.repository.ScholarshipLikeRepository;
 import dankook.capstone.repository.ScholarshipRepository;

@@ -1,20 +1,13 @@
 package dankook.capstone.auth;
 
 import dankook.capstone.domain.Member;
-import dankook.capstone.dto.CustomUserDetails;
+import dankook.capstone.dto.response.CustomUserDetails;
 import dankook.capstone.repository.MemberRepository;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
-
-import static dankook.capstone.domain.QMember.member;
 
 @Service
 @RequiredArgsConstructor

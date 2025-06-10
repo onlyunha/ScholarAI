@@ -1,8 +1,8 @@
 package dankook.capstone.controller;
 
-import dankook.capstone.dto.ChatbotRequestDto;
-import dankook.capstone.dto.ChatbotResponseDto;
-import dankook.capstone.dto.ResponseDto;
+import dankook.capstone.dto.request.ChatbotRequestDto;
+import dankook.capstone.dto.response.ChatbotResponseDto;
+import dankook.capstone.dto.response.ResponseDto;
 import dankook.capstone.service.ChatbotService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

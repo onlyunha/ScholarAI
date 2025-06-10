@@ -2,10 +2,10 @@ package dankook.capstone.controller;
 
 import dankook.capstone.domain.Comment;
 import dankook.capstone.domain.Member;
-import dankook.capstone.dto.CommentRequestDto;
-import dankook.capstone.dto.CommentResponseDto;
-import dankook.capstone.dto.CustomUserDetails;
-import dankook.capstone.dto.ResponseDto;
+import dankook.capstone.dto.request.CommentRequestDto;
+import dankook.capstone.dto.response.CommentResponseDto;
+import dankook.capstone.dto.response.CustomUserDetails;
+import dankook.capstone.dto.response.ResponseDto;
 import dankook.capstone.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

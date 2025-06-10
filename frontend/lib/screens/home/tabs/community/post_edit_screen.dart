@@ -47,7 +47,7 @@ class _PostEditScreenState extends State<PostEditScreen> {
     setState(() => _isSubmitting = true);
     try {
       await CommunityBoardService.updatePost(widget.postId, title, content);
-      if (mounted) Navigator.pop(context, true); // true: 수정 완료
+      if (mounted) context.go('/main?tab=community');
     } catch (e) {
       ScaffoldMessenger.of(
         context,

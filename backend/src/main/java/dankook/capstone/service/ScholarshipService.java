@@ -1,9 +1,8 @@
 package dankook.capstone.service;
 
-import dankook.capstone.domain.FinancialAidType;
 import dankook.capstone.domain.Scholarship;
-import dankook.capstone.dto.ScholarshipResponseDto;
-import dankook.capstone.dto.ScholarshipSearchCondition;
+import dankook.capstone.dto.response.ScholarshipResponseDto;
+import dankook.capstone.dto.request.ScholarshipSearchCondition;
 import dankook.capstone.repository.ScholarshipRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

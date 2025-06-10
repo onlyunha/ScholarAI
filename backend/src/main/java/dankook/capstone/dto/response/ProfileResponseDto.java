@@ -1,4 +1,4 @@
-package dankook.capstone.dto;
+package dankook.capstone.dto.response;
 
 import dankook.capstone.domain.AcademicStatus;
 import dankook.capstone.domain.Gender;

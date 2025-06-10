@@ -2,7 +2,7 @@ package dankook.capstone.service;
 
 import dankook.capstone.auth.JWTUtil;
 import dankook.capstone.domain.Member;
-import dankook.capstone.dto.MemberJoinDto;
+import dankook.capstone.dto.request.MemberJoinDto;
 import dankook.capstone.repository.MemberRepository;
 
 import dankook.capstone.repository.ScholarshipLikeRepository;

@@ -3,7 +3,7 @@
 /// Desc : 기본 메인 탭
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-04-19
-/// Updt : 2025-05-07
+/// Updt : 2025-06-08
 /// =============================================================
 library;
 
@@ -38,85 +38,61 @@ class HomeTab extends StatelessWidget {
                   imagePath: AppImages.homeCard2,
                   link: AppUrls.homeCard2,
                 ),
-                TipCard(
-                  imagePath: AppImages.homeCard3,
-                  link: AppUrls.homeCard3,
-                ),
+                // TipCard(
+                //   imagePath: AppImages.homeCard3,
+                //   link: AppUrls.homeCard3,
+                // ),
               ],
             ),
           ),
 
           const SizedBox(height: 24),
-
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child: Row(
+              children: const [
+                Text(
+                  '더 알아보기',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                SizedBox(width: 8),
+                Expanded(child: Divider(thickness: 1, color: Colors.grey)),
+              ],
+            ),
+          ),
           // 2️⃣ 아래 2/3 구간
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  // 튜토리얼 바로가기 (왼쪽)
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        context.push('/onboarding'); // ✅ GoRouter로 튜토리얼 이동
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.2),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: const Center(
-                          child: Text(
-                            '🎓 튜토리얼 바로가기',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-
-                  // 마감 임박 장학금 (오른쪽)
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.2),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: const Center(
-                        child: Text(
-                          '⏰ 마감 임박 장학금',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              children: [
+                _WideBanner(
+                  title: '튜토리얼 바로가기',
+                  subtitle: '앱 사용법을 처음부터 알려드려요',
+                  icon: (Icons.school),
+                  onTap: () => context.push('/onboarding'),
+                ),
+                const SizedBox(height: 5),
+                _WideBanner(
+                  title: '학교별 장학금',
+                  subtitle: '내 학교 맞춤 장학금 정보 확인',
+                  icon: Icons.account_balance,
+                  onTap: () async {
+                    final url = Uri.parse(AppUrls.homeCard3);
+                    if (await canLaunchUrl(url)) {
+                      await launchUrl(
+                        url,
+                        mode: LaunchMode.externalApplication,
+                      ); // 🔗 외부 브라우저
+                    } else {
+                      debugPrint('❌ 링크 열기 실패: $url');
+                    }
+                  },
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 24),
@@ -160,6 +136,69 @@ class TipCard extends StatelessWidget {
                   child: card,
                 )
                 : card,
+      ),
+    );
+  }
+}
+
+class _WideBanner extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _WideBanner({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        margin: const EdgeInsets.symmetric(vertical: 6),
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 32, color: kPrimaryColor),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(fontSize: 13, color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right, color: Colors.grey),
+          ],
+        ),
       ),
     );
   }

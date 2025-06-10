@@ -40,16 +40,16 @@ class SettingsTab extends StatelessWidget {
           _sectionDivider(),
 
           _buildSectionTitle('커뮤니티'),
-          _buildSimpleItem(
-            icon: Icons.article_outlined,
-            label: '내가 쓴 글',
-            onTap: () {},
-          ),
-          _buildSimpleItem(
-            icon: Icons.chat_bubble_outline,
-            label: '내가 쓴 댓글',
-            onTap: () {},
-          ),
+          // _buildSimpleItem(
+          //   icon: Icons.article_outlined,
+          //   label: '내가 쓴 글',
+          //   onTap: () {},
+          // ),
+          // _buildSimpleItem(
+          //   icon: Icons.chat_bubble_outline,
+          //   label: '내가 쓴 댓글',
+          //   onTap: () {},
+          // ),
           _buildSimpleItem(
             icon: Icons.rule,
             label: '커뮤니티 이용규칙',
@@ -74,12 +74,12 @@ class SettingsTab extends StatelessWidget {
           _sectionDivider(),
 
           _buildSectionTitle('기타'),
-          _buildSimpleItem(
-            icon: Icons.delete_forever,
-            label: '회원 탈퇴',
-            onTap: () {},
-            textColor: Colors.red,
-          ),
+          // _buildSimpleItem(
+          //   icon: Icons.delete_forever,
+          //   label: '회원 탈퇴',
+          //   onTap: () {},
+          //   textColor: Colors.red,
+          // ),
           _buildSimpleItem(
             icon: Icons.logout,
             label: '로그아웃',

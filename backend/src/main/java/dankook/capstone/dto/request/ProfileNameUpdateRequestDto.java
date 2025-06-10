@@ -1,4 +1,4 @@
-package dankook.capstone.dto;
+package dankook.capstone.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -8,10 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SignupNameUpdateRequestDto {
-
+public class ProfileNameUpdateRequestDto {
     @NotBlank
-    String email;
-    @NotBlank
-    String name;
+    private String name;
 }

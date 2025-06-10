@@ -1,10 +1,10 @@
 package dankook.capstone.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dankook.capstone.dto.CustomUserDetails;
-import dankook.capstone.dto.LoginRequestDto;
-import dankook.capstone.dto.LoginResponseDto;
-import dankook.capstone.dto.ResponseDto;
+import dankook.capstone.dto.response.CustomUserDetails;
+import dankook.capstone.dto.request.LoginRequestDto;
+import dankook.capstone.dto.response.LoginResponseDto;
+import dankook.capstone.dto.response.ResponseDto;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;

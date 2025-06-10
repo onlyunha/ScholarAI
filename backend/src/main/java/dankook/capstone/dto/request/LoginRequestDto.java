@@ -1,4 +1,4 @@
-package dankook.capstone.dto;
+package dankook.capstone.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

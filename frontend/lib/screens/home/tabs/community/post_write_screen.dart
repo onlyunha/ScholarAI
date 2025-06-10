@@ -3,7 +3,7 @@
 /// Desc : 커뮤니티 게시판 - 글쓰기 화면
 /// Auth : yunha Hwang (DKU)
 /// Crtd : 2025-06-01
-/// Updt : 2025-06-07
+/// Updt : 2025-06-08
 /// =============================================================
 
 import 'package:flutter/material.dart';
@@ -92,8 +92,11 @@ class _PostWriteScreenState extends State<PostWriteScreen> {
                         );
                         debugPrint('✅ 등록된 postId: $postId');
 
-                        // 성공 시 상세 페이지로 이동
-                        context.push('/post/detail/$postId');
+                        // 성공 시 리스트로 이동
+                        context.go('/main?tab=3&refresh=true');
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('게시글이 등록되었습니다')),
+                        );
                       } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('게시글 등록 실패: $e')),

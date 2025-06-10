@@ -1,8 +1,8 @@
-package dankook.capstone.dto;
+package dankook.capstone.dto.request;
 
 import dankook.capstone.domain.AcademicStatus;
 import dankook.capstone.domain.Gender;
-import dankook.capstone.domain.Profile;
+import dankook.capstone.dto.response.ProfileResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
