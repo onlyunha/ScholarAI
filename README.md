@@ -61,12 +61,12 @@
 [![ChromaDB](https://img.shields.io/badge/Chroma-FF6F61?style=for-the-badge)](https://www.trychroma.com)
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 
-#### Database & API Protocol
+## Database & API Protocol
 [![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com)
 [![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io)
 [![REST API](https://img.shields.io/badge/REST%20API-02569B?style=for-the-badge)]()
 
-#### External Services & Authentication
+## External Services & Authentication
 [![Google](https://img.shields.io/badge/Google-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://developers.google.com/identity)
 [![KakaoTalk](https://img.shields.io/badge/KakaoTalk-FFCD00?style=for-the-badge&logo=kakaotalk&logoColor=black)](https://developers.kakao.com)
 [![Gmail](https://img.shields.io/badge/Gmail-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](https://gmail.com)
