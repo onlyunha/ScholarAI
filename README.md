@@ -122,8 +122,9 @@ ScholarAI/
 
 <br><br>
 <br><br>
+<div align = "left">
 ## 🚀 How to Run
-### Requirments
+### Requirements
 For building and running the application you need:
 - Python 3.8
 
@@ -175,6 +176,7 @@ uvicorn api.recommend_server:app --reload --port 8001
 <br><br>
 <br><br>
 
+</div>
 ## 🔗 Related Links
 **Github** https://github.com/onlyunha/ScholarAI <br>
 **📝 Notion**:<br>
