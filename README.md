@@ -184,7 +184,6 @@ ScholarAI/
 ## 🚀 How to Run
 ## Requirements
 For building and running the application you need:
-- Python ≥ 3.8
 
 ## Installation
   
@@ -223,7 +222,6 @@ cd backend
 <sub>💡 JDK 17 이상 권장<br></sub>
 <sub>💡 Gradle 8.12.1<br></sub>
 <sub>💡 IntelliJ 또는 CLI<br></sub>
-
 <br>
 
 ### AI
