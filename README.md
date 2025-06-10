@@ -76,9 +76,7 @@
 ## 💡 Main Features
 ### 주요 기능
 
-![검색.png](attachment:https://github.com/user-attachments/assets/7b9e80f4-f60a-47ed-b269-cd6e953f3110)
-
-![상세정보.png](attachment:https://github.com/user-attachments/assets/4d719330-c391-440d-a144-dda534ad80a1)
+![검색](https://github.com/user-attachments/assets/7b9e80f4-f60a-47ed-b269-cd6e953f3110) ![상세정보](https://github.com/user-attachments/assets/4d719330-c391-440d-a144-dda534ad80a1)
 
 <br><br>
 <br><br>
