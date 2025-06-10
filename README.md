@@ -78,7 +78,7 @@
 
 ### 🔍 장학금 통합 검색 및 상세정보 조회
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/7b9e80f4-f60a-47ed-b269-cd6e953f3110" width="200"/>
+  <img src="https://github.com/user-attachments/assets/7b9e80f4-f60a-47ed-b269-cd6e953f3110" width="200"  border-radius: 20%/>
   <img src="https://github.com/user-attachments/assets/4d719330-c391-440d-a144-dda534ad80a1" width="200"/>
 </p>
 
