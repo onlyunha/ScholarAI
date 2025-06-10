@@ -74,7 +74,8 @@
 <br><br>
 <br><br>
 ## 💡 Main Features
-
+### <span style="backgroung-color: #7180CB"> 1. 장학금 통합 검색 </span> 
+<img src="https://github.com/user-attachments/assets/7b9e80f4-f60a-47ed-b269-cd6e953f3110">
 <br><br>
 <br><br>
 ## 📁 Project Structure
@@ -165,7 +166,7 @@ flutter run
 ```
 <sub>💡 Flutter SDK 설치 필요: [Flutter 설치 가이드](https://docs.flutter.dev/get-started/install)<br></sub>
 <sub>💡 Android Emulator 또는 iOS Simulator 필요<br></sub>
-<br><br>
+<br>
 
 ### Backend (Spring Boot)
 
@@ -186,7 +187,7 @@ cd backend
 <sub>💡 Gradle 8.12.1<br></sub>
 <sub>💡 IntelliJ 또는 CLI<br></sub>
 
-<br><br>
+<br>
 ### AI
 
 <div align="left">
