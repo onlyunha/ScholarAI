@@ -180,11 +180,8 @@ ScholarAI/
 ├── .gitignore                        Git 제외 파일 설정
 └── README.md                         프로젝트 개요 및 실행 가이드
 ```
-<div align="center">
 
 <br><br>
-<br><br>
-<div align = "left">
   
 ## 🚀 How to Run
 ## Requirements
@@ -192,13 +189,12 @@ For building and running the application you need:
 - Python ≥ 3.8
 
 ## Installation
-<div align="left">
   
 ```bash
 git clone https://github.com/onlyunha/ScholarAI.git
 cd ScholarAI
 ```
-</div>
+<br>
 
 ### Frontend (Flutter)
 
@@ -233,22 +229,15 @@ cd backend
 <br>
 
 ### AI
-
-<div align="left">
-  
 ``` bash
 cd AI
 pip install -r requirements.txt
 uvicorn api.chatbot_server:app --reload
 uvicorn api.recommend_server:app --reload --port 8001
 ```
-</div>
 
 
 <br><br>
-<br><br>
-
-</div>
  
 ## 🔗 Related Links
 **Github** https://github.com/onlyunha/ScholarAI <br>
