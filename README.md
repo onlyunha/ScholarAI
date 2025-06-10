@@ -68,6 +68,12 @@
 [![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com)
 <br><br>
 <sub>📌 [ScholarAI 시스템 구조도 보기](https://github.com/user-attachments/assets/e93c206a-3115-4260-841e-f9dd5cd255e9)</sub>
+<sub> <img src="https://github.com/user-attachments/assets/669b34b0-9d33-4e13-b0f9-c84dda51e862](https://github.com/user-attachments/assets/e93c206a-3115-4260-841e-f9dd5cd255e9" width="1000"
+    /><br><br></sub>
+
+<br><br>
+<br><br>
+## 💡 Main Features
 
 <br><br>
 <br><br>
@@ -139,7 +145,7 @@ ScholarAI/
 ## 🚀 How to Run
 ## Requirements
 For building and running the application you need:
-- Python 3.8
+- Python ≥ 3.8
 
 ## Installation
 <div align="left">
