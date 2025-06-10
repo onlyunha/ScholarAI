@@ -100,7 +100,7 @@
 <p>
   <img src="https://github.com/user-attachments/assets/fa186138-cffe-4daa-838a-5ceab132f535" width="200"/>
 </p>
-<i> 사용자 프로필 기반 신청할 수 있는 장학금을 추천받을 수 있습니다. </i>  
+사용자 프로필 기반 신청할 수 있는 장학금을 추천받을 수 있습니다. 
 
 <br><br>
 ### 💬 챗봇 FAQ
@@ -118,7 +118,6 @@
 사용자들끼리 정보를 공유하면서 소통할 수 있습니다.
 
 
-<br><br>
 <br><br>
 
 ## 📁 Project Structure
