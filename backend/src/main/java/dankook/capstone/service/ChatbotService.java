@@ -17,7 +17,7 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "feature.ai.enabled", havingValue = "true") //EC2에서 FastAPI 임시 제외
 public class ChatbotService {
-    @Value("${ai.api.url}")
+    @Value("${chat.api.url}")
     private String fastApiUrl;
 
     private final RestTemplate restTemplate = new RestTemplate();

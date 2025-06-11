@@ -47,37 +47,46 @@ public class JWTFilter extends OncePerRequestFilter { //JWT 검증
         //"Bearer " 부분 제거 후 순수 JWT 토큰만 획득
         String token = authorization.split(" ")[1];
 
-        //토큰 소멸 시간 검증
-        if(jwtUtil.isExpired(token)){
-            System.out.println("token expired");
-            filterChain.doFilter(request, response);
+        try{
+            //토큰 소멸 시간 검증
+            if(jwtUtil.isExpired(token)){
+                System.out.println("token expired");
+                filterChain.doFilter(request, response);
 
-            //조건이 해당되면 메소드 종료
-            return;
-        }
+                //조건이 해당되면 메소드 종료
+                return;
+            }
 
-        //JWT 토큰에서 email과 role 획득
-        String email = jwtUtil.getEmail(token);
-        String role = jwtUtil.getRole(token);
+            //JWT 토큰에서 email과 role 획득
+            String email = jwtUtil.getEmail(token);
+            String role = jwtUtil.getRole(token);
 
-        //Member 객체를 생성하여 값 set -> jwt 인증에서는 비밀번호 필요 없음.
-//        Member member = Member.builder()
+            //Member 객체를 생성하여 값 set -> jwt 인증에서는 비밀번호 필요 없음.
+            //Member member = Member.builder()
 //                .email(email)
 //                .password("") //빈 문자열
 //                .role(role)
 //                .build();
 
-        Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
+            Member member = memberRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
 
-        //UserDetails에 회원 정보 객체 담기
-        CustomUserDetails customUserDetails = new CustomUserDetails(member);
+            //UserDetails에 회원 정보 객체 담기
+            CustomUserDetails customUserDetails = new CustomUserDetails(member);
 
-        //스프링 시큐리티 인증 토큰 생성
-        Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
+            //스프링 시큐리티 인증 토큰 생성
+            Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
 
-        //세션에 사용자 등록(SecurityContextHolder에 인증 정보 저장)
-        SecurityContextHolder.getContext().setAuthentication(authToken);
+            //세션에 사용자 등록(SecurityContextHolder에 인증 정보 저장)
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+        }catch (io.jsonwebtoken.ExpiredJwtException e) {
+            //토큰 만료됐지만 permitAll 경로일 수 있으므로 그냥 통과
+            System.out.println("catch: Expired JWT - 통과시킴");
+        } catch (Exception e) {
+            //기타 예외 → 로그 찍고 통과
+            System.out.println("catch: 기타 JWT 처리 예외 - " + e.getMessage());
+        }
+
 
         //JWT 검증이 끝난 후 요청을 다음 필터로 넘김
         filterChain.doFilter(request, response);
