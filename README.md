@@ -228,8 +228,8 @@ cd backend
 ``` bash
 cd AI
 pip install -r requirements.txt
-uvicorn api.chatbot_server:app --reload
-uvicorn api.recommend_server:app --reload --port 8001
+uvicorn api.fastapi_server:app --reload --host 127.0.0.1 --port 8000
+uvicorn faq_chatbot.run_test:app --reload --host 127.0.0.1 --port 8001
 ```
 <sub>💡 Pythhon 3.8 이상 권장<br></sub>
 
